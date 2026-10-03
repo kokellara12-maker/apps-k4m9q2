@@ -41,6 +41,27 @@
       "href": "colorrush.html",
       "icono": "🌈",
       "color": "#b05cff"
+    },
+    {
+      "nombre": "Merge Planets",
+      "desc": "Suelta planetas, junta los iguales y llega al Sol. Estilo Suika en pixel art.",
+      "href": "planets.html",
+      "icono": "🪐",
+      "color": "#ffa300"
+    },
+    {
+      "nombre": "Survivors",
+      "desc": "Sobrevive a hordas: armas automáticas, gemas, mejoras y jefes. Joystick flotante.",
+      "href": "survivors.html",
+      "icono": "🧙",
+      "color": "#ff004d"
+    },
+    {
+      "nombre": "Last Hill",
+      "desc": "Defensa de torres pixel: arqueros, cañones, hielo y rayos contra oleadas y jefes.",
+      "href": "lasthill.html",
+      "icono": "🏰",
+      "color": "#00e436"
     }
   ]
 }
