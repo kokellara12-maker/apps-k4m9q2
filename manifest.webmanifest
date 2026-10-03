@@ -1,7 +1,7 @@
 {
-  "name": "Mis Apps",
-  "short_name": "Mis Apps",
-  "description": "Mis apps y juegos, con o sin internet.",
+  "name": "Koke Phone",
+  "short_name": "Koke Phone",
+  "description": "Mi móvil dentro del móvil, con o sin internet.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

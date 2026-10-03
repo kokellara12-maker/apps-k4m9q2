@@ -1,15 +1,13 @@
 // Mis Juegos: modo offline.
 // Cambia el número de versión si quieres forzar una recarga completa.
-const CORE = 'mis-juegos-core-v2';
-const RUN = 'mis-juegos-run-v1';
+const CORE = 'mis-juegos-core-v3';
+const RUN = 'mis-juegos-run-v2';
 const PRECACHE = [
   './',
   './index.html',
-  './juegos.json',
+  './apps.json',
   './manifest.webmanifest',
   './runner3d.html',
-  './calculadora.html',
-  './koke-phone.html',
   './icon-180.png',
   './icon-192.png',
   './icon-512.png',

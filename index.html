@@ -2,254 +2,1226 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Mis Apps">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0614">
-<title>Mis Apps</title>
+<meta name="apple-mobile-web-app-title" content="Koke Phone">
 <link rel="manifest" href="manifest.webmanifest">
+<title>Koke Phone</title>
 <link rel="apple-touch-icon" href="icon-180.png">
 <style>
-  /* Hub de juegos: cabecera grande, tarjetas en rejilla, estado offline arriba a la derecha */
+  /* Koke Phone: un móvil dentro del móvil. Fondo oscuro, acentos cian / magenta / violeta. */
   :root {
-    --bg: #0a0614;
-    --panel: #150d2a;
-    --line: #2d2052;
-    --ink: #f1ecff;
-    --dim: #9a8fc2;
-    --cyan: #00f0ff;
+    --ink: #f4f1ff;
+    --dim: #a69fc4;
+    --bg: #0c0a14;
+    --panel: #181428;
+    --line: #2b2444;
+    --cyan: #00e5f0;
     --mag: #ff2bd6;
+    --vio: #7a4dff;
     --yel: #ffd23f;
     --ok: #3dff9a;
-    --font: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --bad: #ff5d73;
+    --sb: 44px;
+    --hb: calc(env(safe-area-inset-bottom, 0px) + 24px);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Rounded", system-ui, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     color-scheme: dark;
   }
+  html.standalone { --sb: max(env(safe-area-inset-top, 0px), 20px); }
   * { box-sizing: border-box; }
-  html { background: var(--bg); }
-  body {
+  html, body {
     margin: 0;
-    padding-inline: 16px;
-    padding-block: 20px 40px;
-    background: var(--bg);
+    height: 100%;
+    background: #000;
     color: var(--ink);
     font-family: var(--font);
+    overflow: hidden;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
   }
-  main { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
-
-  header { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
-  h1 {
-    margin: 0;
-    font-size: clamp(44px, 13vw, 76px);
-    line-height: 0.92;
-    font-weight: 900;
-    font-style: italic;
-    letter-spacing: 0.005em;
-    text-shadow: 0 0 24px rgba(255, 43, 214, 0.6);
-  }
-  h1 span { color: var(--cyan); text-shadow: 0 0 24px rgba(0, 240, 255, 0.55); }
-
-  #status {
-    align-self: flex-start;
-    display: inline-flex;
+  button { font: inherit; color: inherit; }
+  .stage {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 7px 12px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--panel);
-    color: var(--dim);
-    font-size: 13px;
+    justify-content: center;
+    background: #07050d;
+  }
+  .phone {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: 430px;
+    overflow: hidden;
+    background: #000;
+    isolation: isolate;
+  }
+  @media (min-width: 600px) and (min-height: 720px) {
+    html:not(.standalone) .phone {
+      height: min(900px, 94%);
+      width: 400px;
+      border-radius: 54px;
+      border: 10px solid #1b1826;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 0 2px #2a2540;
+    }
+    html:not(.standalone) .phone::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 108px;
+      height: 30px;
+      margin-left: -54px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 80;
+    }
+  }
+
+  /* fondo de pantalla */
+  .wall { position: absolute; inset: 0; z-index: 0; }
+
+  /* barra de estado */
+  .sb {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: var(--sb);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 28px 7px;
+    font-size: 15px;
     font-weight: 700;
+    z-index: 50;
+    pointer-events: none;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
   }
-  #status i { width: 9px; height: 9px; border-radius: 50%; background: var(--yel); flex: none; }
-  #status[data-s="ok"] i { background: var(--ok); box-shadow: 0 0 10px var(--ok); }
-  #status[data-s="off"] i { background: var(--mag); }
+  html.standalone .sb { display: none; }
+  .sb .r { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); display: inline-block; }
+  .dot.off { background: var(--bad); }
 
-  #tip {
-    margin: 0;
-    padding: 12px 14px;
-    border: 1px dashed var(--line);
-    border-radius: 12px;
-    color: var(--dim);
-    font-size: 14px;
-    line-height: 1.5;
-  }
-  #tip b { color: var(--ink); }
-
-  #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 14px; }
-  .game {
-    --c: var(--cyan);
+  /* pantalla de bloqueo */
+  .lock {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    min-width: 0;
-    padding: 18px;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: var(--panel);
-    color: inherit;
-    text-decoration: none;
-    box-shadow: inset 0 0 0 1px transparent;
-    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    align-items: center;
+    text-align: center;
+    padding: calc(var(--sb) + 56px) 24px calc(var(--hb) + 34px);
+    background: rgba(0, 0, 0, 0.22);
+    transition: transform 0.45s cubic-bezier(0.3, 0.9, 0.2, 1), opacity 0.45s;
+    touch-action: none;
   }
-  .game:hover, .game:focus-visible {
-    border-color: var(--c);
-    box-shadow: 0 0 22px color-mix(in srgb, var(--c) 35%, transparent);
-    outline: none;
-  }
-  .game:active { transform: scale(0.985); }
-  .game h2 { margin: 0; font-size: 22px; font-weight: 900; font-style: italic; color: var(--c); overflow-wrap: anywhere; }
-  .game p { margin: 0; color: var(--dim); font-size: 14px; line-height: 1.45; }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tags span {
-    padding: 3px 9px;
-    border: 1px solid var(--line);
+  .lock.up { transform: translateY(-105%); opacity: 0; pointer-events: none; }
+  .lock.nox { transition: none; }
+  #lkDate { font-size: 20px; font-weight: 600; margin-bottom: 2px; }
+  #lkTime { font-size: 96px; line-height: 1; font-weight: 200; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .lock .hint { margin-top: auto; font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, 0.85); }
+  .lock .hint i { display: block; width: 44px; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.7); margin: 0 auto 12px; }
+  .lock .exit {
+    position: absolute;
+    top: calc(var(--sb) + 8px);
+    left: 14px;
+    padding: 8px 12px;
     border-radius: 999px;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--dim);
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
   }
-  .play { margin-top: auto; font-weight: 900; color: var(--c); }
+  @media (prefers-reduced-motion: no-preference) {
+    .lock .hint i { animation: nudge 1.8s ease-in-out infinite; }
+    @keyframes nudge { 50% { transform: translateY(-6px); opacity: 0.6; } }
+  }
 
-  .more { border-style: dashed; color: var(--dim); }
-  .more:hover { border-color: var(--line); box-shadow: none; }
-  .more h2 { color: var(--dim); font-size: 18px; }
+  /* inicio */
+  .home {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    padding: calc(var(--sb) + 14px) 18px calc(var(--hb) + 112px);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    transition: transform 0.32s cubic-bezier(0.2, 0.85, 0.25, 1), opacity 0.28s, filter 0.28s;
+  }
+  .home.away { transform: scale(0.9); opacity: 0; filter: blur(8px); pointer-events: none; }
+  .glass {
+    background: rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  .widget { border-radius: 28px; padding: 16px 20px; display: flex; flex-direction: column; gap: 2px; }
+  #wTime { font-size: 46px; line-height: 1.05; font-weight: 300; font-variant-numeric: tabular-nums; }
+  #wDate { font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, 0.85); }
+  #wNet { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.75); display: flex; gap: 7px; align-items: center; margin-top: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 8px; }
+  .app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  }
+  .app .ic {
+    width: 100%;
+    max-width: 62px;
+    aspect-ratio: 1;
+    border-radius: 22.5%;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: transform 0.1s;
+  }
+  .app:active .ic { transform: scale(0.92); }
+  .app svg { width: 56%; height: 56%; fill: none; stroke: #fff; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .app .ic b.em { font-size: 28px; font-weight: 800; line-height: 1; text-shadow: none; }
+  .app .lb { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dock {
+    position: absolute;
+    left: 12px; right: 12px;
+    bottom: calc(var(--hb) + 6px);
+    padding: 12px;
+    border-radius: 34px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
 
-  @media (prefers-reduced-motion: reduce) { .game { transition: none; } }
+  /* ventana de app */
+  .win {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: none;
+    flex-direction: column;
+    background: var(--bg);
+    transform: scale(0.1);
+    opacity: 0;
+    border-radius: 46px;
+    overflow: hidden;
+    transition: transform 0.34s cubic-bezier(0.2, 0.85, 0.25, 1), opacity 0.22s, border-radius 0.34s;
+  }
+  .win.show { display: flex; }
+  .win.open { transform: none; opacity: 1; border-radius: 0; }
+  .appbody {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--sb);
+    padding-bottom: var(--hb);
+  }
+  .scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
+  .ah { padding: 14px 20px 8px; font-size: 32px; font-weight: 800; letter-spacing: -0.02em; }
+  .pad { padding: 0 18px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 14px 16px; }
+  .sec { padding: 12px 6px 0; font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+  .note { margin: 0; font-size: 13px; line-height: 1.5; color: var(--dim); padding: 0 4px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn {
+    border: 0;
+    border-radius: 14px;
+    padding: 13px 16px;
+    font-weight: 800;
+    font-size: 16px;
+    background: var(--vio);
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn:active { filter: brightness(1.25); }
+  .btn.alt { background: #221c38; border: 1px solid var(--line); }
+  .btn.bad { background: var(--bad); color: #20040a; }
+  .btn.ok { background: var(--cyan); color: #04181a; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 14px; }
+  .chip:active { background: #2a2244; }
+  .sw { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 16px; }
+  .sw:first-child { border-top: 0; }
+  .sw input {
+    -webkit-appearance: none; appearance: none;
+    flex: none; width: 50px; height: 30px; border-radius: 15px; background: #3a3454; position: relative; transition: background 0.2s; margin: 0;
+  }
+  .sw input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
+  .sw input:checked { background: var(--cyan); }
+  .sw input:checked::after { transform: translateX(20px); }
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
+  .kv:first-child { border-top: 0; }
+  .kv span { color: var(--dim); }
+  input[type="range"] { width: 100%; accent-color: var(--cyan); margin: 8px 0 2px; }
+
+  /* contraseñas */
+  .pw { min-height: 74px; font-family: var(--mono); font-weight: 700; line-height: 1.25; word-break: break-all; -webkit-user-select: text; user-select: text; padding: 4px 2px 10px; }
+  .pw .d { color: var(--cyan); }
+  .pw .s { color: var(--mag); }
+  .meter { height: 8px; border-radius: 4px; background: #2a2440; overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 10%; border-radius: 4px; background: var(--bad); transition: width 0.25s, background 0.25s; }
+  .mrow { display: flex; justify-content: space-between; margin: 8px 0 12px; font-size: 14px; }
+  .mrow span { color: var(--dim); font-variant-numeric: tabular-nums; }
+  .lenrow { display: flex; justify-content: space-between; font-size: 16px; }
+  .lenrow b { color: var(--cyan); font-variant-numeric: tabular-nums; }
+
+  /* calculadora */
+  .calc { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 0 16px 8px; min-height: 0; }
+  .cdisp { flex: 0 0 24%; min-height: 96px; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; gap: 4px; padding: 0 6px; min-width: 0; }
+  .cexpr { min-height: 1.3em; color: var(--dim); font-size: 19px; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+  .cout { max-width: 100%; line-height: 1; font-weight: 300; font-size: 76px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .cpad { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(5, 1fr); gap: 10px; }
+  .cpad button { border: 0; border-radius: 999px; background: #1e1a2e; font-size: clamp(22px, 5.4vh, 32px); font-weight: 500; padding: 0; min-height: 0; }
+  .cpad button:active { filter: brightness(1.4); }
+  .cpad .fn { background: #3a3454; }
+  .cpad .op { background: #00c8d6; color: #07151a; font-weight: 700; }
+  .cpad .eq { background: var(--mag); color: #1a0416; font-weight: 700; }
+
+  /* cámara */
+  .cam { position: absolute; inset: 0; background: #000; overflow: hidden; }
+  .cam video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+  .cam video.mir { transform: scaleX(-1); }
+  .cam .msg { position: absolute; left: 24px; right: 24px; top: 38%; text-align: center; font-size: 16px; line-height: 1.5; color: var(--dim); }
+  .cam .bar {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 18px 28px calc(var(--hb) + 12px);
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
+  }
+  .shutter { width: 76px; height: 76px; border-radius: 50%; border: 5px solid #fff; background: transparent; padding: 0; position: relative; }
+  .shutter::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: #fff; transition: transform 0.1s; }
+  .shutter:active::after { transform: scale(0.86); }
+  .circ { width: 52px; height: 52px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.2); display: grid; place-items: center; overflow: hidden; padding: 0; background-size: cover; background-position: center; }
+  .circ svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+  .flash.go { animation: fl 0.35s ease-out; }
+  @keyframes fl { 0% { opacity: 0.9; } 100% { opacity: 0; } }
+
+  /* fotos */
+  .photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 0 3px; }
+  .photos button { aspect-ratio: 1; border: 0; padding: 0; background: #1e1a2e center / cover no-repeat; }
+  .empty { padding: 40px 28px; text-align: center; color: var(--dim); line-height: 1.55; font-size: 16px; }
+  .viewer { position: absolute; inset: 0; z-index: 5; background: #000; display: flex; flex-direction: column; padding-top: 0; }
+  .viewer img { flex: 1; min-height: 0; width: 100%; object-fit: contain; }
+  .viewer .vb { display: flex; gap: 10px; padding: 12px 16px calc(var(--hb) + 6px); background: #000; }
+  .viewer .vb > * { flex: 1; }
+  .viewer .vt { padding: calc(var(--sb) + 6px) 16px 8px; font-size: 14px; color: var(--dim); text-align: center; }
+
+  /* notas */
+  .nlist { display: flex; flex-direction: column; gap: 10px; }
+  .nitem { text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 13px 16px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .nitem b { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nitem span { font-size: 13px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fab { position: absolute; right: 20px; bottom: calc(var(--hb) + 16px); width: 58px; height: 58px; border-radius: 50%; border: 0; background: var(--yel); color: #1d1500; font-size: 32px; font-weight: 400; line-height: 1; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5); }
+  .editor { position: absolute; inset: 0; z-index: 5; background: var(--bg); display: flex; flex-direction: column; padding-top: var(--sb); padding-bottom: var(--hb); }
+  .editor .eb { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; }
+  .editor .eb button { background: none; border: 0; padding: 8px 6px; font-size: 16px; font-weight: 700; color: var(--yel); }
+  .editor .eb .del { color: var(--bad); }
+  .editor textarea { flex: 1; min-height: 0; border: 0; outline: 0; resize: none; background: transparent; color: var(--ink); font: 17px/1.5 var(--font); padding: 6px 20px 20px; -webkit-user-select: text; user-select: text; }
+
+  /* reloj */
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 4px 18px 14px; padding: 4px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+  .seg button { border: 0; border-radius: 10px; padding: 9px 0; background: none; font-size: 14px; font-weight: 700; color: var(--dim); }
+  .seg button.on { background: #2f2750; color: var(--ink); }
+  .big { font-size: 66px; font-weight: 200; text-align: center; padding: 18px 0 14px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .big.sm { font-size: 58px; }
+  .sub { text-align: center; color: var(--dim); font-size: 17px; font-weight: 600; margin-top: -8px; }
+  .laps { display: flex; flex-direction: column; }
+  .lap { display: flex; justify-content: space-between; padding: 10px 6px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; font-size: 16px; }
+  .lap span { color: var(--dim); }
+
+  /* linterna y dados */
+  .torch { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 0 20px calc(var(--hb) + 18px); transition: background 0.2s; }
+  .torch .chips { background: rgba(0, 0, 0, 0.35); padding: 10px; border-radius: 999px; }
+  .swatch { width: 38px; height: 38px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.5); padding: 0; }
+  .swatch.on { border-color: #000; box-shadow: 0 0 0 3px #fff; }
+  .result { text-align: center; font-size: 84px; font-weight: 800; padding: 22px 0 8px; min-height: 140px; font-variant-numeric: tabular-nums; }
+  .result.t { font-size: 52px; padding-top: 44px; }
+
+  /* juegos */
+  .frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #0a0614; }
+
+  /* ajustes */
+  .walls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .walls button { aspect-ratio: 9 / 16; border-radius: 12px; border: 2px solid transparent; padding: 0; }
+  .walls button.on { border-color: #fff; box-shadow: 0 0 0 2px var(--vio); }
+
+  /* aviso */
+  .toast {
+    position: absolute;
+    top: calc(var(--sb) + 6px);
+    left: 12px; right: 12px;
+    z-index: 70;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 22px;
+    background: rgba(40, 34, 64, 0.92);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    transform: translateY(-170%);
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+  .toast.show { transform: none; }
+  .toast .ti { flex: none; width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(145deg, var(--vio), var(--mag)); display: grid; place-items: center; }
+  .toast .ti svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .toast b { display: block; font-size: 14px; }
+  .toast span { display: block; font-size: 13px; color: var(--dim); }
+
+  /* barra de inicio */
+  .hit { position: absolute; left: 18%; right: 18%; bottom: 0; height: calc(env(safe-area-inset-bottom, 0px) + 30px); z-index: 90; touch-action: none; }
+  .hit i { position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) * 0.4 + 8px); width: 138px; max-width: 100%; height: 5px; margin-left: -69px; border-radius: 3px; background: rgba(255, 255, 255, 0.88); box-shadow: 0 0 6px rgba(0, 0, 0, 0.35); }
+
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .win, .home, .lock, .toast { transition-duration: 0.01s; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <h1>MIS<br><span>APPS</span></h1>
-    <div id="status" data-s="work"><i></i><span id="statusText">Comprobando…</span></div>
-  </header>
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="wall" id="wall"></div>
 
-  <p id="tip" hidden>Para tenerlos como app: toca <b>Compartir</b> en Safari y luego <b>Añadir a pantalla de inicio</b>. Ábrela una vez con internet y después funciona sin conexión.</p>
+    <div class="sb" id="sb"><span id="sbTime">--:--</span><span class="r"><span id="sbNet"></span><span id="sbBat"></span></span></div>
 
-  <section id="grid" aria-label="Lista de apps"></section>
-</main>
+    <section class="home away" id="home" aria-label="Pantalla de inicio">
+      <div class="widget glass">
+        <div id="wTime">--:--</div>
+        <div id="wDate"></div>
+        <div id="wNet"></div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <nav class="dock glass" id="dock" aria-label="Dock"></nav>
+    </section>
+
+    <section class="win" id="win" aria-label="Aplicación"><div class="appbody" id="appbody"></div></section>
+
+    <section class="lock" id="lock" aria-label="Pantalla de bloqueo">
+      <div id="lkDate"></div>
+      <div id="lkTime">--:--</div>
+      <div class="hint"><i></i>Desliza hacia arriba para desbloquear</div>
+    </section>
+
+    <div class="toast" id="toast" role="status">
+      <div class="ti"><svg viewBox="0 0 24 24"><path d="M6 17h12l-1.5-2V10a4.5 4.5 0 0 0-9 0v5z"/><path d="M10 20h4"/></svg></div>
+      <div><b id="tTitle"></b><span id="tText"></span></div>
+    </div>
+
+    <div class="hit" id="hb" role="button" aria-label="Ir al inicio"><i></i></div>
+  </div>
+</div>
 
 <script>
 (function () {
-  var FALLBACK = [
-    { nombre: 'Koke Phone', desc: 'Un móvil dentro del móvil: bloqueo, inicio, cámara, fotos, notas, contraseñas y más.', href: 'koke-phone.html', tags: ['móvil', 'cámara', 'apps'], color: '#7a4dff' },
-    { nombre: 'Neon Runner 3D', desc: 'Corre por una autopista neón, esquiva muros y recoge monedas.', href: 'runner3d.html', tags: ['3D', 'táctil', 'récord'], color: '#00f0ff' },
-    { nombre: 'Calculadora', desc: 'Calculadora normal con coma decimal, % y borrar.', href: 'calculadora.html', tags: ['app', 'simple'], color: '#ff2bd6' }
-  ];
+  'use strict';
 
-  var grid = document.getElementById('grid');
-  var status = document.getElementById('status');
-  var statusText = document.getElementById('statusText');
-
-  function setStatus(kind, text) {
-    status.setAttribute('data-s', kind);
-    statusText.textContent = text;
+  /* ---------- utilidades ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+  function h(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function rnd(n) {
+    var lim = Math.floor(4294967296 / n) * n;
+    var a = new Uint32Array(1);
+    do { crypto.getRandomValues(a); } while (a[0] >= lim);
+    return a[0] % n;
+  }
+  var mem = {};
+  function lsGet(k, def) {
+    try { var v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); }
+    catch (e) { return (k in mem) ? mem[k] : def; }
+  }
+  function lsSet(k, v) {
+    try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { mem[k] = v; }
   }
 
-  // consejo de instalación solo si no está ya instalada
-  var standalone = window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
-  if (!standalone) document.getElementById('tip').hidden = false;
+  var standalone = window.navigator.standalone === true ||
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  if (standalone) document.documentElement.classList.add('standalone');
 
-  function card(g) {
-    var a = document.createElement('a');
-    a.className = 'game';
-    a.href = g.href;
-    if (g.color) a.style.setProperty('--c', g.color);
-    var h = document.createElement('h2');
-    h.textContent = g.nombre;
-    var p = document.createElement('p');
-    p.textContent = g.desc || '';
-    a.appendChild(h);
-    a.appendChild(p);
-    if (g.tags && g.tags.length) {
-      var t = document.createElement('div');
-      t.className = 'tags';
-      g.tags.forEach(function (x) {
-        var s = document.createElement('span');
-        s.textContent = x;
-        t.appendChild(s);
+  /* ---------- ajustes ---------- */
+  var S = Object.assign({ wall: 'neon', lock: true, h24: true }, lsGet('kp.settings', {}));
+  function saveS() { lsSet('kp.settings', S); }
+
+  var WALLS = {
+    neon: { n: 'Neón', c: 'radial-gradient(120% 70% at 15% 0%, rgba(122,77,255,.95) 0%, transparent 60%), radial-gradient(110% 70% at 95% 100%, rgba(255,43,214,.85) 0%, transparent 58%), radial-gradient(80% 50% at 50% 55%, rgba(0,229,240,.35) 0%, transparent 70%), linear-gradient(160deg, #150b30, #07040f)' },
+    ocean: { n: 'Océano', c: 'linear-gradient(160deg, #021b3a, #0b5f8a 55%, #2ad0d0)' },
+    sunset: { n: 'Atardecer', c: 'linear-gradient(170deg, #2b1055, #d4418e 55%, #ffb347)' },
+    forest: { n: 'Bosque', c: 'linear-gradient(165deg, #04170f, #0f5a3c 60%, #9bd36a)' },
+    graph: { n: 'Grafito', c: 'linear-gradient(160deg, #0d0d12, #2a2a35)' }
+  };
+  function applyWall() { $('wall').style.background = (WALLS[S.wall] || WALLS.neon).c; }
+
+  /* ---------- sonido ---------- */
+  var actx = null;
+  function unlockAudio() {
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+    } catch (e) { actx = null; }
+  }
+  function beep(f, d, type, vol) {
+    if (!actx) return;
+    try {
+      var t0 = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(f, t0);
+      g.gain.setValueAtTime(vol || 0.1, t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t0); o.stop(t0 + d);
+    } catch (e) { /* sin sonido */ }
+  }
+  document.addEventListener('pointerdown', unlockAudio, { passive: true });
+
+  /* ---------- fotos (IndexedDB, con copia en memoria si falla) ---------- */
+  var DB = null, memPhotos = [];
+  var dbReady = new Promise(function (res) {
+    try {
+      var r = indexedDB.open('kokephone', 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore('photos', { keyPath: 'id', autoIncrement: true }); };
+      r.onsuccess = function () { DB = r.result; res(true); };
+      r.onerror = function () { res(false); };
+    } catch (e) { res(false); }
+  });
+  function photoAdd(blob) {
+    return dbReady.then(function (ok) {
+      var rec = { blob: blob, ts: Date.now() };
+      if (!ok) { rec.id = Date.now(); memPhotos.push(rec); return rec; }
+      return new Promise(function (res) {
+        var rq = DB.transaction('photos', 'readwrite').objectStore('photos').add(rec);
+        rq.onsuccess = function () { rec.id = rq.result; res(rec); };
+        rq.onerror = function () { rec.id = Date.now(); memPhotos.push(rec); res(rec); };
       });
-      a.appendChild(t);
-    }
-    var pl = document.createElement('div');
-    pl.className = 'play';
-    pl.textContent = 'Abrir ›';
-    a.appendChild(pl);
-    return a;
-  }
-
-  function more() {
-    var d = document.createElement('div');
-    d.className = 'game more';
-    var h = document.createElement('h2');
-    h.textContent = 'Próxima app';
-    var p = document.createElement('p');
-    p.textContent = 'Pídelo, súbelo y aparecerá aquí solo.';
-    d.appendChild(h);
-    d.appendChild(p);
-    return d;
-  }
-
-  function render(list) {
-    grid.textContent = '';
-    list.forEach(function (g) { grid.appendChild(card(g)); });
-    grid.appendChild(more());
-  }
-
-  function loadList() {
-    return fetch('juegos.json', { cache: 'no-cache' })
-      .then(function (r) { if (!r.ok) throw new Error('lista'); return r.json(); })
-      .then(function (j) { return j.juegos && j.juegos.length ? j.juegos : FALLBACK; })
-      .catch(function () { return FALLBACK; });
-  }
-
-  // descarga cada juego para que funcione sin internet
-  function saveAll(list) {
-    var ok = 0;
-    return list.reduce(function (p, g) {
-      return p.then(function () {
-        return fetch(g.href, { cache: 'reload' })
-          .then(function (r) { if (r.ok) ok++; })
-          .catch(function () {
-            return caches.match(g.href).then(function (hit) { if (hit) ok++; });
-          });
-      });
-    }, Promise.resolve()).then(function () { return ok; });
-  }
-
-  function plural(n) { return n + (n === 1 ? ' app guardada' : ' apps guardadas'); }
-
-  loadList().then(function (list) {
-    render(list);
-
-    if (!('serviceWorker' in navigator) || !('caches' in window)) {
-      setStatus('off', 'Este navegador no guarda para offline');
-      return;
-    }
-    if (!navigator.onLine) {
-      setStatus('off', 'Sin conexión · usando lo guardado');
-      return;
-    }
-    setStatus('work', 'Guardando para jugar sin internet…');
-    navigator.serviceWorker.register('sw.js').then(function () {
-      return navigator.serviceWorker.ready;
-    }).then(function () {
-      return saveAll(list);
-    }).then(function (ok) {
-      if (ok === list.length) setStatus('ok', 'Listo sin internet · ' + plural(ok));
-      else setStatus('work', 'Faltan apps por guardar (' + ok + '/' + list.length + ')');
-    }).catch(function () {
-      setStatus('off', 'No se pudo activar el modo offline');
     });
+  }
+  function photoList() {
+    return dbReady.then(function (ok) {
+      if (!ok) return memPhotos.slice();
+      return new Promise(function (res) {
+        var out = [];
+        var rq = DB.transaction('photos').objectStore('photos').openCursor();
+        rq.onsuccess = function () { var c = rq.result; if (c) { out.push(c.value); c.continue(); } else res(out); };
+        rq.onerror = function () { res(out); };
+      });
+    });
+  }
+  function photoDel(id) {
+    return dbReady.then(function (ok) {
+      if (!ok) { memPhotos = memPhotos.filter(function (p) { return p.id !== id; }); return; }
+      return new Promise(function (res) {
+        var rq = DB.transaction('photos', 'readwrite').objectStore('photos').delete(id);
+        rq.onsuccess = rq.onerror = function () { res(); };
+      });
+    });
+  }
+  function photoClear() {
+    return dbReady.then(function (ok) {
+      memPhotos = [];
+      if (!ok) return;
+      return new Promise(function (res) {
+        var rq = DB.transaction('photos', 'readwrite').objectStore('photos').clear();
+        rq.onsuccess = rq.onerror = function () { res(); };
+      });
+    });
+  }
+
+  /* ---------- aviso tipo notificación ---------- */
+  var toastT = null;
+  function toast(title, text) {
+    $('tTitle').textContent = title;
+    $('tText').textContent = text || '';
+    $('toast').classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { $('toast').classList.remove('show'); }, 4000);
+  }
+  $('toast').addEventListener('click', function () { $('toast').classList.remove('show'); });
+
+  /* ---------- cronómetro y temporizador globales ---------- */
+  var SW = { run: false, start: 0, acc: 0, laps: [] };
+  function swMs() { return SW.acc + (SW.run ? performance.now() - SW.start : 0); }
+  var TM = { total: 0, left: 0, end: 0, run: false };
+  function tmLeft() { return TM.run ? Math.max(0, TM.end - Date.now()) : TM.left; }
+  function tmStart() { if (!TM.run && TM.left > 0) { TM.end = Date.now() + TM.left; TM.run = true; } }
+  function tmPause() { if (TM.run) { TM.left = tmLeft(); TM.run = false; } }
+  function tmReset() { TM.run = false; TM.left = TM.total; }
+  setInterval(function () {
+    if (TM.run && tmLeft() <= 0) {
+      TM.run = false; TM.left = 0;
+      toast('Temporizador', '¡Tiempo!');
+      [0, 350, 700].forEach(function (d) { setTimeout(function () { beep(880, 0.25, 'square', 0.12); }, d); });
+    }
+  }, 250);
+
+  /* ---------- iconos ---------- */
+  function svg(inner) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + inner + '</svg>'; }
+  var IC = {
+    key: svg('<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/>'),
+    calc: svg('<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8 7.5h8M8 12h2M14 12h2M8 16h2M14 16h2"/>'),
+    cam: svg('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
+    photo: svg('<rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M3 17l5-5 4 4 3-3 6 5"/>'),
+    note: svg('<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7"/>'),
+    clock: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    game: svg('<rect x="3" y="7.5" width="18" height="10" rx="5"/><path d="M8 10.5v4M6 12.5h4"/><circle cx="15.5" cy="12" r=".9"/><circle cx="18" cy="13.5" r=".9"/>'),
+    gear: svg('<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>'),
+    torch: svg('<path d="M9 3h6l-1 6h-4z"/><path d="M10 9v11h4V9"/><path d="M12 12v2"/>'),
+    dice: svg('<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="15" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/>'),
+    flip: svg('<path d="M4 8a8 8 0 0 1 14-3l2 2"/><path d="M20 4v4h-4"/><path d="M20 16a8 8 0 0 1-14 3l-2-2"/><path d="M4 20v-4h4"/>')
+  };
+
+  /* =====================================================
+     APPS
+     ===================================================== */
+
+  /* ----- Contraseñas ----- */
+  function appPass(root) {
+    var SETS = { up: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', lo: 'abcdefghijklmnopqrstuvwxyz', nu: '0123456789', sy: '!@#$%&*?+-_=.,:;' };
+    var st = { len: 16, up: true, lo: true, nu: true, sy: true, cf: false };
+    var pw = '';
+    root.innerHTML =
+      '<div class="scroll"><div class="ah">Contraseñas</div><div class="pad">' +
+      '<div class="card"><div class="pw" id="pw"></div>' +
+      '<div class="meter"><i id="mBar"></i></div><div class="mrow"><b id="mLbl"></b><span id="mBits"></span></div>' +
+      '<div class="row2"><button class="btn" id="bGen">Nueva</button><button class="btn alt" id="bCopy">Copiar</button></div></div>' +
+      '<div class="chips"><button class="chip" data-p="pin">PIN de 6</button><button class="chip" data-p="read">Fácil de leer</button><button class="chip" data-p="max">Máxima</button></div>' +
+      '<div class="card"><div class="lenrow"><span>Longitud</span><b id="lenV">16</b></div><input type="range" id="len" min="6" max="64" value="16" aria-label="Longitud">' +
+      '<label class="sw"><span>Mayúsculas (A–Z)</span><input type="checkbox" data-k="up"></label>' +
+      '<label class="sw"><span>Minúsculas (a–z)</span><input type="checkbox" data-k="lo"></label>' +
+      '<label class="sw"><span>Números (0–9)</span><input type="checkbox" data-k="nu"></label>' +
+      '<label class="sw"><span>Símbolos (!@#$)</span><input type="checkbox" data-k="sy"></label>' +
+      '<label class="sw"><span>Evitar confusos (0 O 1 l I)</span><input type="checkbox" data-k="cf"></label></div>' +
+      '<p class="note">Se crean en tu móvil con el generador seguro del navegador. No se guardan ni salen de aquí.</p>' +
+      '</div></div>';
+
+    function pool(k) { var s = SETS[k]; return st.cf ? s.replace(/[0O1lI]/g, '') : s; }
+    function sync() {
+      root.querySelector('#len').value = st.len;
+      root.querySelector('#lenV').textContent = st.len;
+      root.querySelectorAll('input[data-k]').forEach(function (i) { i.checked = !!st[i.getAttribute('data-k')]; });
+    }
+    function show(poolSize) {
+      var box = root.querySelector('#pw');
+      box.textContent = '';
+      for (var i = 0; i < pw.length; i++) {
+        var c = pw.charAt(i), s = document.createElement('span');
+        if (/[0-9]/.test(c)) s.className = 'd'; else if (!/[A-Za-z]/.test(c)) s.className = 's';
+        s.textContent = c;
+        box.appendChild(s);
+      }
+      box.style.fontSize = (pw.length <= 16 ? 30 : pw.length <= 32 ? 24 : 19) + 'px';
+      var bits = Math.round(pw.length * Math.log(poolSize) / Math.LN2);
+      var lv = bits < 40 ? ['Débil', 'var(--bad)', 25] : bits < 60 ? ['Media', 'var(--yel)', 50] : bits < 80 ? ['Fuerte', 'var(--cyan)', 75] : ['Muy fuerte', 'var(--ok)', 100];
+      var bar = root.querySelector('#mBar');
+      bar.style.width = lv[2] + '%';
+      bar.style.background = lv[1];
+      root.querySelector('#mLbl').textContent = lv[0];
+      root.querySelector('#mBits').textContent = '≈ ' + bits + ' bits';
+    }
+    function gen() {
+      var keys = ['up', 'lo', 'nu', 'sy'].filter(function (k) { return st[k]; });
+      if (!keys.length) { st.lo = true; keys.push('lo'); sync(); }
+      var all = keys.map(pool).join('');
+      var out = [];
+      keys.forEach(function (k) { var p = pool(k); out.push(p.charAt(rnd(p.length))); });
+      while (out.length < st.len) out.push(all.charAt(rnd(all.length)));
+      for (var i = out.length - 1; i > 0; i--) { var j = rnd(i + 1), t = out[i]; out[i] = out[j]; out[j] = t; }
+      pw = out.join('');
+      show(all.length);
+    }
+    function done() { toast('Copiada', 'La contraseña está en el portapapeles.'); }
+    function copy() {
+      var fallback = function () {
+        var ta = document.createElement('textarea');
+        ta.value = pw; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+        root.appendChild(ta); ta.select(); ta.setSelectionRange(0, 999);
+        var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+        ta.remove();
+        if (ok) done(); else toast('No se pudo copiar', 'Mantén pulsada la contraseña para copiarla.');
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(pw).then(done, fallback);
+      else fallback();
+    }
+    root.querySelector('#bGen').addEventListener('click', gen);
+    root.querySelector('#bCopy').addEventListener('click', copy);
+    root.querySelector('#len').addEventListener('input', function (e) {
+      st.len = +e.target.value; root.querySelector('#lenV').textContent = st.len; gen();
+    });
+    root.querySelectorAll('input[data-k]').forEach(function (i) {
+      i.addEventListener('change', function () { st[i.getAttribute('data-k')] = i.checked; gen(); });
+    });
+    var PRE = {
+      pin: { len: 6, up: false, lo: false, nu: true, sy: false, cf: false },
+      read: { len: 14, up: true, lo: true, nu: true, sy: false, cf: true },
+      max: { len: 32, up: true, lo: true, nu: true, sy: true, cf: false }
+    };
+    root.querySelectorAll('.chip').forEach(function (c) {
+      c.addEventListener('click', function () { Object.assign(st, PRE[c.getAttribute('data-p')]); sync(); gen(); });
+    });
+    sync(); gen();
+  }
+
+  /* ----- Calculadora ----- */
+  function appCalc(root) {
+    var SYM = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+    var LAYOUT = [
+      ['AC', 'AC', 'fn'], ['BS', '⌫', 'fn'], ['%', '%', 'fn'], ['/', '÷', 'op'],
+      ['7', '7'], ['8', '8'], ['9', '9'], ['*', '×', 'op'],
+      ['4', '4'], ['5', '5'], ['6', '6'], ['-', '−', 'op'],
+      ['1', '1'], ['2', '2'], ['3', '3'], ['+', '+', 'op'],
+      ['SIGN', '±'], ['0', '0'], ['.', ','], ['=', '=', 'eq']
+    ];
+    root.innerHTML = '<div class="ah">Calculadora</div><div class="calc"><div class="cdisp"><div class="cexpr"></div><div class="cout">0</div></div><div class="cpad"></div></div>';
+    var pad = root.querySelector('.cpad'), out = root.querySelector('.cout'), exprEl = root.querySelector('.cexpr');
+    LAYOUT.forEach(function (k) {
+      var b = h('button', k[2] || '', ''); b.textContent = k[1]; b.setAttribute('data-k', k[0]); pad.appendChild(b);
+    });
+    var cur = '0', prev = null, op = null, awaiting = false, replace = false, err = false, expr = '';
+    function numStr(n) {
+      if (!isFinite(n)) return null;
+      var r = parseFloat(n.toPrecision(12)), s = String(r);
+      if (s.indexOf('e') !== -1) s = r.toExponential(6).replace(/\.?0+e/, 'e');
+      return s;
+    }
+    function fmt(s) {
+      if (s === 'Error') return s;
+      var neg = s.charAt(0) === '-'; if (neg) s = s.slice(1);
+      var p = s.split('.'), i = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      return (neg ? '-' : '') + i + (p.length > 1 ? ',' + p[1] : '');
+    }
+    function render() {
+      var t = err ? 'Error' : fmt(cur);
+      out.textContent = t; exprEl.textContent = expr;
+      var w = out.parentNode.clientWidth - 12;
+      out.style.fontSize = Math.max(30, Math.min(76, w / (Math.max(t.length, 5) * 0.6))) + 'px';
+    }
+    function fail() { err = true; cur = '0'; prev = null; op = null; awaiting = false; replace = false; expr = ''; render(); }
+    function clearAll() { cur = '0'; prev = null; op = null; awaiting = false; replace = false; err = false; expr = ''; render(); }
+    function digits(s) { return s.replace(/[-.]/g, '').length; }
+    function begin() {
+      if (err) clearAll();
+      if (replace || awaiting) { if (replace && op === null) expr = ''; cur = '0'; replace = false; awaiting = false; }
+    }
+    function operate(a, b, o) {
+      switch (o) { case '+': return a + b; case '-': return a - b; case '*': return a * b; case '/': return b === 0 ? NaN : a / b; }
+      return b;
+    }
+    function setOp(o) {
+      if (err) return;
+      var v = Number(cur);
+      if (op !== null && !awaiting) {
+        var s = numStr(operate(prev, v, op));
+        if (s === null) { fail(); return; }
+        prev = Number(s); cur = s;
+      } else if (op === null) prev = v;
+      op = o; awaiting = true; replace = false;
+      expr = fmt(numStr(prev)) + ' ' + SYM[o]; render();
+    }
+    function equals() {
+      if (err || op === null) return;
+      var v = Number(cur), s = numStr(operate(prev, v, op));
+      if (s === null) { fail(); return; }
+      expr = fmt(numStr(prev)) + ' ' + SYM[op] + ' ' + fmt(numStr(v)) + ' =';
+      cur = s; prev = null; op = null; awaiting = false; replace = true; render();
+    }
+    function press(k) {
+      if (k.length === 1 && k >= '0' && k <= '9') { begin(); if (cur === '0') cur = k; else if (digits(cur) < 12) cur += k; render(); }
+      else if (k === '.') { begin(); if (cur.indexOf('.') === -1) cur += '.'; render(); }
+      else if (k === '+' || k === '-' || k === '*' || k === '/') setOp(k);
+      else if (k === '=') equals();
+      else if (k === 'AC') clearAll();
+      else if (k === 'BS') { if (err || replace || awaiting) return; cur = (cur.length <= 1 || (cur.length === 2 && cur.charAt(0) === '-')) ? '0' : cur.slice(0, -1); render(); }
+      else if (k === '%') {
+        if (err) return;
+        var v = Number(cur), s = numStr((op !== null && prev !== null) ? prev * v / 100 : v / 100);
+        if (s === null) { fail(); return; }
+        cur = s; awaiting = false; replace = true; render();
+      }
+      else if (k === 'SIGN') { if (err || cur === '0') return; cur = cur.charAt(0) === '-' ? cur.slice(1) : '-' + cur; render(); }
+    }
+    pad.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) press(b.getAttribute('data-k')); });
+    render();
+  }
+
+  /* ----- Cámara ----- */
+  function appCam(root) {
+    root.innerHTML =
+      '<div class="cam"><video playsinline muted autoplay></video><div class="msg" hidden></div><div class="flash"></div>' +
+      '<div class="bar"><button class="circ" id="cThumb" aria-label="Abrir Fotos"></button>' +
+      '<button class="shutter" id="cShot" aria-label="Hacer foto"></button>' +
+      '<button class="circ" id="cFlip" aria-label="Girar cámara">' + IC.flip + '</button></div></div>';
+    var video = root.querySelector('video'), msg = root.querySelector('.msg'), flash = root.querySelector('.flash');
+    var thumb = root.querySelector('#cThumb');
+    var stream = null, facing = 'environment', thumbURL = null, alive = true;
+
+    function showMsg(t) { msg.textContent = t; msg.hidden = false; }
+    function stop() { if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } video.srcObject = null; }
+    function start() {
+      stop();
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showMsg('Este navegador no deja usar la cámara aquí. Prueba desde la web con https.'); return;
+      }
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false })
+        .then(function (s) {
+          if (!alive) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
+          stream = s; video.srcObject = s; video.className = facing === 'user' ? 'mir' : '';
+          msg.hidden = true; return video.play();
+        })
+        .catch(function (e) {
+          var n = e && e.name;
+          showMsg(n === 'NotAllowedError' ? 'No hay permiso para la cámara. Actívalo en Ajustes de iPhone → Safari → Cámara.' :
+            n === 'NotFoundError' ? 'No se encontró ninguna cámara.' : 'No se pudo abrir la cámara.');
+        });
+    }
+    function setThumb() {
+      photoList().then(function (l) {
+        if (!alive) return;
+        if (thumbURL) { URL.revokeObjectURL(thumbURL); thumbURL = null; }
+        if (l.length) { thumbURL = URL.createObjectURL(l[l.length - 1].blob); thumb.style.backgroundImage = 'url(' + thumbURL + ')'; }
+        else { thumb.style.backgroundImage = ''; thumb.innerHTML = IC.photo; }
+      });
+    }
+    root.querySelector('#cShot').addEventListener('click', function () {
+      if (!stream || !video.videoWidth) { toast('Cámara', 'Todavía no hay imagen.'); return; }
+      var c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight;
+      c.getContext('2d').drawImage(video, 0, 0);
+      flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go');
+      beep(1200, 0.04, 'square', 0.05);
+      c.toBlob(function (b) { if (b) photoAdd(b).then(setThumb); }, 'image/jpeg', 0.9);
+    });
+    root.querySelector('#cFlip').addEventListener('click', function () { facing = facing === 'user' ? 'environment' : 'user'; start(); });
+    thumb.addEventListener('click', function () { switchApp('fotos'); });
+    setThumb(); start();
+    return function () { alive = false; stop(); if (thumbURL) URL.revokeObjectURL(thumbURL); };
+  }
+
+  /* ----- Fotos ----- */
+  function appPhotos(root) {
+    root.innerHTML = '<div class="scroll"><div class="ah">Fotos</div><div class="photos" id="pg"></div></div>';
+    var pg = root.querySelector('#pg'), urls = [], alive = true;
+    function clearURLs() { urls.forEach(function (u) { URL.revokeObjectURL(u); }); urls = []; }
+    function load() {
+      photoList().then(function (list) {
+        if (!alive) return;
+        clearURLs(); pg.textContent = '';
+        if (!list.length) {
+          var e = h('div', 'empty', 'Todavía no hay fotos.<br>Haz una con la app <b>Cámara</b>.');
+          pg.style.display = 'block'; pg.appendChild(e); return;
+        }
+        pg.style.display = '';
+        list.slice().reverse().forEach(function (p) {
+          var u = URL.createObjectURL(p.blob); urls.push(u);
+          var b = h('button'); b.style.backgroundImage = 'url(' + u + ')'; b.setAttribute('aria-label', 'Abrir foto');
+          b.addEventListener('click', function () { view(p, u); });
+          pg.appendChild(b);
+        });
+      });
+    }
+    function view(p, u) {
+      var v = h('div', 'viewer');
+      var d = new Date(p.ts);
+      v.innerHTML = '<div class="vt">' + cap(d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })) + ' · ' +
+        d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) + '</div><img alt="Foto"><div class="vb"></div>';
+      v.querySelector('img').src = u;
+      var vb = v.querySelector('.vb');
+      var close = h('button', 'btn alt'); close.textContent = 'Cerrar';
+      var dl = h('a', 'btn ok'); dl.textContent = 'Guardar'; dl.href = u; dl.download = 'foto-' + p.ts + '.jpg';
+      var del = h('button', 'btn alt'); del.textContent = 'Borrar';
+      var armed = false;
+      close.addEventListener('click', function () { v.remove(); });
+      del.addEventListener('click', function () {
+        if (!armed) { armed = true; del.textContent = '¿Seguro?'; del.className = 'btn bad'; setTimeout(function () { armed = false; del.textContent = 'Borrar'; del.className = 'btn alt'; }, 3000); return; }
+        photoDel(p.id).then(function () { v.remove(); load(); });
+      });
+      vb.appendChild(close); vb.appendChild(dl); vb.appendChild(del);
+      root.appendChild(v);
+    }
+    load();
+    return function () { alive = false; clearURLs(); };
+  }
+
+  /* ----- Notas ----- */
+  function appNotes(root) {
+    var notes = lsGet('kp.notes', []);
+    root.innerHTML = '<div class="scroll"><div class="ah">Notas</div><div class="pad"><div class="nlist" id="nl"></div></div></div><button class="fab" aria-label="Nueva nota">+</button>';
+    var nl = root.querySelector('#nl');
+    function save() { lsSet('kp.notes', notes); }
+    function title(t) { var l = (t || '').split('\n')[0].trim(); return l || 'Nota vacía'; }
+    function renderList() {
+      nl.textContent = '';
+      if (!notes.length) { nl.appendChild(h('div', 'empty', 'No hay notas.<br>Toca <b>+</b> para escribir la primera.')); return; }
+      notes.slice().sort(function (a, b) { return b.ts - a.ts; }).forEach(function (n) {
+        var b = h('button', 'nitem'), t = h('b'), s = h('span');
+        t.textContent = title(n.text);
+        var rest = (n.text || '').split('\n').slice(1).join(' ').trim();
+        s.textContent = new Date(n.ts).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) + (rest ? ' · ' + rest : '');
+        b.appendChild(t); b.appendChild(s);
+        b.addEventListener('click', function () { edit(n); });
+        nl.appendChild(b);
+      });
+    }
+    function edit(n) {
+      var ed = h('div', 'editor');
+      ed.innerHTML = '<div class="eb"><button class="back">‹ Notas</button><button class="del">Borrar</button></div><textarea placeholder="Escribe aquí…" aria-label="Texto de la nota"></textarea>';
+      var ta = ed.querySelector('textarea'), armed = false;
+      ta.value = n.text || '';
+      ta.addEventListener('input', function () { n.text = ta.value; n.ts = Date.now(); save(); });
+      ed.querySelector('.back').addEventListener('click', function () {
+        if (!(n.text || '').trim()) notes = notes.filter(function (x) { return x !== n; });
+        save(); ed.remove(); renderList();
+      });
+      var del = ed.querySelector('.del');
+      del.addEventListener('click', function () {
+        if (!armed) { armed = true; del.textContent = '¿Seguro?'; setTimeout(function () { armed = false; del.textContent = 'Borrar'; }, 3000); return; }
+        notes = notes.filter(function (x) { return x !== n; }); save(); ed.remove(); renderList();
+      });
+      root.appendChild(ed);
+      if (!n.text) ta.focus();
+    }
+    root.querySelector('.fab').addEventListener('click', function () {
+      var n = { id: Date.now(), text: '', ts: Date.now() }; notes.push(n); edit(n);
+    });
+    renderList();
+  }
+
+  /* ----- Reloj ----- */
+  function appClock(root) {
+    var tab = 'hora', timer = null;
+    root.innerHTML = '<div class="ah">Reloj</div><div class="seg"><button data-t="hora">Hora</button><button data-t="crono">Cronómetro</button><button data-t="temp">Temporizador</button></div><div class="scroll" id="cv"></div>';
+    var cv = root.querySelector('#cv');
+    function fmtMs(ms, cs) {
+      var t = Math.floor(ms / 10), c = t % 100, s = Math.floor(t / 100) % 60, m = Math.floor(t / 6000);
+      return pad2(m) + ':' + pad2(s) + (cs ? ',' + pad2(c) : '');
+    }
+    function tabs() { root.querySelectorAll('.seg button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-t') === tab); }); }
+    function build() {
+      clearInterval(timer); tabs(); cv.textContent = '';
+      if (tab === 'hora') {
+        cv.innerHTML = '<div class="big" id="ck"></div><div class="sub" id="cd"></div>';
+        var upd = function () {
+          var d = new Date();
+          cv.querySelector('#ck').textContent = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: !S.h24 });
+          cv.querySelector('#cd').textContent = cap(d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }));
+        };
+        upd(); timer = setInterval(upd, 500);
+      } else if (tab === 'crono') {
+        cv.innerHTML = '<div class="big" id="sw"></div><div class="pad"><div class="row2"><button class="btn" id="sgo"></button><button class="btn alt" id="slap"></button></div><div class="laps" id="laps"></div></div>';
+        var go = cv.querySelector('#sgo'), lap = cv.querySelector('#slap'), disp = cv.querySelector('#sw'), laps = cv.querySelector('#laps');
+        var paint = function () {
+          disp.textContent = fmtMs(swMs(), true);
+          go.textContent = SW.run ? 'Parar' : 'Iniciar'; go.className = 'btn ' + (SW.run ? 'bad' : 'ok');
+          lap.textContent = SW.run ? 'Vuelta' : 'Reiniciar';
+        };
+        var drawLaps = function () {
+          laps.textContent = '';
+          SW.laps.slice().reverse().forEach(function (ms, i) {
+            var r = h('div', 'lap'); r.innerHTML = '<span>Vuelta ' + (SW.laps.length - i) + '</span><b>' + fmtMs(ms, true) + '</b>'; laps.appendChild(r);
+          });
+        };
+        go.addEventListener('click', function () {
+          if (SW.run) { SW.acc += performance.now() - SW.start; SW.run = false; } else { SW.start = performance.now(); SW.run = true; }
+          paint();
+        });
+        lap.addEventListener('click', function () {
+          if (SW.run) SW.laps.push(swMs()); else { SW.acc = 0; SW.laps = []; }
+          drawLaps(); paint();
+        });
+        paint(); drawLaps(); timer = setInterval(paint, 40);
+      } else {
+        cv.innerHTML = '<div class="big" id="tm"></div><div class="pad"><div class="chips" id="tchips" style="justify-content:center"></div><div class="row2"><button class="btn" id="tgo"></button><button class="btn alt" id="trs">Reiniciar</button></div><p class="note" style="text-align:center">Si cierras la app, el temporizador sigue y te avisa al terminar.</p></div>';
+        var disp2 = cv.querySelector('#tm'), go2 = cv.querySelector('#tgo'), chips = cv.querySelector('#tchips');
+        [['+1 min', 60000], ['+5 min', 300000], ['+10 s', 10000]].forEach(function (p) {
+          var c = h('button', 'chip'); c.textContent = p[0];
+          c.addEventListener('click', function () {
+            if (TM.run) return;
+            TM.total += p[1]; TM.left += p[1]; paint2();
+          });
+          chips.appendChild(c);
+        });
+        var paint2 = function () {
+          var ms = tmLeft(), s = Math.ceil(ms / 1000);
+          disp2.textContent = pad2(Math.floor(s / 60)) + ':' + pad2(s % 60);
+          disp2.className = 'big sm';
+          go2.textContent = TM.run ? 'Pausar' : 'Iniciar'; go2.className = 'btn ' + (TM.run ? 'bad' : 'ok');
+        };
+        go2.addEventListener('click', function () { if (TM.run) tmPause(); else tmStart(); paint2(); });
+        cv.querySelector('#trs').addEventListener('click', function () { tmReset(); paint2(); });
+        paint2(); timer = setInterval(paint2, 200);
+      }
+    }
+    root.querySelectorAll('.seg button').forEach(function (b) {
+      b.addEventListener('click', function () { tab = b.getAttribute('data-t'); build(); });
+    });
+    build();
+    return function () { clearInterval(timer); };
+  }
+
+  /* ----- Apps en marco (Juegos y las que se añadan desde apps.json) ----- */
+  function frameApp(href, title) {
+    return function (root) {
+      var f = h('iframe', 'frame');
+      f.title = title;
+      f.setAttribute('allow', 'fullscreen');
+      f.addEventListener('load', function () {
+        try {
+          var top = parseFloat(getComputedStyle(body).paddingTop) || 0;
+          f.contentDocument.documentElement.style.setProperty('--embed-top', top + 'px');
+        } catch (e) { /* sin ajuste */ }
+      });
+      f.src = href + (href.indexOf('?') === -1 ? '?embed=1' : '&embed=1');
+      root.appendChild(f);
+      return function () { f.src = 'about:blank'; f.remove(); };
+    };
+  }
+  var appGames = frameApp('runner3d.html', 'Neon Runner 3D');
+
+  /* ----- Linterna ----- */
+  function appTorch(root) {
+    var cols = [['#ffffff', 'Blanca'], ['#fff1c9', 'Cálida'], ['#ff2b2b', 'Roja'], ['#00e5f0', 'Cian']];
+    root.innerHTML = '<div class="torch" style="background:#fff"><div class="chips"></div></div>';
+    var t = root.querySelector('.torch'), chips = root.querySelector('.chips'), lock = null;
+    cols.forEach(function (c, i) {
+      var b = h('button', 'swatch' + (i === 0 ? ' on' : '')); b.style.background = c[0]; b.setAttribute('aria-label', c[1]);
+      b.addEventListener('click', function () {
+        t.style.background = c[0];
+        chips.querySelectorAll('.swatch').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on');
+      });
+      chips.appendChild(b);
+    });
+    try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function (l) { lock = l; }, function () {}); } catch (e) { /* sin bloqueo de pantalla */ }
+    return function () { try { if (lock) lock.release(); } catch (e) { /* nada */ } };
+  }
+
+  /* ----- Dados ----- */
+  function appDice(root) {
+    root.innerHTML = '<div class="ah">Dados</div><div class="pad"><div class="card"><div class="result" id="dr">?</div></div>' +
+      '<div class="row2"><button class="btn" data-d="coin">Moneda</button><button class="btn" data-d="6">Dado d6</button></div>' +
+      '<div class="row2"><button class="btn alt" data-d="20">Dado d20</button><button class="btn alt" data-d="100">1–100</button></div></div>';
+    var out = root.querySelector('#dr'), timer = null;
+    root.querySelectorAll('button[data-d]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var d = b.getAttribute('data-d'), n = 0;
+        var val = function () { return d === 'coin' ? (rnd(2) ? 'Cara' : 'Cruz') : String(rnd(+d) + 1); };
+        out.className = 'result' + (d === 'coin' ? ' t' : '');
+        clearInterval(timer);
+        timer = setInterval(function () {
+          out.textContent = val(); beep(500 + n * 40, 0.03, 'square', 0.04);
+          if (++n >= 9) { clearInterval(timer); out.textContent = val(); beep(900, 0.12, 'triangle', 0.1); }
+        }, 70);
+      });
+    });
+    return function () { clearInterval(timer); };
+  }
+
+  /* ----- Ajustes ----- */
+  function appSettings(root) {
+    root.innerHTML = '<div class="scroll"><div class="ah">Ajustes</div><div class="pad">' +
+      '<div class="sec">Fondo de pantalla</div><div class="walls" id="wl"></div>' +
+      '<div class="sec">Sistema</div><div class="card">' +
+      '<label class="sw"><span>Pantalla de bloqueo al abrir</span><input type="checkbox" id="sLock"></label>' +
+      '<label class="sw"><span>Reloj de 24 horas</span><input type="checkbox" id="sH24"></label></div>' +
+      '<div class="sec">Conexión</div><div class="card"><div class="kv"><span>Internet</span><b id="sNet"></b></div>' +
+      '<div class="kv"><span>Modo sin internet</span><b id="sSW"></b></div></div>' +
+      '<div class="sec">Datos</div><div class="card"><div class="kv"><span>Fotos</span><b id="sPh">…</b></div><div class="kv"><span>Notas</span><b id="sNo"></b></div>' +
+      '<div class="row2" style="margin-top:10px"><button class="btn alt" id="dPh">Borrar fotos</button><button class="btn alt" id="dNo">Borrar notas</button></div></div>' +
+      '<div class="sec">Koke Phone</div><div class="card"><div class="kv"><span>Versión</span><b>1.1</b></div><button class="btn alt" id="sUpd" style="width:100%;margin-top:10px">Buscar actualizaciones</button></div>' +
+      '</div></div>';
+    var wl = root.querySelector('#wl');
+    Object.keys(WALLS).forEach(function (k) {
+      var b = h('button', k === S.wall ? 'on' : ''); b.style.background = WALLS[k].c; b.setAttribute('aria-label', WALLS[k].n);
+      b.addEventListener('click', function () {
+        S.wall = k; saveS(); applyWall();
+        wl.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on');
+      });
+      wl.appendChild(b);
+    });
+    var sl = root.querySelector('#sLock'), s24 = root.querySelector('#sH24');
+    sl.checked = S.lock; s24.checked = S.h24;
+    sl.addEventListener('change', function () { S.lock = sl.checked; saveS(); });
+    s24.addEventListener('change', function () { S.h24 = s24.checked; saveS(); tick(); });
+    root.querySelector('#sNet').textContent = navigator.onLine ? 'Conectado' : 'Sin conexión';
+    root.querySelector('#sSW').textContent = (navigator.serviceWorker && navigator.serviceWorker.controller) ? 'Activo' : 'No activo';
+    function counts() {
+      photoList().then(function (l) { root.querySelector('#sPh').textContent = l.length; });
+      root.querySelector('#sNo').textContent = lsGet('kp.notes', []).length;
+    }
+    function armed(btn, label, run) {
+      var on = false;
+      btn.addEventListener('click', function () {
+        if (!on) { on = true; btn.textContent = '¿Seguro?'; btn.className = 'btn bad'; setTimeout(function () { on = false; btn.textContent = label; btn.className = 'btn alt'; }, 3000); return; }
+        on = false; btn.textContent = label; btn.className = 'btn alt'; run();
+      });
+    }
+    armed(root.querySelector('#dPh'), 'Borrar fotos', function () { photoClear().then(counts); });
+    armed(root.querySelector('#dNo'), 'Borrar notas', function () { lsSet('kp.notes', []); counts(); });
+    root.querySelector('#sUpd').addEventListener('click', function () { location.reload(); });
+    counts();
+  }
+
+  /* =====================================================
+     SISTEMA
+     ===================================================== */
+  var APPS = [
+    { id: 'cam', name: 'Cámara', g: 'linear-gradient(145deg,#9a9aae,#4a4a5a)', ic: IC.cam, mount: appCam },
+    { id: 'fotos', name: 'Fotos', g: 'linear-gradient(145deg,#ffd23f,#ff2bd6)', ic: IC.photo, mount: appPhotos },
+    { id: 'notas', name: 'Notas', g: 'linear-gradient(145deg,#ffe066,#f2a000)', ic: IC.note, mount: appNotes },
+    { id: 'ajustes', name: 'Ajustes', g: 'linear-gradient(145deg,#a0a0b0,#5c5c6c)', ic: IC.gear, mount: appSettings },
+    { id: 'pass', name: 'Contraseñas', g: 'linear-gradient(145deg,#8a62ff,#4a28d0)', ic: IC.key, mount: appPass },
+    { id: 'calc', name: 'Calculadora', g: 'linear-gradient(145deg,#ff9540,#e0480b)', ic: IC.calc, mount: appCalc },
+    { id: 'reloj', name: 'Reloj', g: 'linear-gradient(145deg,#34344a,#0c0c14)', ic: IC.clock, mount: appClock },
+    { id: 'juegos', name: 'Juegos', g: 'linear-gradient(145deg,#00e5f0,#0a62d6)', ic: IC.game, mount: appGames },
+    { id: 'luz', name: 'Linterna', g: 'linear-gradient(145deg,#ffe58a,#e8a100)', ic: IC.torch, mount: appTorch },
+    { id: 'dados', name: 'Dados', g: 'linear-gradient(145deg,#ff5d9c,#c4147a)', ic: IC.dice, mount: appDice }
+  ];
+  var BY = {};
+  APPS.forEach(function (a) { BY[a.id] = a; });
+  var DOCK = ['cam', 'fotos', 'notas', 'ajustes'];
+
+  var phone = $('phone'), win = $('win'), body = $('appbody'), home = $('home'), lockEl = $('lock');
+  var cur = null, cleanup = null, busy = false, locked = true;
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function mkIcon(app, label) {
+    var b = h('button', 'app');
+    b.innerHTML = '<span class="ic" style="background:' + app.g + '">' + app.ic + '</span>' + (label ? '<span class="lb">' + esc(app.name) + '</span>' : '');
+    b.setAttribute('aria-label', app.name);
+    b.addEventListener('click', function () { openApp(app.id, b.querySelector('.ic')); });
+    return b;
+  }
+  APPS.forEach(function (a) { if (DOCK.indexOf(a.id) === -1) $('grid').appendChild(mkIcon(a, true)); });
+  DOCK.forEach(function (id) { $('dock').appendChild(mkIcon(BY[id], false)); });
+
+  /* apps extra: se leen de apps.json (cada una es un archivo HTML suelto) */
+  function addExtra(a) {
+    if (!a || !a.nombre || !a.href || BY['x-' + a.id]) return;
+    var color = a.color ? esc(a.color) : '#4b3a8a';
+    var app = {
+      id: 'x-' + (a.id || a.nombre), name: a.nombre,
+      g: 'linear-gradient(145deg,rgba(255,255,255,.2),rgba(0,0,0,.28)),' + color,
+      ic: '<b class="em">' + esc(a.icono || a.nombre.charAt(0).toUpperCase()) + '</b>',
+      mount: frameApp(a.href, a.nombre)
+    };
+    APPS.push(app); BY[app.id] = app; $('grid').appendChild(mkIcon(app, true));
+  }
+  fetch('apps.json', { cache: 'no-cache' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { if (j && j.apps) j.apps.forEach(addExtra); })
+    .catch(function () { /* sin apps extra */ });
+
+  function mountInto(app) {
+    body.innerHTML = ''; cleanup = null; cur = app.id;
+    var c = app.mount(body);
+    if (typeof c === 'function') cleanup = c;
+  }
+  function unmountCur() {
+    if (cleanup) { try { cleanup(); } catch (e) { /* nada */ } }
+    cleanup = null; body.innerHTML = ''; cur = null;
+  }
+  function openApp(id, from) {
+    if (busy || !BY[id]) return;
+    if (cur) { unmountCur(); mountInto(BY[id]); return; }
+    busy = true;
+    var pr = phone.getBoundingClientRect(), ox = pr.width / 2, oy = pr.height / 2;
+    if (from) { var r = from.getBoundingClientRect(); ox = r.left + r.width / 2 - pr.left; oy = r.top + r.height / 2 - pr.top; }
+    win.style.transformOrigin = ox + 'px ' + oy + 'px';
+    mountInto(BY[id]);
+    win.classList.add('show'); void win.offsetWidth; win.classList.add('open');
+    home.classList.add('away');
+    setTimeout(function () { busy = false; }, 340);
+  }
+  function switchApp(id) { if (cur && BY[id]) { unmountCur(); mountInto(BY[id]); } }
+  function closeApp() {
+    if (!cur || busy) return;
+    busy = true;
+    win.classList.remove('open'); home.classList.remove('away');
+    setTimeout(function () { unmountCur(); win.classList.remove('show'); busy = false; }, 330);
+  }
+  function unlock() { if (locked) { locked = false; lockEl.classList.add('up'); home.classList.remove('away'); } }
+  function goHome() { if (locked) unlock(); else closeApp(); }
+
+  /* gestos: bloqueo y barra de inicio */
+  var lp = null;
+  lockEl.addEventListener('pointerdown', function (e) { if (e.target.closest('a')) return; lp = { y: e.clientY }; });
+  lockEl.addEventListener('pointerup', function (e) {
+    if (!lp) return;
+    var dy = e.clientY - lp.y; lp = null;
+    if (dy < -40 || Math.abs(dy) < 10) unlock();
+  });
+  lockEl.addEventListener('pointercancel', function () { lp = null; });
+  var hbEl = $('hb'), hp = null;
+  hbEl.addEventListener('pointerdown', function (e) { hp = { y: e.clientY }; try { hbEl.setPointerCapture(e.pointerId); } catch (_) { /* nada */ } });
+  hbEl.addEventListener('pointerup', function (e) {
+    if (!hp) return;
+    var dy = e.clientY - hp.y; hp = null;
+    if (dy < -15 || Math.abs(dy) < 8) goHome();
+  });
+  hbEl.addEventListener('pointercancel', function () { hp = null; });
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') goHome();
+    else if ((e.key === 'Enter' || e.key === ' ') && locked) { unlock(); e.preventDefault(); }
   });
 
-  window.addEventListener('offline', function () { setStatus('off', 'Sin conexión · usando lo guardado'); });
+  /* reloj de sistema, red y batería */
+  function lockTime(d) {
+    return d.toLocaleTimeString('es-ES', { hour: 'numeric', minute: '2-digit', hour12: !S.h24 }).replace(/\s?[ap]\.?\s?m\.?/i, '');
+  }
+  function tick() {
+    var d = new Date();
+    $('sbTime').textContent = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: !S.h24 });
+    $('lkTime').textContent = lockTime(d);
+    $('wTime').textContent = lockTime(d);
+    var ds = cap(d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }));
+    $('lkDate').textContent = ds; $('wDate').textContent = ds;
+  }
+  function net() {
+    var on = navigator.onLine;
+    $('sbNet').innerHTML = '<span class="dot' + (on ? '' : ' off') + '"></span>' + (on ? '' : 'Sin conexión');
+    $('wNet').innerHTML = '<span class="dot' + (on ? '' : ' off') + '"></span>' + (on ? 'Con internet' : 'Sin internet · todo sigue funcionando');
+  }
+  window.addEventListener('online', function () { net(); toast('Koke Phone', 'Conexión recuperada.'); });
+  window.addEventListener('offline', function () { net(); toast('Sin internet', 'Todo sigue funcionando.'); });
+  if (navigator.getBattery) {
+    navigator.getBattery().then(function (b) {
+      var up = function () { $('sbBat').textContent = Math.round(b.level * 100) + '%'; };
+      up(); b.addEventListener('levelchange', up);
+    }, function () { /* sin batería */ });
+  }
+
+  applyWall(); tick(); net();
+  setInterval(tick, 1000);
+  if (!S.lock) {
+    locked = false; lockEl.classList.add('nox', 'up');
+    home.style.transition = 'none'; home.classList.remove('away');
+    setTimeout(function () { lockEl.classList.remove('nox'); home.style.transition = ''; }, 60);
+  }
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) navigator.serviceWorker.register('sw.js').catch(function () { /* sin modo offline */ });
 })();
 </script>
 </body>
