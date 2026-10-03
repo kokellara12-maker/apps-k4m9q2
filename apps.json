@@ -20,6 +20,27 @@
       "href": "pengu.html",
       "icono": "🐧",
       "color": "#35e0ff"
+    },
+    {
+      "nombre": "Slide Ice",
+      "desc": "Puzzle pixel contrarreloj: desliza al pingüino por el hielo hasta el iglú.",
+      "href": "slideice.html",
+      "icono": "🧊",
+      "color": "#35e0ff"
+    },
+    {
+      "nombre": "Ninja Slice",
+      "desc": "Corta fruta pixel con el dedo, esquiva bombas, combos y modo frenesí.",
+      "href": "ninja.html",
+      "icono": "🥷",
+      "color": "#ff4d6d"
+    },
+    {
+      "nombre": "Color Rush",
+      "desc": "Salta y atraviesa solo el color de tu bola. Anillos, cruces y prismas.",
+      "href": "colorrush.html",
+      "icono": "🌈",
+      "color": "#b05cff"
     }
   ]
 }
