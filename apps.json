@@ -90,6 +90,13 @@
       "href": "driftking.html",
       "icono": "🏎️",
       "color": "#ff004d"
+    },
+    {
+      "nombre": "Universo",
+      "desc": "Sal de la ciudad y viaja: Tierra, Luna, planetas, galaxia, universo y multiverso. Todo en 3D.",
+      "href": "universe.html",
+      "icono": "🌌",
+      "color": "#5b6cff"
     }
   ]
 }
