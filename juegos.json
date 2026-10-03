@@ -1,6 +1,17 @@
 {
   "juegos": [
     {
+      "nombre": "Koke Phone",
+      "desc": "Un móvil dentro del móvil: bloqueo, inicio, cámara, fotos, notas, contraseñas y más.",
+      "href": "koke-phone.html",
+      "tags": [
+        "móvil",
+        "cámara",
+        "apps"
+      ],
+      "color": "#7a4dff"
+    },
+    {
       "nombre": "Neon Runner 3D",
       "desc": "Corre por una autopista neón, esquiva muros y recoge monedas.",
       "href": "runner3d.html",
