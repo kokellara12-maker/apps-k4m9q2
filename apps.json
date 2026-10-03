@@ -9,7 +9,7 @@
     },
     {
       "nombre": "Carreras 3D",
-      "desc": "Carreras realistas: física de coche, 3 vueltas, fantasma y sonido de motor.",
+      "desc": "Carreras realistas + modo Drift con puntos. 5 mapas, fantasma y sonido de motor.",
       "href": "carreras3d.html",
       "icono": "🏎️",
       "color": "#ff4d3d"
