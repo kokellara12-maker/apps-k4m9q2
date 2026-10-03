@@ -20,41 +20,6 @@
       "href": "pengu.html",
       "icono": "🐧",
       "color": "#35e0ff"
-    },
-    {
-      "nombre": "Snake",
-      "desc": "La serpiente neón: combos, estrellas doradas y manzanas brillantes.",
-      "href": "snake.html",
-      "icono": "🐍",
-      "color": "#3dffb0"
-    },
-    {
-      "nombre": "Tetris",
-      "desc": "Bloques de cristal, fantasma, hold y combos. Con música.",
-      "href": "tetris.html",
-      "icono": "🧱",
-      "color": "#b36bff"
-    },
-    {
-      "nombre": "Breakout",
-      "desc": "Rompe ladrillos con power-ups: multibola, fuego y láser.",
-      "href": "breakout.html",
-      "icono": "🏐",
-      "color": "#ff7a45"
-    },
-    {
-      "nombre": "Invasores",
-      "desc": "Defiende la Tierra: oleadas, OVNI, escudos y power-ups.",
-      "href": "invaders.html",
-      "icono": "👾",
-      "color": "#5df2ff"
-    },
-    {
-      "nombre": "Comecocos",
-      "desc": "Laberinto neón con 4 fantasmas, frutas y niveles.",
-      "href": "pacman.html",
-      "icono": "🟡",
-      "color": "#ffd23f"
     }
   ]
 }

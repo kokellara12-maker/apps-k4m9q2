@@ -1,13 +1,13 @@
 // Mis Apps: modo offline.
 // Cambia el número de versión si quieres forzar una recarga completa.
-const CORE = 'mis-juegos-core-v12';
+const CORE = 'mis-juegos-core-v13';
 const RUN = 'mis-juegos-run-v3';
 const PRECACHE = [
   './',
   './index.html',
   './apps.json',
   './contrasenas.html',
-  './carreras3d.html','./pengu.html','./snake.html','./tetris.html','./breakout.html','./invaders.html','./pacman.html',
+  './carreras3d.html','./pengu.html',
   './manifest.webmanifest',
   './icon-180.png',
   './icon-192.png',
