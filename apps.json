@@ -62,6 +62,27 @@
       "href": "lasthill.html",
       "icono": "🏰",
       "color": "#00e436"
+    },
+    {
+      "nombre": "Gravity Flip",
+      "desc": "3D neón: corres por un túnel y volteas la gravedad para esquivar pinchos y huecos.",
+      "href": "gravityflip.html",
+      "icono": "🌀",
+      "color": "#b05cff"
+    },
+    {
+      "nombre": "Orbit",
+      "desc": "3D espacial: orbita planetas, suéltate en el momento justo y engánchate al siguiente.",
+      "href": "orbit.html",
+      "icono": "🛰️",
+      "color": "#35e0ff"
+    },
+    {
+      "nombre": "Basket Flick",
+      "desc": "Lanza canastas con un gesto en 3D. 60 segundos, rachas y aro que se mueve.",
+      "href": "basket.html",
+      "icono": "🏀",
+      "color": "#ff8a1a"
     }
   ]
 }
