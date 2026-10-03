@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f1115">
+<title>Contraseñas</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#181b22; --line:#262a34; --ink:#f3f4f7; --dim:#8b91a1;
+    --acc:#4f8cff; --ok:#34d27b; --warn:#ffb020; --bad:#ff5a5f;
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font)}
+  body{padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 28px)}
+  main{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+  .top{display:flex;align-items:center;justify-content:space-between}
+  .back{color:var(--acc);text-decoration:none;font-size:17px;font-weight:500}
+  h1{margin:6px 0 0;font-size:32px;font-weight:700;letter-spacing:-.02em}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+  #pw{font:600 24px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;min-height:66px;letter-spacing:.02em;user-select:all;-webkit-user-select:all}
+  #pw .d{color:var(--acc)} #pw .s{color:var(--warn)}
+  .meter{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:14px}
+  .meter i{display:block;height:100%;width:0;border-radius:3px;background:var(--bad);transition:width .25s,background .25s}
+  .lvl{display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:var(--dim)}
+  .row{display:flex;gap:10px}
+  button{font:inherit;border:0;cursor:pointer;border-radius:14px;padding:15px;font-weight:600;font-size:17px}
+  .pri{flex:1;background:var(--acc);color:#fff}
+  .sec{flex:1;background:#242936;color:var(--ink)}
+  button:active{filter:brightness(.85);transform:scale(.98)}
+  .ctl{display:flex;flex-direction:column;gap:16px}
+  .len{display:flex;justify-content:space-between;align-items:baseline;font-size:15px;color:var(--dim)}
+  .len b{font-size:22px;color:var(--ink)}
+  input[type=range]{width:100%;accent-color:var(--acc);height:32px;margin:0}
+  label.sw{display:flex;justify-content:space-between;align-items:center;font-size:17px}
+  label.sw small{display:block;color:var(--dim);font-size:13px;margin-top:2px}
+  input[type=checkbox]{appearance:none;-webkit-appearance:none;width:51px;height:31px;border-radius:16px;background:#3a3f4d;position:relative;flex:none;transition:background .2s;margin:0}
+  input[type=checkbox]::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+  input[type=checkbox]:checked{background:var(--ok)} input[type=checkbox]:checked::after{transform:translateX(20px)}
+  .hist h2{margin:0 0 8px;font-size:15px;color:var(--dim);font-weight:600}
+  .hist div{padding:10px 0;border-top:1px solid var(--line);font:15px ui-monospace,Menlo,monospace;word-break:break-all;color:var(--ink)}
+  .hist div:first-of-type{border-top:0}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translate(-50%,30px);background:#fff;color:#111;padding:11px 18px;border-radius:999px;font-weight:600;opacity:0;transition:.25s;pointer-events:none}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><a class="back" href="index.html">‹ Apps</a></div>
+  <h1>Contraseñas</h1>
+
+  <div class="card">
+    <div id="pw" aria-live="polite"></div>
+    <div class="meter"><i id="bar"></i></div>
+    <div class="lvl"><span id="lvl">—</span><span id="bits"></span></div>
+  </div>
+
+  <div class="row">
+    <button class="sec" id="copy">Copiar</button>
+    <button class="pri" id="gen">Generar otra</button>
+  </div>
+
+  <div class="card ctl">
+    <div>
+      <div class="len"><span>Longitud</span><b id="lenv">16</b></div>
+      <input type="range" id="len" min="6" max="64" value="16">
+    </div>
+    <label class="sw"><span>Mayúsculas A–Z</span><input type="checkbox" id="up" checked></label>
+    <label class="sw"><span>Minúsculas a–z</span><input type="checkbox" id="lo" checked></label>
+    <label class="sw"><span>Números 0–9</span><input type="checkbox" id="nu" checked></label>
+    <label class="sw"><span>Símbolos<small>!@#$%&*?…</small></span><input type="checkbox" id="sy" checked></label>
+    <label class="sw"><span>Sin parecidos<small>evita 0 O 1 l I</small></span><input type="checkbox" id="amb"></label>
+  </div>
+
+  <div class="card hist" id="histc" hidden><h2>Recientes (solo en esta sesión)</h2><div id="hist"></div></div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var SETS={up:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',lo:'abcdefghijklmnopqrstuvwxyz',nu:'0123456789',sy:'!@#$%&*?+-=_.:;'};
+  var AMB=/[0O1lI|]/g;
+  var cur='',hist=[];
+
+  function rnd(n){ // entero uniforme 0..n-1 sin sesgo
+    var max=Math.floor(4294967296/n)*n,a=new Uint32Array(1);
+    do{crypto.getRandomValues(a)}while(a[0]>=max);
+    return a[0]%n;
+  }
+  function pools(){
+    var p=[];
+    ['up','lo','nu','sy'].forEach(function(k){
+      if(!$(k).checked)return;
+      var s=SETS[k]; if($('amb').checked)s=s.replace(AMB,'');
+      if(s)p.push(s);
+    });
+    return p;
+  }
+  function make(){
+    var p=pools();
+    if(!p.length){$('lo').checked=true;p=pools()}
+    var len=+$('len').value,all=p.join(''),out=[];
+    p.forEach(function(s){out.push(s[rnd(s.length)])}); // al menos uno de cada tipo
+    while(out.length<len)out.push(all[rnd(all.length)]);
+    for(var i=out.length-1;i>0;i--){var j=rnd(i+1),t=out[i];out[i]=out[j];out[j]=t}
+    out=out.slice(0,len);
+    return {pw:out.join(''),size:all.length};
+  }
+  function show(){
+    var r=make();cur=r.pw;
+    var h='';
+    for(var i=0;i<cur.length;i++){
+      var c=cur[i],e=c.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      h+=/[0-9]/.test(c)?'<span class="d">'+e+'</span>':/[a-zA-Z]/.test(c)?e:'<span class="s">'+e+'</span>';
+    }
+    $('pw').innerHTML=h;
+    var bits=Math.round(cur.length*Math.log(r.size)/Math.LN2);
+    var lv=bits<45?['Débil','#ff5a5f',20]:bits<65?['Aceptable','#ffb020',45]:bits<90?['Fuerte','#7fd24a',72]:['Muy fuerte','#34d27b',100];
+    $('lvl').textContent=lv[0];$('bits').textContent=bits+' bits';
+    $('bar').style.width=lv[2]+'%';$('bar').style.background=lv[1];
+    hist.unshift(cur);hist=hist.slice(0,5);
+    if(hist.length>1){$('histc').hidden=false;$('hist').innerHTML=hist.slice(1).map(function(x){return '<div></div>'}).join('');
+      var ds=$('hist').children;for(var k=0;k<ds.length;k++)ds[k].textContent=hist[k+1]}
+  }
+  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on')},1400)}
+  function copy(){
+    function ok(){toast('Copiada ✓')}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(cur).then(ok,fb)}else fb();
+    function fb(){var t=document.createElement('textarea');t.value=cur;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.select();t.setSelectionRange(0,999);try{document.execCommand('copy');ok()}catch(e){toast('Mantén pulsada para copiar')}t.remove()}
+  }
+  $('gen').onclick=show;$('copy').onclick=copy;
+  $('len').oninput=function(){$('lenv').textContent=this.value;show()};
+  ['up','lo','nu','sy','amb'].forEach(function(k){$(k).onchange=show});
+  show();
+})();
+</script>
+</body>
+</html>

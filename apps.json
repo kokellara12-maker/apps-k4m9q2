@@ -1,1 +1,11 @@
-{ "apps": [] }
+{
+  "apps": [
+    {
+      "nombre": "Contraseñas",
+      "desc": "Genera contraseñas seguras: elige longitud y símbolos, y mira lo fuertes que son.",
+      "href": "contrasenas.html",
+      "icono": "key",
+      "color": "#4f8cff"
+    }
+  ]
+}
