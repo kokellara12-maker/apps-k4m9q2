@@ -79,7 +79,11 @@
   }
   #tip b { color: var(--ink); }
 
-  #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: 14px; }
+  #grid { display: flex; flex-direction: column; gap: 26px; }
+  .sec h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+  .sec h3 small { margin-left: auto; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--dim); font-size: 12px; font-weight: 700; }
+  .sec h3::after { content: none; }
+  .g { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: 14px; }
   .tile {
     --c: var(--cyan);
     display: flex;
@@ -185,7 +189,31 @@
 
   function render(list) {
     grid.textContent = '';
-    list.forEach(function (a) { if (a && a.nombre && a.href) grid.appendChild(tile(a)); });
+    var SEC = [['juegos', '🎮', 'Juegos'], ['herramientas', '🧰', 'Herramientas'], ['aplicaciones', '📱', 'Aplicaciones']];
+    var by = {};
+    list.forEach(function (a) {
+      if (!(a && a.nombre && a.href)) return;
+      var c = a.cat || 'juegos';
+      if (!by[c]) { by[c] = []; if (!SEC.some(function (s) { return s[0] === c; })) SEC.push([c, '📦', c.charAt(0).toUpperCase() + c.slice(1)]); }
+      by[c].push(a);
+    });
+    SEC.forEach(function (s) {
+      var items = by[s[0]];
+      if (!items || !items.length) return;
+      var sec = document.createElement('section');
+      sec.className = 'sec';
+      var h = document.createElement('h3');
+      h.textContent = s[1] + ' ' + s[2];
+      var n = document.createElement('small');
+      n.textContent = items.length;
+      h.appendChild(n);
+      var g = document.createElement('div');
+      g.className = 'g';
+      items.forEach(function (a) { g.appendChild(tile(a)); });
+      sec.appendChild(h);
+      sec.appendChild(g);
+      grid.appendChild(sec);
+    });
   }
 
   function loadList() {

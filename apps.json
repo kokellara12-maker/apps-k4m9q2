@@ -5,112 +5,128 @@
    "desc": "Genera contraseñas seguras: elige longitud y símbolos, y mira lo fuertes que son.",
    "href": "contrasenas.html",
    "icono": "key",
-   "color": "#4f8cff"
+   "color": "#4f8cff",
+   "cat": "herramientas"
   },
   {
    "nombre": "Carreras 3D",
    "desc": "Carreras realistas + modo Drift con puntos. 5 mapas, fantasma y sonido de motor.",
    "href": "carreras3d.html",
    "icono": "🏎️",
-   "color": "#ff4d3d"
+   "color": "#ff4d3d",
+   "cat": "juegos"
   },
   {
    "nombre": "Pengu Ice",
    "desc": "Estilo Pengo: empuja bloques de hielo, aplasta llamas y junta los 3 diamantes.",
    "href": "pengu.html",
    "icono": "🐧",
-   "color": "#35e0ff"
+   "color": "#35e0ff",
+   "cat": "juegos"
   },
   {
    "nombre": "Slide Ice",
    "desc": "Puzzle pixel contrarreloj: desliza al pingüino por el hielo hasta el iglú.",
    "href": "slideice.html",
    "icono": "🧊",
-   "color": "#35e0ff"
+   "color": "#35e0ff",
+   "cat": "juegos"
   },
   {
    "nombre": "Ninja Slice",
    "desc": "Corta fruta pixel con el dedo, esquiva bombas, combos y modo frenesí.",
    "href": "ninja.html",
    "icono": "🥷",
-   "color": "#ff4d6d"
+   "color": "#ff4d6d",
+   "cat": "juegos"
   },
   {
    "nombre": "Color Rush",
    "desc": "Salta y atraviesa solo el color de tu bola. Anillos, cruces y prismas.",
    "href": "colorrush.html",
    "icono": "🌈",
-   "color": "#b05cff"
+   "color": "#b05cff",
+   "cat": "juegos"
   },
   {
    "nombre": "Merge Planets",
    "desc": "Suelta planetas, junta los iguales y llega al Sol. Estilo Suika en pixel art.",
    "href": "planets.html",
    "icono": "🪐",
-   "color": "#ffa300"
+   "color": "#ffa300",
+   "cat": "juegos"
   },
   {
    "nombre": "Survivors",
    "desc": "Sobrevive a hordas: armas automáticas, gemas, mejoras y jefes. Joystick flotante.",
    "href": "survivors.html",
    "icono": "🧙",
-   "color": "#ff004d"
+   "color": "#ff004d",
+   "cat": "juegos"
   },
   {
    "nombre": "Last Hill",
    "desc": "Defensa de torres pixel: arqueros, cañones, hielo y rayos contra oleadas y jefes.",
    "href": "lasthill.html",
    "icono": "🏰",
-   "color": "#00e436"
+   "color": "#00e436",
+   "cat": "juegos"
   },
   {
    "nombre": "Gravity Flip",
    "desc": "3D neón: corres por un túnel y volteas la gravedad para esquivar pinchos y huecos.",
    "href": "gravityflip.html",
    "icono": "🌀",
-   "color": "#b05cff"
+   "color": "#b05cff",
+   "cat": "juegos"
   },
   {
    "nombre": "Orbit",
    "desc": "3D espacial: orbita planetas, suéltate en el momento justo y engánchate al siguiente.",
    "href": "orbit.html",
    "icono": "🛰️",
-   "color": "#35e0ff"
+   "color": "#35e0ff",
+   "cat": "juegos"
   },
   {
    "nombre": "Basket Flick",
    "desc": "Lanza canastas con un gesto en 3D. 60 segundos, rachas y aro que se mueve.",
    "href": "basket.html",
    "icono": "🏀",
-   "color": "#ff8a1a"
+   "color": "#ff8a1a",
+   "cat": "juegos"
   },
   {
    "nombre": "Drift King",
    "desc": "Derrapes pixel en un parking: marcas de ruedas, humo, cadena de multiplicadores y 60 s.",
    "href": "driftking.html",
    "icono": "🏎️",
-   "color": "#ff004d"
+   "color": "#ff004d",
+   "cat": "juegos"
   },
   {
    "nombre": "Royale Island",
    "desc": "Battle royale 3D: salta del bus, saquea, construye y sobrevive a la tormenta. 23 bots con puntería.",
    "href": "royale.html",
    "icono": "🏝️",
-   "color": "#7a3cff"
+   "color": "#7a3cff",
+   "cat": "juegos"
   },
   {
    "nombre": "Drift Runner",
    "desc": "Drift 100% manual: volante + freno de mano, 3D o 2D pixel",
    "href": "./driftrunner.html",
    "icono": "🏎️",
-   "color": "#ff2bd6"
+   "color": "#ff2bd6",
+   "cat": "juegos"
   },
   {
    "nombre": "Voz Reversa",
    "desc": "Graba tu voz, se guarda y la escuchas al revés. Velocidad, compartir y todo offline.",
    "href": "vozreversa.html",
    "icono": "⏪",
-   "color": "#ff2bd6"
+   "color": "#ff2bd6",
+   "cat": "aplicaciones"
   }
  ]
 }
