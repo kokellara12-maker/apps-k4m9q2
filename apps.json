@@ -6,6 +6,13 @@
       "href": "contrasenas.html",
       "icono": "key",
       "color": "#4f8cff"
+    },
+    {
+      "nombre": "Carreras 3D",
+      "desc": "Carreras realistas: física de coche, 3 vueltas, fantasma y sonido de motor.",
+      "href": "carreras3d.html",
+      "icono": "🏎️",
+      "color": "#ff4d3d"
     }
   ]
 }
