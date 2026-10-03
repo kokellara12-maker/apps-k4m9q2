@@ -90,6 +90,13 @@
       "href": "driftking.html",
       "icono": "🏎️",
       "color": "#ff004d"
+    },
+    {
+      "nombre": "Royale Island",
+      "desc": "Battle royale 3D: salta del bus, saquea, construye y sobrevive a la tormenta. 23 bots con puntería.",
+      "href": "royale.html",
+      "icono": "🏝️",
+      "color": "#7a3cff"
     }
   ]
 }
