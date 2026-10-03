@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0716">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Voz Reversa</title>
+<style>
+:root{--bg:#0b0716;--card:#161026;--line:#2a2145;--ink:#f5f2ff;--dim:#9a91b8;--c1:#35e8ff;--c2:#ff2bd6;--rec:#ff3860;
+--font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);min-height:100%}
+body{background:radial-gradient(900px 500px at 50% -120px,#2a1458 0,transparent 70%),var(--bg);padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 40px);overscroll-behavior:none}
+main{max-width:480px;margin:0 auto}
+.back{color:#7fb0ff;text-decoration:none;font-size:17px;font-weight:500}
+h1{margin:8px 0 2px;font-size:34px;font-weight:800;letter-spacing:-.02em;font-style:italic}
+h1 span{background:linear-gradient(90deg,var(--c1),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--dim);font-size:15px;margin:0 0 6px}
+.hero{display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 0 14px}
+#rb{position:relative;width:132px;height:132px;border-radius:50%;border:0;padding:0;background:linear-gradient(145deg,#ff4d7a,#e0143f);color:#fff;font-size:48px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 34px rgba(255,56,96,.45),inset 0 -6px 14px rgba(0,0,0,.25);touch-action:manipulation;transition:transform .12s}
+#rb:active{transform:scale(.94)}
+#rb::before{content:"";position:absolute;inset:-12px;border-radius:50%;border:3px solid rgba(255,56,96,.35);transform:scale(var(--lv,1));opacity:var(--lo,.4);transition:transform .08s,opacity .08s}
+#rb.on{background:linear-gradient(145deg,#2b2347,#14102a);box-shadow:0 0 0 3px var(--rec),0 10px 34px rgba(255,56,96,.5)}
+#rb.on i{display:block;width:38px;height:38px;border-radius:9px;background:var(--rec);animation:bl 1s infinite}
+@keyframes bl{50%{opacity:.55}}
+#rt{font:700 28px ui-monospace,Menlo,monospace;letter-spacing:.04em;min-height:34px}
+#hint{color:var(--dim);font-size:15px;text-align:center;min-height:20px}
+.err{color:#ff8a9d}
+.list{display:flex;flex-direction:column;gap:14px;margin-top:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;position:relative;overflow:hidden}
+.card.pl{border-color:var(--c1);box-shadow:0 0 22px rgba(53,232,255,.18)}
+.card.pl.rv{border-color:var(--c2);box-shadow:0 0 22px rgba(255,43,214,.22)}
+.hd{display:flex;align-items:center;gap:8px}
+.nm{flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font:700 17px var(--font);padding:4px 0;-webkit-user-select:text;user-select:text}
+.nm:focus{outline:none;border-bottom:1px solid var(--c1)}
+.mt{color:var(--dim);font-size:13px;white-space:nowrap}
+canvas{width:100%;height:76px;display:block;margin:8px 0 10px;border-radius:12px;background:#0f0a20}
+.row{display:flex;gap:8px;margin-top:8px}
+.btn{flex:1;border:0;border-radius:14px;padding:14px 8px;font:800 16px var(--font);color:#fff;background:#2a2145;touch-action:manipulation}
+.btn:active{transform:scale(.97)}
+.fw{background:linear-gradient(135deg,#1aa9c7,#2f6bff)}
+.rv{}
+.btn.bw{background:linear-gradient(135deg,#ff2bd6,#7a3cff);font-size:17px}
+.btn.stp{background:#3a2f5e}
+.chip{flex:1;border:1px solid var(--line);background:#120c22;color:var(--dim);border-radius:12px;padding:10px 4px;font:700 14px var(--font);touch-action:manipulation}
+.chip.a{color:#fff;border-color:var(--c1);background:#10304a}
+.ic{flex:0 0 52px;font-size:20px;padding:10px 0}
+.empty{text-align:center;color:var(--dim);padding:26px 10px;line-height:1.5;font-size:16px;border:1.5px dashed var(--line);border-radius:20px}
+.empty b{color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translate(-50%,40px);background:#2a2145;color:#fff;padding:12px 18px;border-radius:14px;opacity:0;transition:.25s;font-size:15px;pointer-events:none;z-index:9;max-width:90%}
+.toast.s{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<main>
+<a class="back" href="index.html">‹ Apps</a>
+<h1><span>Voz Reversa</span> ⏪</h1>
+<p class="sub">Habla, guarda y escúchate al revés 😈</p>
+<div class="hero">
+  <button id="rb" aria-label="Grabar">🎙️</button>
+  <div id="rt">0:00</div>
+  <div id="hint">Toca el micro y habla</div>
+</div>
+<div class="list" id="list"></div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const MAXS=90;
+let AC=null,recs=[],db=null,cur=null,raf=0;
+const bufCache=new Map();
+function ctx(){if(!AC){const C=window.AudioContext||window.webkitAudioContext;AC=new C();}return AC}
+function unlock(){const a=ctx();if(a.state!=='running')a.resume();try{const b=a.createBuffer(1,1,22050),s=a.createBufferSource();s.buffer=b;s.connect(a.destination);s.start(0)}catch(e){}}
+function toast(t,ms=2200){const e=$('toast');e.textContent=t;e.classList.add('s');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('s'),ms)}
+const fmt=s=>{s=Math.max(0,s);const m=Math.floor(s/60),x=s-m*60;return m+':'+(x<10?'0':'')+x.toFixed(x<10&&s<60?1:0).replace(/^0(\d)/,'$1')};
+const fmtT=s=>s<10?s.toFixed(1)+' s':Math.floor(s/60)+':'+('0'+Math.floor(s%60)).slice(-2);
+// ---------- IndexedDB
+function dbOpen(){return new Promise(res=>{try{const r=indexedDB.open('vozreversa',1);r.onupgradeneeded=()=>r.result.createObjectStore('r',{keyPath:'id'});r.onsuccess=()=>{db=r.result;res()};r.onerror=()=>res()}catch(e){res()}})}
+const dbAll=()=>new Promise(res=>{if(!db)return res([]);try{const q=db.transaction('r').objectStore('r').getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>res([])}catch(e){res([])}});
+const dbPut=r=>new Promise(res=>{if(!db)return res(false);try{const t=db.transaction('r','readwrite');t.objectStore('r').put(r);t.oncomplete=()=>res(true);t.onerror=()=>res(false)}catch(e){res(false)}});
+const dbDel=id=>new Promise(res=>{if(!db)return res();try{const t=db.transaction('r','readwrite');t.objectStore('r').delete(id);t.oncomplete=()=>res();t.onerror=()=>res()}catch(e){res()}});
+// ---------- grabar (PCM directo: sin códecs, sin sorpresas)
+let st=null,tick=0;
+async function startRec(){
+  unlock();
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('hint').innerHTML='<span class=err>Este navegador no deja usar el micro 😢</span>';return}
+  let stream;
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
+  catch(e){$('hint').innerHTML='<span class=err>Sin permiso de micro. Actívalo en Ajustes → Safari → Micrófono 🙏</span>';return}
+  stopPlay();
+  const a=ctx();await a.resume();
+  const src=a.createMediaStreamSource(stream),pr=a.createScriptProcessor(4096,1,1),mute=a.createGain();mute.gain.value=0;
+  const chunks=[];let n=0,peak=0;
+  pr.onaudioprocess=e=>{const d=e.inputBuffer.getChannelData(0);chunks.push(new Float32Array(d));n+=d.length;let s=0;for(let i=0;i<d.length;i+=4)s+=d[i]*d[i];peak=Math.sqrt(s/(d.length/4))};
+  src.connect(pr);pr.connect(mute);mute.connect(a.destination);
+  st={stream,src,pr,mute,chunks,t0:performance.now(),get n(){return n},get lv(){return peak},sr:a.sampleRate};
+  $('rb').classList.add('on');$('rb').innerHTML='<i></i>';$('hint').textContent='Grabando… toca para parar';
+  tick=setInterval(()=>{const s=(performance.now()-st.t0)/1000;$('rt').textContent=fmt(s);const l=Math.min(1,st.lv*5);$('rb').style.setProperty('--lv',1+l*.35);$('rb').style.setProperty('--lo',.35+l*.65);if(s>=MAXS)stopRec()},60);
+}
+async function stopRec(){
+  if(!st)return;const s=st;st=null;clearInterval(tick);
+  try{s.pr.disconnect();s.src.disconnect();s.mute.disconnect()}catch(e){}
+  s.pr.onaudioprocess=null;s.stream.getTracks().forEach(t=>t.stop());
+  $('rb').classList.remove('on');$('rb').textContent='🎙️';$('rb').style.setProperty('--lv',1);$('rb').style.setProperty('--lo',.4);$('rt').textContent='0:00';
+  const len=s.n;if(len<s.sr*.3){$('hint').textContent='Muy cortito 😅 prueba otra vez';return}
+  const f=new Float32Array(len);let o=0;for(const c of s.chunks){f.set(c,o);o+=c.length}
+  // recorta silencio de los bordes (suave) para que la reversa arranque al instante
+  let a=0,b=len-1;const th=.012;while(a<len&&Math.abs(f[a])<th)a++;while(b>a&&Math.abs(f[b])<th)b--;
+  a=Math.max(0,a-Math.round(s.sr*.08));b=Math.min(len-1,b+Math.round(s.sr*.12));
+  const pcm=f.subarray(a,b+1);const i16=new Int16Array(pcm.length);for(let i=0;i<pcm.length;i++){const v=Math.max(-1,Math.min(1,pcm[i]));i16[i]=v<0?v*32768:v*32767}
+  const d=new Date(),r={id:Date.now()+'',name:'Grabación '+(recs.length+1),t:d.getTime(),sr:s.sr,pcm:i16.buffer,rate:1};
+  recs.unshift(r);const ok=await dbPut(r);render();
+  $('hint').textContent=ok?'Guardada ✅ Dale a ⏪ REVERSA':'Grabada, pero este navegador no la pudo guardar 😕';
+  setTimeout(()=>{const c=document.querySelector('.card');if(c)c.scrollIntoView({behavior:'smooth',block:'nearest'})},50);
+}
+// ---------- datos de audio
+function f32(r){if(r._f)return r._f;const i=new Int16Array(r.pcm),f=new Float32Array(i.length);for(let k=0;k<i.length;k++)f[k]=i[k]/(i[k]<0?32768:32767);return r._f=f}
+function getBuf(r,rev){const k=r.id+(rev?'r':'f');let b=bufCache.get(k);if(b)return b;const f=f32(r),a=ctx();b=a.createBuffer(1,f.length,r.sr);const d=b.getChannelData(0);if(rev){for(let i=0,n=f.length;i<n;i++)d[i]=f[n-1-i]}else d.set(f);bufCache.set(k,b);return b}
+function peaks(r,rev,n){const f=f32(r),L=f.length,out=new Float32Array(n),w=L/n;for(let i=0;i<n;i++){const s=Math.floor(i*w),e=Math.min(L,Math.floor((i+1)*w)+1);let m=0;for(let j=s;j<e;j+=Math.max(1,(e-s)>>5)){const v=Math.abs(f[j]);if(v>m)m=v}out[rev?n-1-i:i]=m}let mx=.05;for(const v of out)if(v>mx)mx=v;for(let i=0;i<n;i++)out[i]/=mx;return out}
+// ---------- reproducir
+function stopPlay(){if(cur){try{cur.src.onended=null;cur.src.stop()}catch(e){}cur=null}cancelAnimationFrame(raf);paint()}
+function play(r,rev){
+  unlock();const had=cur&&cur.id===r.id&&cur.rev===rev;stopPlay();if(had)return;
+  const a=ctx(),src=a.createBufferSource();src.buffer=getBuf(r,rev);src.playbackRate.value=r.rate||1;
+  const g=a.createGain();g.gain.value=1;src.connect(g);g.connect(a.destination);
+  const dur=src.buffer.duration/(r.rate||1);cur={id:r.id,rev,src,t0:a.currentTime+.02,dur};
+  src.onended=()=>{if(cur&&cur.src===src){cur=null;cancelAnimationFrame(raf);paint()}};
+  src.start(cur.t0);paint();loop();
+}
+function loop(){raf=requestAnimationFrame(()=>{if(!cur)return;const p=Math.min(1,Math.max(0,(ctx().currentTime-cur.t0)/cur.dur));const c=document.querySelector('.card[data-id="'+cur.id+'"] canvas');if(c)draw(c,recs.find(x=>x.id===cur.id),cur.rev,p);loop()})}
+// ---------- dibujo
+function draw(c,r,rev,p){
+  const dpr=Math.min(2,devicePixelRatio||1),w=c.clientWidth,h=c.clientHeight;if(!w)return;
+  if(c.width!==Math.round(w*dpr)){c.width=Math.round(w*dpr);c.height=Math.round(h*dpr)}
+  const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+  const key=r.id+rev+w;if(!c._pk||c._pk.k!==key)c._pk={k:key,v:peaks(r,rev,Math.floor(w/4))};const pk=c._pk.v,n=pk.length,bw=w/n;
+  const col1=rev?'#ff2bd6':'#35e8ff',col0=rev?'#6b2a78':'#1a5a73';
+  for(let i=0;i<n;i++){const v=Math.max(.04,pk[i])*(h*.44),x=i*bw+bw*.15,done=p!=null&&i/n<=p;g.fillStyle=done?col1:col0;g.beginPath();g.roundRect?g.roundRect(x,h/2-v,bw*.7,v*2,2):g.rect(x,h/2-v,bw*.7,v*2);g.fill()}
+  if(p!=null&&p>0){g.fillStyle='#fff';g.fillRect(Math.min(w-2,p*w),4,2,h-8)}
+  g.fillStyle='rgba(255,255,255,.55)';g.font='700 11px '+getComputedStyle(document.body).fontFamily;g.fillText(rev?'⏪ REVERSA':'▶ NORMAL',8,h-7);
+}
+function paint(){
+  for(const el of document.querySelectorAll('.card')){const r=recs.find(x=>x.id===el.dataset.id);if(!r)continue;
+    const on=cur&&cur.id===r.id;el.classList.toggle('pl',!!on);el.classList.toggle('rv',!!(on&&cur.rev));
+    const bf=el.querySelector('.fw'),br=el.querySelector('.bw');
+    bf.textContent=on&&!cur.rev?'⏹ Parar':'▶ Normal';br.textContent=on&&cur.rev?'⏹ Parar':'⏪ REVERSA';
+    draw(el.querySelector('canvas'),r,on?cur.rev:false,on?0:null)}
+}
+// ---------- WAV / compartir
+function wav(r,rev){const f=getBuf(r,rev).getChannelData(0),n=f.length,sr=r.sr,b=new ArrayBuffer(44+n*2),v=new DataView(b);
+  const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+  w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){const s=Math.max(-1,Math.min(1,f[i]));v.setInt16(44+i*2,s<0?s*32768:s*32767,true)}return new Blob([b],{type:'audio/wav'})}
+async function share(r){
+  const blob=wav(r,true),name=(r.name||'audio').replace(/[^\w\- áéíóúñ]/gi,'')+' (reversa).wav',file=new File([blob],name,{type:'audio/wav'});
+  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}}catch(e){if(e&&e.name==='AbortError')return}
+  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),20000);toast('Descargando la reversa 📥');
+}
+// ---------- UI
+const SP=[[.7,'🐢 0.7×'],[1,'1×'],[1.4,'🐿️ 1.4×']];
+function render(){
+  const L=$('list');L.innerHTML='';
+  if(!recs.length){L.innerHTML='<div class="empty">Aún no hay nada 🎤<br><b>Di algo</b> y luego dale a <b>⏪ REVERSA</b>.<br><br>💡 Truco: di una frase <b>al revés a propósito</b> (suena a idioma alienígena) y reprodúcela invertida: ¡sonará normal!</div>';return}
+  for(const r of recs){
+    const c=document.createElement('div');c.className='card';c.dataset.id=r.id;
+    const d=new Date(r.t),dur=new Int16Array(r.pcm).length/r.sr;
+    c.innerHTML='<div class=hd><input class=nm maxlength=40 enterkeyhint=done><span class=mt></span></div><canvas></canvas><div class=row><button class="btn fw">▶ Normal</button><button class="btn bw">⏪ REVERSA</button></div><div class=row></div>';
+    const nm=c.querySelector('.nm');nm.value=r.name;nm.onchange=()=>{r.name=nm.value.trim()||'Sin nombre';nm.value=r.name;dbPut(strip(r))};nm.onkeydown=e=>{if(e.key==='Enter')nm.blur()};
+    c.querySelector('.mt').textContent=fmtT(dur)+' · '+d.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})+' '+d.toLocaleDateString('es',{day:'numeric',month:'short'});
+    c.querySelector('.fw').onclick=()=>play(r,false);c.querySelector('.bw').onclick=()=>play(r,true);
+    const row=c.querySelectorAll('.row')[1];
+    for(const [v,t] of SP){const b=document.createElement('button');b.className='chip'+((r.rate||1)===v?' a':'');b.textContent=t;b.onclick=()=>{r.rate=v;dbPut(strip(r));row.querySelectorAll('.chip').forEach(x=>x.classList.remove('a'));b.classList.add('a');if(cur&&cur.id===r.id){const rv=cur.rev;stopPlay();play(r,rv)}};row.appendChild(b)}
+    const sh=document.createElement('button');sh.className='btn ic';sh.textContent='📤';sh.onclick=()=>share(r);
+    const de=document.createElement('button');de.className='btn ic';de.textContent='🗑️';de.onclick=async()=>{if(!de.dataset.s){de.dataset.s=1;de.textContent='❓';setTimeout(()=>{de.dataset.s='';de.textContent='🗑️'},2200);return}if(cur&&cur.id===r.id)stopPlay();recs=recs.filter(x=>x!==r);bufCache.delete(r.id+'f');bufCache.delete(r.id+'r');await dbDel(r.id);render()};
+    row.append(sh,de);L.appendChild(c);
+  }
+  paint();
+}
+const strip=r=>({id:r.id,name:r.name,t:r.t,sr:r.sr,pcm:r.pcm,rate:r.rate||1});
+$('rb').addEventListener('click',()=>{st?stopRec():startRec()});
+addEventListener('resize',()=>{for(const c of document.querySelectorAll('canvas'))c._pk=null;paint()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(st)stopRec();stopPlay()}});
+(async()=>{await dbOpen();recs=(await dbAll()).sort((a,b)=>b.t-a.t);render();
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+})();
+</script>
+</body>
+</html>

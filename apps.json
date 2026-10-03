@@ -104,6 +104,13 @@
    "href": "./driftrunner.html",
    "icono": "🏎️",
    "color": "#ff2bd6"
+  },
+  {
+   "nombre": "Voz Reversa",
+   "desc": "Graba tu voz, se guarda y la escuchas al revés. Velocidad, compartir y todo offline.",
+   "href": "vozreversa.html",
+   "icono": "⏪",
+   "color": "#ff2bd6"
   }
  ]
 }
