@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#12070c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Impostor</title>
+<style>
+:root{--bg:#12070c;--card:#201017;--line:#3a1c27;--ink:#fff4f6;--dim:#b99aa4;--red:#ff3b5c;--red2:#c4143a;--ok:#34d27b;--yel:#ffcc33;
+--font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);min-height:100%}
+body{background:radial-gradient(800px 420px at 50% -100px,#5a0f27 0,transparent 70%),var(--bg);padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 30px);overscroll-behavior:none}
+main{max-width:480px;margin:0 auto}
+.back{color:#ff8aa0;text-decoration:none;font-size:17px;font-weight:500;background:none;border:0;font-family:var(--font);padding:0}
+h1{margin:8px 0 2px;font-size:38px;font-weight:900;letter-spacing:-.03em;font-style:italic}
+h1 span{color:var(--red)}
+.sub{color:var(--dim);margin:0 0 14px;font-size:15px}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:20px 0 8px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px}
+.pl{display:flex;flex-direction:column;gap:8px}
+.p{display:flex;gap:8px;align-items:center}
+.p input{flex:1;min-width:0;background:#160a10;border:1px solid var(--line);border-radius:12px;color:var(--ink);font:700 17px var(--font);padding:12px;-webkit-user-select:text;user-select:text}
+.p input:focus{outline:none;border-color:var(--red)}
+.p .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;flex:none}
+.x{width:42px;height:42px;border:0;border-radius:12px;background:#2d1520;color:#ff8aa0;font-size:18px}
+.add{width:100%;margin-top:8px;border:1.5px dashed var(--line);background:transparent;color:var(--dim);border-radius:14px;padding:12px;font:700 16px var(--font)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:#160a10;color:var(--dim);border-radius:999px;padding:10px 14px;font:700 15px var(--font)}
+.chip.a{background:#4a1224;border-color:var(--red);color:#fff}
+.step{display:flex;align-items:center;gap:14px}
+.step b{font-size:28px;min-width:30px;text-align:center}
+.step button{width:46px;height:46px;border-radius:14px;border:0;background:#2d1520;color:#fff;font-size:24px;font-weight:800}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.row small{color:var(--dim);display:block;font-size:13px;margin-top:2px}
+.sw{width:54px;height:32px;border-radius:16px;background:#2d1520;position:relative;border:0;flex:none;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:.2s}
+.sw.a{background:var(--red)}.sw.a::after{left:25px}
+.big{width:100%;border:0;border-radius:18px;padding:18px;font:900 20px var(--font);color:#fff;background:linear-gradient(135deg,var(--red),var(--red2));box-shadow:0 8px 26px rgba(255,59,92,.35);margin-top:22px;touch-action:manipulation}
+.big:active{transform:scale(.97)}
+.big.g{background:#2d1520;box-shadow:none;margin-top:10px;font-size:17px}
+.big[disabled]{opacity:.35}
+.err{color:#ff8aa0;font-size:14px;margin-top:8px;min-height:18px;text-align:center}
+.scr{display:none}.scr.on{display:block}
+.center{min-height:calc(100vh - 120px);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px}
+.em{font-size:76px;line-height:1}
+.nm{font-size:40px;font-weight:900;letter-spacing:-.02em}
+.hold{width:100%;aspect-ratio:1.15;max-height:46vh;border-radius:28px;border:2px dashed var(--red);background:#1c0c13;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:800;touch-action:none;transition:background .1s}
+.hold .t{font-size:18px;color:var(--dim)}
+.hold.show{border-style:solid;background:#240e17}
+.hold.imp{background:linear-gradient(145deg,#7a0f2a,#32060f);border-color:#ff6b86}
+.word{font-size:44px;font-weight:900;word-break:break-word;padding:0 10px;line-height:1.1}
+.cat{color:var(--dim);font-size:15px;font-weight:700;margin-top:4px}
+.timer{font:900 76px ui-monospace,Menlo,monospace;letter-spacing:.02em}
+.timer.low{color:var(--red);animation:pu 1s infinite}
+@keyframes pu{50%{opacity:.5}}
+.tag{display:inline-block;background:#2d1520;border-radius:999px;padding:8px 14px;font-weight:800;color:#ffd0da;font-size:15px}
+.list{width:100%;display:flex;flex-direction:column;gap:8px}
+.res{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:800;font-size:18px;display:flex;justify-content:space-between;text-align:left}
+.res.im{border-color:var(--red);background:#3a0f1d}
+.prog{color:var(--dim);font-size:14px;font-weight:700}
+</style>
+</head>
+<body>
+<main>
+<!-- AJUSTES -->
+<section class="scr on" id="s0">
+  <a class="back" href="index.html">‹ Apps</a>
+  <h1>EL <span>IMPOSTOR</span> 🕵️</h1>
+  <p class="sub">Un móvil, un grupo y alguien que miente fatal.</p>
+  <h2>Jugadores <span id="cnt"></span></h2>
+  <div class="card"><div class="pl" id="pl"></div><button class="add" id="add">＋ Añadir jugador</button></div>
+  <h2>Impostores</h2>
+  <div class="card"><div class="step"><button id="im-">−</button><b id="imn">1</b><button id="im+">＋</button><span class="prog" id="imh"></span></div></div>
+  <h2>Categorías <span><button class="chip" id="all" style="padding:6px 12px;font-size:13px">Todas</button></span></h2>
+  <div class="chips" id="cats"></div>
+  <h2>Opciones</h2>
+  <div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div class="row"><div>Pista para el impostor<small>Ve la categoría (más fácil)</small></div><button class="sw" id="hint"></button></div>
+    <div class="row"><div>Tiempo de debate<small>Cuenta atrás</small></div><div class="chips" id="tm"></div></div>
+  </div>
+  <div class="err" id="err"></div>
+  <button class="big" id="go">🎭 ¡Repartir roles!</button>
+</section>
+<!-- PASAR MÓVIL -->
+<section class="scr" id="s1">
+  <div class="center">
+    <div class="prog" id="pg"></div>
+    <div class="em">📱</div>
+    <div class="nm" id="who"></div>
+    <div class="sub" style="margin:0">Pasa el móvil a esta persona.<br>Que nadie más mire 👀</div>
+    <div class="hold" id="hold"><div class="t" id="ht">👆 Mantén pulsado para ver tu rol</div></div>
+    <button class="big" id="nx" disabled>Entendido, siguiente ➜</button>
+  </div>
+</section>
+<!-- DEBATE -->
+<section class="scr" id="s2">
+  <div class="center">
+    <div class="tag" id="first"></div>
+    <div class="timer" id="tmr">5:00</div>
+    <div class="sub" style="margin:0">Haced preguntas por turnos sin decir la palabra.<br>¡Descubrid quién es el impostor! 🕵️</div>
+    <button class="big" id="rev">🗳️ Votar y revelar</button>
+    <button class="big g" id="skip">⏯️ Pausar / seguir tiempo</button>
+  </div>
+</section>
+<!-- RESULTADO -->
+<section class="scr" id="s3">
+  <div class="center" style="justify-content:flex-start;padding-top:18px">
+    <div class="em">🎭</div>
+    <div class="sub" style="margin:0">La palabra era</div>
+    <div class="word" id="rw"></div><div class="cat" id="rc"></div>
+    <h2 style="margin:10px 0 0">Los impostores eran…</h2>
+    <div class="list" id="ri"></div>
+    <div class="list" id="ra"></div>
+    <button class="big" id="again">🔁 Otra ronda</button>
+    <button class="big g" id="menu">⚙️ Ajustes</button>
+  </div>
+</section>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const WORDS={
+'🐾 Animales':['León','Elefante','Delfín','Pingüino','Jirafa','Canguro','Pulpo','Búho','Cocodrilo','Gato','Perro','Tiburón','Loro','Camello','Mapache','Oso panda','Murciélago','Caballo','Cerdo','Mono','Tortuga','Águila','Pato','Zorro','Cebra','Hámster','Medusa','Flamenco','Rana','Lobo'],
+'🍕 Comida':['Pizza','Paella','Tortilla de patatas','Hamburguesa','Sushi','Helado','Chocolate','Tacos','Croquetas','Gazpacho','Churros','Espaguetis','Sandwich','Palomitas','Plátano','Sandía','Huevo frito','Kebab','Donuts','Jamón','Pollo asado','Nuggets','Ensalada','Tarta','Patatas fritas','Fideuá','Lasaña','Arroz con leche','Aguacate','Pan con tomate'],
+'📍 Lugares':['Playa','Hospital','Aeropuerto','Cine','Biblioteca','Gimnasio','Discoteca','Supermercado','Colegio','Parque de atracciones','Estadio de fútbol','Piscina','Cementerio','Zoo','Banco','Museo','Peluquería','Iglesia','Casino','Camping','Tren','Cárcel','Gasolinera','Circo','Montaña','Cocina','Ascensor','Ayuntamiento','Barco','Spa'],
+'🧸 Objetos':['Paraguas','Gafas','Cepillo de dientes','Móvil','Llaves','Espejo','Reloj','Mochila','Almohada','Tijeras','Linterna','Calculadora','Mando de la tele','Cargador','Vela','Globo','Cuchara','Maleta','Bicicleta','Candado','Auriculares','Peluche','Sartén','Microondas','Zapatillas','Cámara','Guitarra','Escoba','Lápiz','Despertador'],
+'👷 Profesiones':['Médico','Bombero','Policía','Profesor','Cocinero','Piloto','Astronauta','Camarero','Peluquero','Abogado','Fontanero','Youtuber','Futbolista','Cantante','Actor','Arquitecto','Dentista','Payaso','Mago','Cartero','Veterinario','Soldador','Taxista','Árbitro','Modelo','Detective','Panadero','Jardinero','DJ','Socorrista'],
+'⚽ Deportes':['Fútbol','Baloncesto','Tenis','Natación','Boxeo','Golf','Surf','Esquí','Ciclismo','Voleibol','Rugby','Pádel','Ajedrez','Balonmano','Skate','Karate','Atletismo','Escalada','Hockey','Béisbol','Ping pong','Equitación','Gimnasia','Dardos','Yoga','Fórmula 1','Esgrima','Bolos','Waterpolo','Parkour'],
+'🌍 Países':['España','Italia','Japón','Brasil','México','Egipto','Argentina','Francia','Alemania','Australia','India','China','Marruecos','Portugal','Rusia','Canadá','Grecia','Cuba','Perú','Noruega','Turquía','Colombia','Irlanda','Suiza','Tailandia','Chile','Estados Unidos','Reino Unido','Corea del Sur','Sudáfrica'],
+'🎬 Pelis y series':['Shrek','Titanic','El Rey León','Harry Potter','Toy Story','Frozen','Spider-Man','Los Simpson','La casa de papel','Stranger Things','Star Wars','Jurassic Park','Matrix','Avatar','Joker','Batman','Gladiator','Nemo','Los Vengadores','Cars','Barbie','Minions','Squid Game','Juego de Tronos','Friends','Narnia','Aladdín','Coco','El Señor de los Anillos','Bob Esponja'],
+'🎮 Personajes':['Mario','Pikachu','Sonic','Goku','Spider-Man','Batman','Elsa','Shrek','Homer Simpson','Messi','Cristiano Ronaldo','Shakira','Bad Bunny','Link','Minecraft Steve','Darth Vader','Hello Kitty','Mickey Mouse','Superman','Naruto','Luffy','Donkey Kong','Pac-Man','Yoda','Bob Esponja','Harry Potter','Rosalía','Don Quijote','Papá Noel','Drácula'],
+'🏠 En casa':['Nevera','Sofá','Lavadora','Cama','Ducha','Armario','Televisión','Ventilador','Alfombra','Persiana','Enchufe','Horno','Lavavajillas','Cortina','Balcón','Aspiradora','Plancha','Bañera','Mesita de noche','Tostadora','Escalera','Wifi','Timbre','Cafetera','Sábana','Cojín','Lámpara','Grifo','Cubo de basura','Microondas']
+};
+const COL=['#ff3b5c','#ff9f1c','#ffd23a','#34d27b','#2ec4ff','#7a6bff','#c25bff','#ff5bb5','#8d99ae','#06d6a0','#ef476f','#118ab2'];
+let S={names:['Jugador 1','Jugador 2','Jugador 3'],imp:1,cats:Object.keys(WORDS),hint:true,time:300};
+try{const x=JSON.parse(localStorage.getItem('impostor_v1')||'null');if(x&&x.names&&x.names.length>=3){S=Object.assign(S,x);S.cats=(S.cats||[]).filter(c=>WORDS[c]);if(!S.cats.length)S.cats=Object.keys(WORDS)}}catch(e){}
+const save=()=>{try{localStorage.setItem('impostor_v1',JSON.stringify(S))}catch(e){}};
+const show=n=>{for(let i=0;i<4;i++)$('s'+i).classList.toggle('on',i===n);scrollTo(0,0)};
+const maxImp=()=>Math.max(1,Math.floor((S.names.length-1)/2));
+function drawSetup(){
+  const pl=$('pl');pl.innerHTML='';
+  S.names.forEach((n,i)=>{const r=document.createElement('div');r.className='p';
+    r.innerHTML='<div class=n style="background:'+COL[i%COL.length]+'">'+(i+1)+'</div><input maxlength=16 placeholder="Nombre" enterkeyhint=done><button class=x>✕</button>';
+    const inp=r.querySelector('input');inp.value=n;inp.oninput=()=>{S.names[i]=inp.value;save()};inp.onkeydown=e=>{if(e.key==='Enter')inp.blur()};
+    r.querySelector('.x').onclick=()=>{if(S.names.length<=3){$('err').textContent='Mínimo 3 jugadores 😅';return}S.names.splice(i,1);S.imp=Math.min(S.imp,maxImp());save();drawSetup()};
+    pl.appendChild(r)});
+  $('cnt').textContent=S.names.length+' 👥';
+  $('add').style.display=S.names.length>=14?'none':'';
+  S.imp=Math.min(S.imp,maxImp());$('imn').textContent=S.imp;$('imh').textContent=S.imp===1?'1 impostor entre '+S.names.length:S.imp+' impostores entre '+S.names.length;
+  const c=$('cats');c.innerHTML='';for(const k of Object.keys(WORDS)){const b=document.createElement('button');b.className='chip'+(S.cats.includes(k)?' a':'');b.textContent=k;b.onclick=()=>{const i=S.cats.indexOf(k);if(i>=0){if(S.cats.length===1)return;S.cats.splice(i,1)}else S.cats.push(k);save();drawSetup()};c.appendChild(b)}
+  $('hint').classList.toggle('a',S.hint);
+  const t=$('tm');t.innerHTML='';for(const [v,l] of [[180,'3m'],[300,'5m'],[480,'8m'],[0,'∞']]){const b=document.createElement('button');b.className='chip'+(S.time===v?' a':'');b.textContent=l;b.style.padding='8px 12px';b.onclick=()=>{S.time=v;save();drawSetup()};t.appendChild(b)}
+}
+$('add').onclick=()=>{S.names.push('Jugador '+(S.names.length+1));save();drawSetup();const ins=$('pl').querySelectorAll('input');ins[ins.length-1].focus();ins[ins.length-1].select()};
+$('im-').onclick=()=>{S.imp=Math.max(1,S.imp-1);save();drawSetup()};
+$('im+').onclick=()=>{if(S.imp>=maxImp()){$('err').textContent='Con '+S.names.length+' jugadores, máximo '+maxImp()+' impostor'+(maxImp()>1?'es':'')+' 😉';return}S.imp++;save();drawSetup()};
+$('all').onclick=()=>{S.cats=S.cats.length===Object.keys(WORDS).length?[Object.keys(WORDS)[0]]:Object.keys(WORDS);save();drawSetup()};
+$('hint').onclick=()=>{S.hint=!S.hint;save();drawSetup()};
+// ---------- partida
+let R=null,idx=0,peeked=false,tint=0,left=0,paused=false,lastWord='';
+const rnd=n=>Math.floor(Math.random()*n);
+function deal(){
+  const names=S.names.map((n,i)=>(n||'').trim()||'Jugador '+(i+1));
+  const cat=S.cats[rnd(S.cats.length)];let pool=WORDS[cat].filter(w=>w!==lastWord);const word=pool[rnd(pool.length)];lastWord=word;
+  const ids=names.map((_,i)=>i);for(let i=ids.length-1;i>0;i--){const j=rnd(i+1);[ids[i],ids[j]]=[ids[j],ids[i]]}
+  const imps=new Set(ids.slice(0,S.imp));
+  // orden aleatorio de reparto
+  const ord=names.map((_,i)=>i);for(let i=ord.length-1;i>0;i--){const j=rnd(i+1);[ord[i],ord[j]]=[ord[j],ord[i]]}
+  R={names,cat,word,imps,ord,first:rnd(names.length)};idx=0;startReveal();show(1);
+}
+function startReveal(){
+  const p=R.ord[idx];peeked=false;$('who').textContent=R.names[p];$('pg').textContent='Jugador '+(idx+1)+' de '+R.names.length;
+  const h=$('hold');h.className='hold';h.innerHTML='<div class=t>👆 Mantén pulsado para ver tu rol</div>';
+  $('nx').disabled=true;$('nx').textContent=idx===R.names.length-1?'🚀 ¡Empezar el debate!':'Entendido, siguiente ➜';
+}
+function peek(on){
+  const h=$('hold'),p=R.ord[idx];
+  if(on){const im=R.imps.has(p);h.className='hold show'+(im?' imp':'');
+    h.innerHTML=im?'<div class=em>🕵️</div><div class=word style="font-size:36px">ERES EL IMPOSTOR</div><div class=cat style="color:#ffd0da">'+(S.hint?'Pista: '+R.cat:'Sin pistas… ¡disimula!')+'</div>':'<div class=cat>La palabra secreta es</div><div class=word>'+R.word+'</div><div class=cat>'+R.cat+'</div>';
+    peeked=true;$('nx').disabled=false}
+  else{h.className='hold';h.innerHTML='<div class=t>'+(peeked?'🙈 Oculto. Pasa el móvil':'👆 Mantén pulsado para ver tu rol')+'</div>'}
+}
+const hd=$('hold');
+hd.addEventListener('pointerdown',e=>{e.preventDefault();peek(true)});
+for(const ev of ['pointerup','pointercancel','pointerleave'])hd.addEventListener(ev,()=>peek(false));
+hd.addEventListener('contextmenu',e=>e.preventDefault());
+$('nx').onclick=()=>{if(idx<R.names.length-1){idx++;startReveal()}else startDebate()};
+// ---------- debate
+function beep(){try{const C=window.AudioContext||window.webkitAudioContext,a=new C(),t=a.currentTime;for(let i=0;i<3;i++){const o=a.createOscillator(),g=a.createGain();o.frequency.value=880;g.gain.setValueAtTime(.4,t+i*.3);g.gain.exponentialRampToValueAtTime(.001,t+i*.3+.25);o.connect(g);g.connect(a.destination);o.start(t+i*.3);o.stop(t+i*.3+.26)}}catch(e){}}
+const fm=s=>Math.floor(s/60)+':'+('0'+(s%60)).slice(-2);
+function startDebate(){
+  $('first').textContent='🎤 Empieza: '+R.names[R.first];left=S.time;paused=false;clearInterval(tint);
+  const t=$('tmr');t.classList.remove('low');
+  if(S.time){t.textContent=fm(left);$('skip').style.display='';let last=Date.now();tint=setInterval(()=>{const n=Date.now(),d=n-last;last=n;if(paused)return;left-=d/1000;const s=Math.max(0,Math.ceil(left));t.textContent=fm(s);t.classList.toggle('low',s<=15);if(left<=0){clearInterval(tint);beep();t.textContent='⏰ 0:00'}},250)}
+  else{t.textContent='∞';$('skip').style.display='none'}
+  show(2);
+}
+$('skip').onclick=()=>{paused=!paused;$('skip').textContent=paused?'▶️ Seguir tiempo':'⏯️ Pausar / seguir tiempo'};
+$('rev').onclick=()=>{
+  clearInterval(tint);
+  $('rw').textContent=R.word;$('rc').textContent=R.cat;
+  $('ri').innerHTML=[...R.imps].map(i=>'<div class="res im"><span>🕵️ '+R.names[i]+'</span><span>IMPOSTOR</span></div>').join('');
+  $('ra').innerHTML='<h2 style="margin:10px 0 0">Tripulación</h2>'+R.names.map((n,i)=>R.imps.has(i)?'':'<div class=res><span>'+n+'</span><span>✅</span></div>').join('');
+  show(3);
+};
+$('again').onclick=deal;
+$('menu').onclick=()=>{drawSetup();show(0)};
+$('go').onclick=()=>{
+  const nm=S.names.map(x=>(x||'').trim().toLowerCase());
+  if(new Set(nm.filter(x=>x)).size<nm.filter(x=>x).length){$('err').textContent='Hay nombres repetidos 🙃';return}
+  $('err').textContent='';save();deal();
+};
+drawSetup();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>

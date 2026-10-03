@@ -127,6 +127,14 @@
    "icono": "⏪",
    "color": "#ff2bd6",
    "cat": "aplicaciones"
+  },
+  {
+   "nombre": "El Impostor",
+   "desc": "El de toda la vida: un móvil, palabra secreta y un impostor que disimula. 3 a 14 jugadores.",
+   "href": "impostor.html",
+   "icono": "🕵️",
+   "color": "#ff3b5c",
+   "cat": "juegos"
   }
  ]
 }
