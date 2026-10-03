@@ -1,0 +1,25 @@
+{
+  "juegos": [
+    {
+      "nombre": "Neon Runner 3D",
+      "desc": "Corre por una autopista neón, esquiva muros y recoge monedas.",
+      "href": "runner3d.html",
+      "tags": [
+        "3D",
+        "táctil",
+        "récord"
+      ],
+      "color": "#00f0ff"
+    },
+    {
+      "nombre": "Calculadora",
+      "desc": "Calculadora normal con coma decimal, % y borrar.",
+      "href": "calculadora.html",
+      "tags": [
+        "app",
+        "simple"
+      ],
+      "color": "#ff2bd6"
+    }
+  ]
+}
