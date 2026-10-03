@@ -13,6 +13,13 @@
       "href": "carreras3d.html",
       "icono": "🏎️",
       "color": "#ff4d3d"
+    },
+    {
+      "nombre": "Pengu Ice",
+      "desc": "Estilo Pengo: empuja bloques de hielo, aplasta llamas y junta los 3 diamantes.",
+      "href": "pengu.html",
+      "icono": "🐧",
+      "color": "#35e0ff"
     }
   ]
 }
