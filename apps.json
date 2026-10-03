@@ -1,13 +1,25 @@
 {
   "apps": [
-    { "nombre": "Contraseñas", "desc": "Crea contraseñas seguras: elige la longitud y los símbolos, y mira lo fuertes que son.", "href": "contrasenas.html", "icono": "key", "color": "#7a4dff" },
-    { "nombre": "Calculadora", "desc": "Calculadora normal con coma decimal, porcentaje y borrar.", "href": "calculadora.html", "icono": "calc", "color": "#ff8a3d" },
-    { "nombre": "Notas", "desc": "Escribe notas y se guardan en el móvil.", "href": "notas.html", "icono": "note", "color": "#f5b400" },
-    { "nombre": "Reloj", "desc": "Hora, cronómetro y temporizador con aviso al terminar.", "href": "reloj.html", "icono": "clock", "color": "#34344a" },
-    { "nombre": "Cámara", "desc": "Haz fotos con la cámara de atrás o la de delante.", "href": "camara.html", "icono": "cam", "color": "#7c7c92" },
-    { "nombre": "Fotos", "desc": "Mira, guarda o borra las fotos que has hecho con la cámara.", "href": "fotos.html", "icono": "photo", "color": "#ff4fa3" },
-    { "nombre": "Dados", "desc": "Tira una moneda, un dado de 6, uno de 20 o saca un número del 1 al 100.", "href": "dados.html", "icono": "dice", "color": "#e0267f" },
-    { "nombre": "Linterna", "desc": "Usa la pantalla como luz: blanca, cálida, roja o cian.", "href": "linterna.html", "icono": "torch", "color": "#ffcf33" },
-    { "nombre": "Neon Runner 3D", "desc": "Juego 3D: esquiva muros y recoge monedas en una autopista neón.", "href": "runner3d.html", "icono": "game", "color": "#00c8e0" }
+    {
+      "nombre": "Contraseñas",
+      "desc": "Crea contraseñas seguras: elige la longitud y los símbolos, y mira lo fuertes que son.",
+      "href": "contrasenas.html",
+      "icono": "key",
+      "color": "#7a4dff"
+    },
+    {
+      "nombre": "Calculadora",
+      "desc": "Calculadora normal con coma decimal, porcentaje y borrar.",
+      "href": "calculadora.html",
+      "icono": "calc",
+      "color": "#ff8a3d"
+    },
+    {
+      "nombre": "Neon Runner 3D",
+      "desc": "Juego 3D: esquiva muros y recoge monedas en una autopista neón.",
+      "href": "runner3d.html",
+      "icono": "game",
+      "color": "#00c8e0"
+    }
   ]
 }
