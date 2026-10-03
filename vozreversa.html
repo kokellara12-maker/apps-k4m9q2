@@ -73,8 +73,9 @@ const $=id=>document.getElementById(id);
 const MAXS=90;
 let AC=null,recs=[],db=null,cur=null,raf=0;
 const bufCache=new Map();
+const AS=t=>{try{if(navigator.audioSession)navigator.audioSession.type=t}catch(e){}};
 function ctx(){if(!AC){const C=window.AudioContext||window.webkitAudioContext;AC=new C();}return AC}
-function unlock(){const a=ctx();if(a.state!=='running')a.resume();try{const b=a.createBuffer(1,1,22050),s=a.createBufferSource();s.buffer=b;s.connect(a.destination);s.start(0)}catch(e){}}
+function unlock(){AS('playback');const a=ctx();if(a.state!=='running')a.resume();try{const b=a.createBuffer(1,1,22050),s=a.createBufferSource();s.buffer=b;s.connect(a.destination);s.start(0)}catch(e){}}
 function toast(t,ms=2200){const e=$('toast');e.textContent=t;e.classList.add('s');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('s'),ms)}
 const fmt=s=>{s=Math.max(0,s);const m=Math.floor(s/60),x=s-m*60;return m+':'+(x<10?'0':'')+x.toFixed(x<10&&s<60?1:0).replace(/^0(\d)/,'$1')};
 const fmtT=s=>s<10?s.toFixed(1)+' s':Math.floor(s/60)+':'+('0'+Math.floor(s%60)).slice(-2);
@@ -91,7 +92,7 @@ async function startRec(){
   let stream;
   try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
   catch(e){$('hint').innerHTML='<span class=err>Sin permiso de micro. Actívalo en Ajustes → Safari → Micrófono 🙏</span>';return}
-  stopPlay();
+  stopPlay();AS('play-and-record');
   const a=ctx();await a.resume();
   const src=a.createMediaStreamSource(stream),pr=a.createScriptProcessor(4096,1,1),mute=a.createGain();mute.gain.value=0;
   const chunks=[];let n=0,peak=0;
@@ -104,7 +105,7 @@ async function startRec(){
 async function stopRec(){
   if(!st)return;const s=st;st=null;clearInterval(tick);
   try{s.pr.disconnect();s.src.disconnect();s.mute.disconnect()}catch(e){}
-  s.pr.onaudioprocess=null;s.stream.getTracks().forEach(t=>t.stop());
+  s.pr.onaudioprocess=null;s.stream.getTracks().forEach(t=>t.stop());AS('playback');
   $('rb').classList.remove('on');$('rb').textContent='🎙️';$('rb').style.setProperty('--lv',1);$('rb').style.setProperty('--lo',.4);$('rt').textContent='0:00';
   const len=s.n;if(len<s.sr*.3){$('hint').textContent='Muy cortito 😅 prueba otra vez';return}
   const f=new Float32Array(len);let o=0;for(const c of s.chunks){f.set(c,o);o+=c.length}
@@ -119,14 +120,15 @@ async function stopRec(){
 }
 // ---------- datos de audio
 function f32(r){if(r._f)return r._f;const i=new Int16Array(r.pcm),f=new Float32Array(i.length);for(let k=0;k<i.length;k++)f[k]=i[k]/(i[k]<0?32768:32767);return r._f=f}
-function getBuf(r,rev){const k=r.id+(rev?'r':'f');let b=bufCache.get(k);if(b)return b;const f=f32(r),a=ctx();b=a.createBuffer(1,f.length,r.sr);const d=b.getChannelData(0);if(rev){for(let i=0,n=f.length;i<n;i++)d[i]=f[n-1-i]}else d.set(f);bufCache.set(k,b);return b}
+function getBuf(r,rev){const k=r.id+(rev?'r':'f');let b=bufCache.get(k);if(b)return b;const f=f32(r),a=ctx();b=a.createBuffer(1,f.length,r.sr);const d=b.getChannelData(0);let pk=0;for(let i=0;i<f.length;i++){const v=Math.abs(f[i]);if(v>pk)pk=v}const gn=Math.min(25,.95/Math.max(pk,.01));if(rev){for(let i=0,n=f.length;i<n;i++)d[i]=f[n-1-i]*gn}else{for(let i=0;i<f.length;i++)d[i]=f[i]*gn}bufCache.set(k,b);return b}
 function peaks(r,rev,n){const f=f32(r),L=f.length,out=new Float32Array(n),w=L/n;for(let i=0;i<n;i++){const s=Math.floor(i*w),e=Math.min(L,Math.floor((i+1)*w)+1);let m=0;for(let j=s;j<e;j+=Math.max(1,(e-s)>>5)){const v=Math.abs(f[j]);if(v>m)m=v}out[rev?n-1-i:i]=m}let mx=.05;for(const v of out)if(v>mx)mx=v;for(let i=0;i<n;i++)out[i]/=mx;return out}
 // ---------- reproducir
+let MS=null;function master(){if(MS)return MS;const a=ctx(),g=a.createGain();g.gain.value=2.4;const c=a.createDynamicsCompressor();c.threshold.value=-10;c.knee.value=6;c.ratio.value=14;c.attack.value=.003;c.release.value=.15;const o=a.createGain();o.gain.value=.95;g.connect(c);c.connect(o);o.connect(a.destination);return MS=g}
 function stopPlay(){if(cur){try{cur.src.onended=null;cur.src.stop()}catch(e){}cur=null}cancelAnimationFrame(raf);paint()}
 function play(r,rev){
   unlock();const had=cur&&cur.id===r.id&&cur.rev===rev;stopPlay();if(had)return;
   const a=ctx(),src=a.createBufferSource();src.buffer=getBuf(r,rev);src.playbackRate.value=r.rate||1;
-  const g=a.createGain();g.gain.value=1;src.connect(g);g.connect(a.destination);
+  src.connect(master());
   const dur=src.buffer.duration/(r.rate||1);cur={id:r.id,rev,src,t0:a.currentTime+.02,dur};
   src.onended=()=>{if(cur&&cur.src===src){cur=null;cancelAnimationFrame(raf);paint()}};
   src.start(cur.t0);paint();loop();
