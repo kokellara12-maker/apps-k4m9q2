@@ -143,6 +143,14 @@
    "icono": "⛏️",
    "color": "#4caf50",
    "cat": "juegos"
+   },
+  {
+   "nombre": "Block Blast",
+   "desc": "Arrastra piezas al tablero 8x8, completa filas y columnas, encadena combos. Sin fin, a por el récord.",
+   "href": "blockblast.html",
+   "icono": "🧩",
+   "color": "#7b61ff",
+   "cat": "juegos"
    }
  ]
 }
