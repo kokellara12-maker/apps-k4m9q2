@@ -1,6 +1,15 @@
 {
  "apps": [
   {
+   "nombre": "Puertas",
+   "desc": "Terror estilo Doors: habitaciones oscuras, llaves y un monstruo que te caza. Escóndete en los armarios.",
+   "href": "puertas.html",
+   "icono": "🚪",
+   "color": "#8a1c1c",
+   "cat": "juegos",
+   "img": "img/puertas.webp"
+  },
+  {
    "nombre": "Metro Run",
    "desc": "Estilo Subway Surfers 3D: esquiva trenes y barreras, rueda, salta y recoge monedas.",
    "href": "metro.html",
