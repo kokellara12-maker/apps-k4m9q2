@@ -1,6 +1,15 @@
 {
  "apps": [
   {
+   "nombre": "Backrooms",
+   "desc": "Terror: laberinto amarillo infinito. Encuentra la salida verde mientras algo te persigue.",
+   "href": "backrooms.html",
+   "icono": "🟨",
+   "color": "#b8a94a",
+   "cat": "juegos",
+   "img": "img/backrooms.webp"
+  },
+  {
    "nombre": "Torre Infernal",
    "desc": "Obby tipo Tower of Hell: sube la torre antes de que la lava te alcance. Saltos, spinners y ladrillos rojos.",
    "href": "torre.html",
