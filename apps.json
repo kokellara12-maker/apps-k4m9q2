@@ -239,6 +239,14 @@
       "color": "#00b8d4",
       "cat": "juegos",
       "img": "img/benalmadena.webp"
+    },
+    {
+      "nombre": "Teoría Musical",
+      "desc": "Instrumento de escalas: toca, graba bucles, cuantiza, swing y exporta WAV/MIDI. Gratis y Premium.",
+      "href": "musica.html",
+      "icono": "🎹",
+      "color": "#ff3d7f",
+      "cat": "herramientas"
     }
   ]
 }
