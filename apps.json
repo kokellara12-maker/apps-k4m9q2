@@ -1,6 +1,15 @@
 {
  "apps": [
   {
+   "nombre": "Taller de Electrónica",
+   "desc": "Simulador: ESP32 y Arduino, placa de pruebas, LEDs, sensores, pantallas y código. Monta circuitos y prográmalos.",
+   "href": "taller.html",
+   "icono": "🔌",
+   "color": "#0f6a8a",
+   "cat": "herramientas",
+   "img": "img/taller.webp"
+  },
+  {
    "nombre": "Beat Maker",
    "desc": "Caja de ritmos de 8 pistas con bajo y synth. Presets de trap, house, techno…",
    "href": "beat.html",
