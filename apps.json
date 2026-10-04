@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Machaca al Pupi",
+   "desc": "Descarga tu estrés con 12 armas: martillo, bombas, rayos, yunques… 🔨💥",
+   "href": "muneco.html",
+   "icono": "🔨",
+   "color": "#ffb703",
+   "cat": "juegos",
+   "sub": "accion",
+   "tags": "kick the buddy machacar muneco buddy ragdoll estres armas bomba martillo pupi pegar violencia divertido",
+   "img": "img/muneco.webp"
+  },
+  {
    "nombre": "Ruleta",
    "desc": "Ruleta neón con tus opciones: gira y decide 🎰",
    "href": "ruleta.html",
