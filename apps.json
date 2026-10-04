@@ -183,6 +183,14 @@
    "icono": "🧪",
    "color": "#00acc1",
    "cat": "juegos"
+  },
+  {
+   "nombre": "De Vagabundo a Millonario",
+   "desc": "EN 3D: encuentras una máquina de dinero infinito, compras casas y las llenas con 250+ objetos. ¡Mejora tu hogar!",
+   "href": "casa.html",
+   "icono": "🤑",
+   "color": "#2e9d52",
+   "cat": "juegos"
   }
  ]
 }
