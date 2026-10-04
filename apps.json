@@ -135,6 +135,14 @@
    "icono": "🕵️",
    "color": "#ff3b5c",
    "cat": "juegos"
-  }
+  },
+  {
+   "nombre": "CubeCraft",
+   "desc": "Mundo infinito de bloques: cuevas, minas, crafteo, hornos, mobs, día y noche. Supervivencia o creativo.",
+   "href": "cubecraft.html",
+   "icono": "⛏️",
+   "color": "#4caf50",
+   "cat": "juegos"
+   }
  ]
 }
