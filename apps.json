@@ -1,274 +1,283 @@
 {
-  "apps": [
-    {
-      "nombre": "Contraseñas",
-      "desc": "Genera contraseñas seguras: elige longitud y símbolos, y mira lo fuertes que son.",
-      "href": "contrasenas.html",
-      "icono": "key",
-      "color": "#4f8cff",
-      "cat": "herramientas",
-      "img": "img/contrasenas.webp"
-    },
-    {
-      "nombre": "Carreras 3D",
-      "desc": "Carreras realistas + modo Drift con puntos. 5 mapas, fantasma y sonido de motor.",
-      "href": "carreras3d.html",
-      "icono": "🏎️",
-      "color": "#ff4d3d",
-      "cat": "juegos",
-      "img": "img/carreras3d.webp"
-    },
-    {
-      "nombre": "Pengu Ice",
-      "desc": "Estilo Pengo: empuja bloques de hielo, aplasta llamas y junta los 3 diamantes.",
-      "href": "pengu.html",
-      "icono": "🐧",
-      "color": "#35e0ff",
-      "cat": "juegos",
-      "img": "img/pengu.webp"
-    },
-    {
-      "nombre": "Slide Ice",
-      "desc": "Puzzle pixel contrarreloj: desliza al pingüino por el hielo hasta el iglú.",
-      "href": "slideice.html",
-      "icono": "🧊",
-      "color": "#35e0ff",
-      "cat": "juegos",
-      "img": "img/slideice.webp"
-    },
-    {
-      "nombre": "Ninja Slice",
-      "desc": "Corta fruta pixel con el dedo, esquiva bombas, combos y modo frenesí.",
-      "href": "ninja.html",
-      "icono": "🥷",
-      "color": "#ff4d6d",
-      "cat": "juegos",
-      "img": "img/ninja.webp"
-    },
-    {
-      "nombre": "Color Rush",
-      "desc": "Salta y atraviesa solo el color de tu bola. Anillos, cruces y prismas.",
-      "href": "colorrush.html",
-      "icono": "🌈",
-      "color": "#b05cff",
-      "cat": "juegos",
-      "img": "img/colorrush.webp"
-    },
-    {
-      "nombre": "Merge Planets",
-      "desc": "Suelta planetas, junta los iguales y llega al Sol. Estilo Suika en pixel art.",
-      "href": "planets.html",
-      "icono": "🪐",
-      "color": "#ffa300",
-      "cat": "juegos",
-      "img": "img/planets.webp"
-    },
-    {
-      "nombre": "Survivors",
-      "desc": "Sobrevive a hordas: armas automáticas, gemas, mejoras y jefes. Joystick flotante.",
-      "href": "survivors.html",
-      "icono": "🧙",
-      "color": "#ff004d",
-      "cat": "juegos",
-      "img": "img/survivors.webp"
-    },
-    {
-      "nombre": "Last Hill",
-      "desc": "Defensa de torres pixel: arqueros, cañones, hielo y rayos contra oleadas y jefes.",
-      "href": "lasthill.html",
-      "icono": "🏰",
-      "color": "#00e436",
-      "cat": "juegos",
-      "img": "img/lasthill.webp"
-    },
-    {
-      "nombre": "Gravity Flip",
-      "desc": "3D neón: corres por un túnel y volteas la gravedad para esquivar pinchos y huecos.",
-      "href": "gravityflip.html",
-      "icono": "🌀",
-      "color": "#b05cff",
-      "cat": "juegos",
-      "img": "img/gravityflip.webp"
-    },
-    {
-      "nombre": "Orbit",
-      "desc": "3D espacial: orbita planetas, suéltate en el momento justo y engánchate al siguiente.",
-      "href": "orbit.html",
-      "icono": "🛰️",
-      "color": "#35e0ff",
-      "cat": "juegos",
-      "img": "img/orbit.webp"
-    },
-    {
-      "nombre": "Basket Flick",
-      "desc": "Lanza canastas con un gesto en 3D. 60 segundos, rachas y aro que se mueve.",
-      "href": "basket.html",
-      "icono": "🏀",
-      "color": "#ff8a1a",
-      "cat": "juegos",
-      "img": "img/basket.webp"
-    },
-    {
-      "nombre": "Drift King",
-      "desc": "Derrapes pixel en un parking: marcas de ruedas, humo, cadena de multiplicadores y 60 s.",
-      "href": "driftking.html",
-      "icono": "🏎️",
-      "color": "#ff004d",
-      "cat": "juegos",
-      "img": "img/driftking.webp"
-    },
-    {
-      "nombre": "Royale Island",
-      "desc": "Battle royale 3D: salta del bus, saquea, construye y sobrevive a la tormenta. 23 bots con puntería.",
-      "href": "royale.html",
-      "icono": "🏝️",
-      "color": "#7a3cff",
-      "cat": "juegos",
-      "img": "img/royale.webp"
-    },
-    {
-      "nombre": "Drift Runner",
-      "desc": "Drift 100% manual: volante + freno de mano, 3D o 2D pixel",
-      "href": "./driftrunner.html",
-      "icono": "🏎️",
-      "color": "#ff2bd6",
-      "cat": "juegos",
-      "img": "img/driftrunner.webp"
-    },
-    {
-      "nombre": "Voz Reversa",
-      "desc": "Graba tu voz, se guarda y la escuchas al revés. Velocidad, compartir y todo offline.",
-      "href": "vozreversa.html",
-      "icono": "⏪",
-      "color": "#ff2bd6",
-      "cat": "aplicaciones",
-      "img": "img/vozreversa.webp"
-    },
-    {
-      "nombre": "El Impostor",
-      "desc": "El de toda la vida: un móvil, palabra secreta y un impostor que disimula. 3 a 14 jugadores.",
-      "href": "impostor.html",
-      "icono": "🕵️",
-      "color": "#ff3b5c",
-      "cat": "juegos",
-      "img": "img/impostor.webp"
-    },
-    {
-      "nombre": "CubeCraft",
-      "desc": "Mundo infinito de bloques: cuevas, minas, crafteo, hornos, mobs, día y noche. Supervivencia o creativo.",
-      "href": "cubecraft.html",
-      "icono": "⛏️",
-      "color": "#4caf50",
-      "cat": "juegos",
-      "img": "img/cubecraft.webp"
-    },
-    {
-      "nombre": "Block Blast",
-      "desc": "Arrastra piezas al tablero 8x8, completa filas y columnas, encadena combos. Sin fin, a por el récord.",
-      "href": "blockblast.html",
-      "icono": "🧩",
-      "color": "#7b61ff",
-      "cat": "juegos",
-      "img": "img/blockblast.webp"
-    },
-    {
-      "nombre": "Grow a Garden",
-      "desc": "EN 3D: camina por tu isla, planta, riega y cosecha. Mutaciones, eventos de clima, mascotas y huevos. Crece aunque cierres la app.",
-      "href": "growgarden.html",
-      "icono": "🌱",
-      "color": "#43a047",
-      "cat": "juegos",
-      "img": "img/growgarden.webp"
-    },
-    {
-      "nombre": "Steal a Brainrot",
-      "desc": "EN 3D: compra brainrots en la cinta, cobra sin parar y róbalos a otros esquivando guardias.",
-      "href": "stealbrainrot.html",
-      "icono": "🧠",
-      "color": "#ff4081",
-      "cat": "juegos",
-      "img": "img/stealbrainrot.webp"
-    },
-    {
-      "nombre": "El Búnker Perfecto",
-      "desc": "EN 3D: tienes 100 € y se acaba el mundo. Monta tu búnker y sobrevive a bombas, zombis, tsunamis y más.",
-      "href": "bunker.html",
-      "icono": "🏚️",
-      "color": "#e65100",
-      "cat": "juegos",
-      "img": "img/bunker.webp"
-    },
-    {
-      "nombre": "Laboratorio de Pruebas",
-      "desc": "EN 3D: prensa hidráulica, microondas, horno, torre, lava/ácido/nitrógeno y moldes. Prueba objetos y seres vivos en todo.",
-      "href": "lab.html",
-      "icono": "🧪",
-      "color": "#00acc1",
-      "cat": "juegos",
-      "img": "img/lab.webp"
-    },
-    {
-      "nombre": "De Vagabundo a Millonario",
-      "desc": "EN 3D: encuentras una máquina de dinero infinito, compras casas y las llenas con 250+ objetos. ¡Mejora tu hogar!",
-      "href": "casa.html",
-      "icono": "🤑",
-      "color": "#2e9d52",
-      "cat": "juegos",
-      "img": "img/casa.webp"
-    },
-    {
-      "nombre": "Vecina Siniestra",
-      "desc": "SIGILO 3D en 1ª persona: cuela en la casa de Doña Remedios, roba las llaves y el Rodillo de Oro del sótano. ¡Te oye, te ve y aprende! (en horizontal)",
-      "href": "vecina.html",
-      "icono": "🥖",
-      "color": "#c2508a",
-      "cat": "juegos",
-      "img": "img/vecina.webp"
-    },
-    {
-      "nombre": "¡Que viene mamá!",
-      "desc": "Ordena TU cuarto en 3D antes de que llegue mamá 🧹",
-      "href": "./cuarto.html",
-      "icono": "🛏️",
-      "color": "#7c5cff",
-      "cat": "juegos",
-      "img": "img/cuarto.webp"
-    },
-    {
-      "nombre": "Turno de Noche",
-      "desc": "Sobrevive 5 noches vigilando una juguetería encantada 🔦",
-      "href": "noche.html",
-      "icono": "🧸",
-      "color": "#4b3a8f",
-      "cat": "juegos",
-      "img": "img/noche.webp"
-    },
-    {
-      "nombre": "Perro Ladrón",
-      "desc": "Eres un teckel en primera persona: roba cosas en el cuarto de tu hermana sin que te pille. 3D",
-      "href": "./hermana.html",
-      "icono": "🐶",
-      "color": "#ff6fae",
-      "cat": "juegos",
-      "img": "img/hermana.webp"
-    },
-    {
-      "nombre": "Benalmádena Sim",
-      "desc": "GTA en patinete eléctrico por Benalmádena: repartidor, camello, robos, armas y policía. 3D",
-      "href": "./benalmadena.html",
-      "icono": "🛴",
-      "color": "#00b8d4",
-      "cat": "juegos",
-      "img": "img/benalmadena.webp"
-    },
-    {
-      "nombre": "Teoría Musical",
-      "desc": "Dibuja y suena: pintas líneas y se convierten en música. 9 colores, escalas, octavas, exportar.",
-      "href": "musica.html",
-      "icono": "🎹",
-      "color": "#ff3d7f",
-      "cat": "herramientas",
-      "img": "img/musica.webp"
-    }
-  ]
+ "apps": [
+  {
+   "nombre": "Skate Park",
+   "desc": "Skate 3D: skater real, halfpipe, rampas, rails, grinds, ollie, flips y combos. 2 minutos para batir tu récord.",
+   "href": "skate.html",
+   "icono": "🛹",
+   "color": "#ff7a1a",
+   "cat": "juegos",
+   "img": "img/skate.webp"
+  },
+  {
+   "nombre": "Contraseñas",
+   "desc": "Genera contraseñas seguras: elige longitud y símbolos, y mira lo fuertes que son.",
+   "href": "contrasenas.html",
+   "icono": "key",
+   "color": "#4f8cff",
+   "cat": "herramientas",
+   "img": "img/contrasenas.webp"
+  },
+  {
+   "nombre": "Carreras 3D",
+   "desc": "Carreras realistas + modo Drift con puntos. 5 mapas, fantasma y sonido de motor.",
+   "href": "carreras3d.html",
+   "icono": "🏎️",
+   "color": "#ff4d3d",
+   "cat": "juegos",
+   "img": "img/carreras3d.webp"
+  },
+  {
+   "nombre": "Pengu Ice",
+   "desc": "Estilo Pengo: empuja bloques de hielo, aplasta llamas y junta los 3 diamantes.",
+   "href": "pengu.html",
+   "icono": "🐧",
+   "color": "#35e0ff",
+   "cat": "juegos",
+   "img": "img/pengu.webp"
+  },
+  {
+   "nombre": "Slide Ice",
+   "desc": "Puzzle pixel contrarreloj: desliza al pingüino por el hielo hasta el iglú.",
+   "href": "slideice.html",
+   "icono": "🧊",
+   "color": "#35e0ff",
+   "cat": "juegos",
+   "img": "img/slideice.webp"
+  },
+  {
+   "nombre": "Ninja Slice",
+   "desc": "Corta fruta pixel con el dedo, esquiva bombas, combos y modo frenesí.",
+   "href": "ninja.html",
+   "icono": "🥷",
+   "color": "#ff4d6d",
+   "cat": "juegos",
+   "img": "img/ninja.webp"
+  },
+  {
+   "nombre": "Color Rush",
+   "desc": "Salta y atraviesa solo el color de tu bola. Anillos, cruces y prismas.",
+   "href": "colorrush.html",
+   "icono": "🌈",
+   "color": "#b05cff",
+   "cat": "juegos",
+   "img": "img/colorrush.webp"
+  },
+  {
+   "nombre": "Merge Planets",
+   "desc": "Suelta planetas, junta los iguales y llega al Sol. Estilo Suika en pixel art.",
+   "href": "planets.html",
+   "icono": "🪐",
+   "color": "#ffa300",
+   "cat": "juegos",
+   "img": "img/planets.webp"
+  },
+  {
+   "nombre": "Survivors",
+   "desc": "Sobrevive a hordas: armas automáticas, gemas, mejoras y jefes. Joystick flotante.",
+   "href": "survivors.html",
+   "icono": "🧙",
+   "color": "#ff004d",
+   "cat": "juegos",
+   "img": "img/survivors.webp"
+  },
+  {
+   "nombre": "Last Hill",
+   "desc": "Defensa de torres pixel: arqueros, cañones, hielo y rayos contra oleadas y jefes.",
+   "href": "lasthill.html",
+   "icono": "🏰",
+   "color": "#00e436",
+   "cat": "juegos",
+   "img": "img/lasthill.webp"
+  },
+  {
+   "nombre": "Gravity Flip",
+   "desc": "3D neón: corres por un túnel y volteas la gravedad para esquivar pinchos y huecos.",
+   "href": "gravityflip.html",
+   "icono": "🌀",
+   "color": "#b05cff",
+   "cat": "juegos",
+   "img": "img/gravityflip.webp"
+  },
+  {
+   "nombre": "Orbit",
+   "desc": "3D espacial: orbita planetas, suéltate en el momento justo y engánchate al siguiente.",
+   "href": "orbit.html",
+   "icono": "🛰️",
+   "color": "#35e0ff",
+   "cat": "juegos",
+   "img": "img/orbit.webp"
+  },
+  {
+   "nombre": "Basket Flick",
+   "desc": "Lanza canastas con un gesto en 3D. 60 segundos, rachas y aro que se mueve.",
+   "href": "basket.html",
+   "icono": "🏀",
+   "color": "#ff8a1a",
+   "cat": "juegos",
+   "img": "img/basket.webp"
+  },
+  {
+   "nombre": "Drift King",
+   "desc": "Derrapes pixel en un parking: marcas de ruedas, humo, cadena de multiplicadores y 60 s.",
+   "href": "driftking.html",
+   "icono": "🏎️",
+   "color": "#ff004d",
+   "cat": "juegos",
+   "img": "img/driftking.webp"
+  },
+  {
+   "nombre": "Royale Island",
+   "desc": "Battle royale 3D: salta del bus, saquea, construye y sobrevive a la tormenta. 23 bots con puntería.",
+   "href": "royale.html",
+   "icono": "🏝️",
+   "color": "#7a3cff",
+   "cat": "juegos",
+   "img": "img/royale.webp"
+  },
+  {
+   "nombre": "Drift Runner",
+   "desc": "Drift 100% manual: volante + freno de mano, 3D o 2D pixel",
+   "href": "./driftrunner.html",
+   "icono": "🏎️",
+   "color": "#ff2bd6",
+   "cat": "juegos",
+   "img": "img/driftrunner.webp"
+  },
+  {
+   "nombre": "Voz Reversa",
+   "desc": "Graba tu voz, se guarda y la escuchas al revés. Velocidad, compartir y todo offline.",
+   "href": "vozreversa.html",
+   "icono": "⏪",
+   "color": "#ff2bd6",
+   "cat": "aplicaciones",
+   "img": "img/vozreversa.webp"
+  },
+  {
+   "nombre": "El Impostor",
+   "desc": "El de toda la vida: un móvil, palabra secreta y un impostor que disimula. 3 a 14 jugadores.",
+   "href": "impostor.html",
+   "icono": "🕵️",
+   "color": "#ff3b5c",
+   "cat": "juegos",
+   "img": "img/impostor.webp"
+  },
+  {
+   "nombre": "CubeCraft",
+   "desc": "Mundo infinito de bloques: cuevas, minas, crafteo, hornos, mobs, día y noche. Supervivencia o creativo.",
+   "href": "cubecraft.html",
+   "icono": "⛏️",
+   "color": "#4caf50",
+   "cat": "juegos",
+   "img": "img/cubecraft.webp"
+  },
+  {
+   "nombre": "Block Blast",
+   "desc": "Arrastra piezas al tablero 8x8, completa filas y columnas, encadena combos. Sin fin, a por el récord.",
+   "href": "blockblast.html",
+   "icono": "🧩",
+   "color": "#7b61ff",
+   "cat": "juegos",
+   "img": "img/blockblast.webp"
+  },
+  {
+   "nombre": "Grow a Garden",
+   "desc": "EN 3D: camina por tu isla, planta, riega y cosecha. Mutaciones, eventos de clima, mascotas y huevos. Crece aunque cierres la app.",
+   "href": "growgarden.html",
+   "icono": "🌱",
+   "color": "#43a047",
+   "cat": "juegos",
+   "img": "img/growgarden.webp"
+  },
+  {
+   "nombre": "Steal a Brainrot",
+   "desc": "EN 3D: compra brainrots en la cinta, cobra sin parar y róbalos a otros esquivando guardias.",
+   "href": "stealbrainrot.html",
+   "icono": "🧠",
+   "color": "#ff4081",
+   "cat": "juegos",
+   "img": "img/stealbrainrot.webp"
+  },
+  {
+   "nombre": "El Búnker Perfecto",
+   "desc": "EN 3D: tienes 100 € y se acaba el mundo. Monta tu búnker y sobrevive a bombas, zombis, tsunamis y más.",
+   "href": "bunker.html",
+   "icono": "🏚️",
+   "color": "#e65100",
+   "cat": "juegos",
+   "img": "img/bunker.webp"
+  },
+  {
+   "nombre": "Laboratorio de Pruebas",
+   "desc": "EN 3D: prensa hidráulica, microondas, horno, torre, lava/ácido/nitrógeno y moldes. Prueba objetos y seres vivos en todo.",
+   "href": "lab.html",
+   "icono": "🧪",
+   "color": "#00acc1",
+   "cat": "juegos",
+   "img": "img/lab.webp"
+  },
+  {
+   "nombre": "De Vagabundo a Millonario",
+   "desc": "EN 3D: encuentras una máquina de dinero infinito, compras casas y las llenas con 250+ objetos. ¡Mejora tu hogar!",
+   "href": "casa.html",
+   "icono": "🤑",
+   "color": "#2e9d52",
+   "cat": "juegos",
+   "img": "img/casa.webp"
+  },
+  {
+   "nombre": "Vecina Siniestra",
+   "desc": "SIGILO 3D en 1ª persona: cuela en la casa de Doña Remedios, roba las llaves y el Rodillo de Oro del sótano. ¡Te oye, te ve y aprende! (en horizontal)",
+   "href": "vecina.html",
+   "icono": "🥖",
+   "color": "#c2508a",
+   "cat": "juegos",
+   "img": "img/vecina.webp"
+  },
+  {
+   "nombre": "¡Que viene mamá!",
+   "desc": "Ordena TU cuarto en 3D antes de que llegue mamá 🧹",
+   "href": "./cuarto.html",
+   "icono": "🛏️",
+   "color": "#7c5cff",
+   "cat": "juegos",
+   "img": "img/cuarto.webp"
+  },
+  {
+   "nombre": "Turno de Noche",
+   "desc": "Sobrevive 5 noches vigilando una juguetería encantada 🔦",
+   "href": "noche.html",
+   "icono": "🧸",
+   "color": "#4b3a8f",
+   "cat": "juegos",
+   "img": "img/noche.webp"
+  },
+  {
+   "nombre": "Perro Ladrón",
+   "desc": "Eres un teckel en primera persona: roba cosas en el cuarto de tu hermana sin que te pille. 3D",
+   "href": "./hermana.html",
+   "icono": "🐶",
+   "color": "#ff6fae",
+   "cat": "juegos",
+   "img": "img/hermana.webp"
+  },
+  {
+   "nombre": "Benalmádena Sim",
+   "desc": "GTA en patinete eléctrico por Benalmádena: repartidor, camello, robos, armas y policía. 3D",
+   "href": "./benalmadena.html",
+   "icono": "🛴",
+   "color": "#00b8d4",
+   "cat": "juegos",
+   "img": "img/benalmadena.webp"
+  },
+  {
+   "nombre": "Teoría Musical",
+   "desc": "Dibuja y suena: pintas líneas y se convierten en música. 9 colores, escalas, octavas, exportar.",
+   "href": "musica.html",
+   "icono": "🎹",
+   "color": "#ff3d7f",
+   "cat": "herramientas",
+   "img": "img/musica.webp"
+  }
+ ]
 }
