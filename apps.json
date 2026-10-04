@@ -1,6 +1,15 @@
 {
  "apps": [
   {
+   "nombre": "Metro Run",
+   "desc": "Estilo Subway Surfers 3D: esquiva trenes y barreras, rueda, salta y recoge monedas.",
+   "href": "metro.html",
+   "icono": "🚇",
+   "color": "#ff3b6b",
+   "cat": "juegos",
+   "img": "img/metro.webp"
+  },
+  {
    "nombre": "Palabrita",
    "desc": "Wordle en español: palabra diaria o modo libre, con estadísticas.",
    "href": "palabrita.html",
