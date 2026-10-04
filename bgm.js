@@ -3,6 +3,10 @@
 (function () {
   'use strict';
   var W = window, D = document;
+  var SET = { master: 1, music: 1, fx: 1, eng: 1 }, CH = [];
+  try { var sv = JSON.parse(localStorage.getItem('mis_snd') || 'null'); if (sv) for (var k0 in SET) if (typeof sv[k0] === 'number') SET[k0] = Math.max(0, Math.min(1, sv[k0])); } catch (e) {}
+  var saveSet = function () { try { localStorage.setItem('mis_snd', JSON.stringify(SET)); } catch (e) {} };
+  var applyVol = function () { CH.forEach(function (c) { c.inp.gain.value = SET.fx; c.out.gain.value = 1.1 * SET.master; }); if (W.__engApply) W.__engApply(); };
 
   // ---- 1) Pulido de los efectos sintetizados: filtro suave + compresor + un pelín de reverb ----
   try {
@@ -16,14 +20,14 @@
           wet = ctx.createGain(), conv = ctx.createConvolver(), out = ctx.createGain();
         lp.type = 'lowpass'; lp.frequency.value = 9500; lp.Q.value = 0.4;
         comp.threshold.value = -20; comp.knee.value = 18; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.2;
-        wet.gain.value = 0.13; out.gain.value = 1.1;
+        wet.gain.value = 0.13; out.gain.value = 1.1 * SET.master; inp.gain.value = SET.fx;
         var len = Math.floor(ctx.sampleRate * 0.55), buf = ctx.createBuffer(2, len, ctx.sampleRate);
         for (var ch = 0; ch < 2; ch++) { var d = buf.getChannelData(ch); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.8); }
         conv.buffer = buf;
         oc.call(inp, lp); oc.call(lp, comp); oc.call(comp, out);
         oc.call(lp, conv); oc.call(conv, wet); oc.call(wet, out);
         oc.call(out, ctx.destination);
-        c = { inp: inp }; chains.set(ctx, c); return c;
+        c = { inp: inp, out: out }; chains.set(ctx, c); CH.push(c); return c;
       };
       AN.connect = function (dst) {
         try {
@@ -35,6 +39,7 @@
         return oc.apply(this, arguments);
       };
       AN.__mis = 1;
+      W.__chain = chain;
     }
   } catch (e) {}
 
@@ -142,7 +147,7 @@
     var wrap = function (P) {
       if (!P) return; var os = P.start, ot = P.stop;
       P.start = function (t) {
-        if (!this.__io || this.loop || !ready()) return os.apply(this, arguments);
+        if (!this.__io || this.loop || W.__noSfx || !ready()) return os.apply(this, arguments);
         if (this.__kind === 'buf' && !isNoise(this.buffer)) return os.apply(this, arguments);
         var ev = { n: this, t: (t && t > 0) ? t : this.context.currentTime, dur: this.__kind === 'buf' && arguments[2] != null ? arguments[2] : null };
         this.__ev = ev; batch.push(ev);
@@ -156,12 +161,56 @@
     W.__sfx = { get cues() { return cues; }, get ready() { return ready(); } };
   } catch (e) { try { console.warn('sfx shim', e); } catch (x) {} }
 
-  // ---- 2) Música de fondo ----
-  var sc = D.currentScript, track = sc && sc.getAttribute('data-track');
-  if (!track) return;
-  var base = (sc.src || '').replace(/[^\/]*$/, '');
-  var off = false, el = null, vol = 0, started = false, loading = false, cur = '', want = track, blobs = {}, btn = null;
-  try { off = localStorage.getItem('bgm_off') === '1'; } catch (e) {}
+  // ---- 2) Motores reales (grabaciones de coche por vueltas del motor) ----
+  var scr = D.currentScript, base = ((scr && scr.src) || '').replace(/[^\/]*$/, '');
+  var RP = [1169, 2080, 3169, 4403, 5768, 7347, 8752], EB = {}, ES = new WeakMap(), ELOAD = 0, ESTATES = [];
+  var engLoad = function (ctx) {
+    if (ELOAD) return; ELOAD = 1;
+    RP.forEach(function (r) {
+      fetch(base + 'audio/e/' + r + '.wav').then(function (x) { return x.arrayBuffer(); })
+        .then(function (ab) { return new Promise(function (ok, no) { ctx.decodeAudioData(ab, ok, no); }); })
+        .then(function (b) { EB[r] = b; }).catch(function () {});
+    });
+  };
+  W.__eng = {
+    // ctx: AudioContext del juego, rpm: vueltas, thr: acelerador 0..1, on: motor encendido
+    drive: function (ctx, rpm, thr, on) {
+      try {
+        engLoad(ctx);
+        var st = ES.get(ctx);
+        if (!st) {
+          if (!EB[RP[0]] || !EB[RP[RP.length - 1]]) return false;
+          var ok = RP.every(function (r) { return EB[r]; }); if (!ok) return false;
+          var out = ctx.createGain(); out.gain.value = 0;
+          var dst = (W.__chain && W.__chain(ctx)) ? W.__chain(ctx).out : ctx.destination;
+          out.connect(dst);
+          st = { out: out, l: [] };
+          RP.forEach(function (r) {
+            var s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = EB[r]; s.loop = true; g.gain.value = 0;
+            s.connect(g); g.connect(out); s.start(0, Math.random() * 0.5); st.l.push({ r: r, s: s, g: g });
+          });
+          ES.set(ctx, st); ESTATES.push(st);
+        }
+        var t = ctx.currentTime, x = Math.max(RP[0], Math.min(RP[RP.length - 1], rpm)), i = 0;
+        while (i < RP.length - 2 && x > RP[i + 1]) i++;
+        var f = (x - RP[i]) / (RP[i + 1] - RP[i]); f = Math.max(0, Math.min(1, f));
+        st.l.forEach(function (o, k) {
+          var w = k === i ? Math.cos(f * Math.PI / 2) : (k === i + 1 ? Math.sin(f * Math.PI / 2) : 0);
+          o.g.gain.setTargetAtTime(w, t, 0.04);
+          if (k === i || k === i + 1) o.s.playbackRate.setTargetAtTime(Math.max(0.8, Math.min(1.25, rpm / o.r)), t, 0.04);
+        });
+        var v = on ? (0.3 + 0.7 * Math.max(0, Math.min(1, thr))) * 0.7 : 0;
+        st.v = v; st.out.gain.setTargetAtTime(v * SET.eng, t, 0.05);
+        return true;
+      } catch (e) { return false; }
+    }
+  };
+  W.__engApply = function () { ESTATES.forEach(function (st) { try { st.out.gain.value = (st.v || 0) * SET.eng; } catch (e) {} }); };
+  applyVol();
+
+  // ---- 3) Música de fondo ----
+  var track = scr && scr.getAttribute('data-track');
+  var off = false, el = null, vol = 0, started = false, loading = false, cur = '', want = track || '', blobs = {}, btn = null, last = 0;
 
   var load = function (k) {
     if (blobs[k]) return Promise.resolve(blobs[k]);
@@ -184,40 +233,59 @@
     } catch (e) {}
     last = performance.now(); requestAnimationFrame(tick);
   };
-  var last = 0;
   var tick = function (t) {
     var dt = Math.min(0.1, (t - last) / 1000); last = t;
     if (el) {
-      var tg = (off || D.hidden) ? 0 : 0.3;
-      if (want !== cur && !loading) {
-        if (!off && !D.hidden) { if (vol < 0.02 || !cur) swap(want); else vol = Math.max(0, vol - dt * 1.6); }
+      var tg = (D.hidden || !want) ? 0 : 0.3 * SET.music * SET.master;
+      if (want && want !== cur && !loading) {
+        if (!D.hidden && tg > 0) { if (vol < 0.02 || !cur) swap(want); else vol = Math.max(0, vol - dt * 1.6); }
       } else vol += (tg - vol) * Math.min(1, dt * (tg > vol ? 0.7 : 2.5));
       el.volume = Math.max(0, Math.min(1, vol));
-      if (D.hidden && !el.paused) el.pause();
-      else if (!D.hidden && !off && el.paused && cur && !loading) { var q = el.play(); if (q && q.catch) q.catch(function () {}); }
+      if ((D.hidden || tg === 0 && vol < 0.005) && !el.paused) el.pause();
+      else if (!D.hidden && tg > 0 && el.paused && cur && !loading) { var q = el.play(); if (q && q.catch) q.catch(function () {}); }
     }
     requestAnimationFrame(tick);
   };
 
+  // ---- 4) Panel de sonido (en todos los juegos) ----
+  var panel = null;
+  var ROWS = [['master', '🔊', 'General'], ['music', '🎵', 'Música'], ['fx', '💥', 'Efectos'], ['eng', '🏎️', 'Motores']];
+  var closePanel = function () { if (panel) { panel.remove(); panel = null; } };
+  var openPanel = function () {
+    if (panel) { closePanel(); return; }
+    kick();
+    panel = D.createElement('div');
+    panel.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;font-family:-apple-system,system-ui,sans-serif;touch-action:manipulation';
+    var card = D.createElement('div');
+    card.style.cssText = 'width:min(88vw,360px);max-height:92vh;overflow:auto;background:#1c1b2e;color:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 10px 40px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15)';
+    var h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:17px">🎚️ Sonido</b><span id=mx style="font-size:20px;padding:4px 8px;cursor:pointer">✖</span></div>';
+    ROWS.forEach(function (r) {
+      h += '<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:14px"><span>' + r[1] + ' ' + r[2] + '</span><span id="v_' + r[0] + '">' + Math.round(SET[r[0]] * 100) + '%</span></div><input type=range min=0 max=100 value="' + Math.round(SET[r[0]] * 100) + '" data-k="' + r[0] + '" style="width:100%;height:30px;accent-color:#7c4dff"></div>';
+    });
+    h += '<div style="display:flex;gap:8px;margin-top:10px"><div id=mmute style="flex:1;text-align:center;padding:10px;border-radius:12px;background:#3b3560;font-size:14px;cursor:pointer">🔇 Silenciar todo</div><div id=mrst style="flex:1;text-align:center;padding:10px;border-radius:12px;background:#3b3560;font-size:14px;cursor:pointer">↺ Normal</div></div>';
+    card.innerHTML = h; panel.appendChild(card); D.body.appendChild(panel);
+    ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'touchmove', 'mousedown', 'click', 'keydown'].forEach(function (ev) { panel.addEventListener(ev, function (e) { e.stopPropagation(); }, { passive: true }); });
+    card.querySelectorAll('input').forEach(function (inp) {
+      inp.addEventListener('input', function () { var k = inp.getAttribute('data-k'); SET[k] = inp.value / 100; card.querySelector('#v_' + k).textContent = inp.value + '%'; saveSet(); applyVol(); });
+    });
+    var sync = function () { card.querySelectorAll('input').forEach(function (inp) { var k = inp.getAttribute('data-k'); inp.value = Math.round(SET[k] * 100); card.querySelector('#v_' + k).textContent = inp.value + '%'; }); };
+    card.querySelector('#mx').addEventListener('click', closePanel);
+    panel.addEventListener('click', function (e) { if (e.target === panel) closePanel(); });
+    card.querySelector('#mmute').addEventListener('click', function () { SET.master = SET.master > 0 ? 0 : 1; saveSet(); applyVol(); sync(); });
+    card.querySelector('#mrst').addEventListener('click', function () { SET.master = 1; SET.music = 1; SET.fx = 1; SET.eng = 1; saveSet(); applyVol(); sync(); });
+  };
   var mkBtn = function () {
     if (btn || !D.body) return;
     btn = D.createElement('div');
-    btn.setAttribute('aria-label', 'Música');
-    btn.style.cssText = 'position:fixed;left:calc(6px + env(safe-area-inset-left,0px));bottom:calc(6px + env(safe-area-inset-bottom,0px));width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:15px;line-height:30px;text-align:center;z-index:99999;opacity:.55;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation';
-    var paint = function () { btn.textContent = off ? '🔇' : '🎵'; };
-    paint();
-    var tog = function (e) {
-      e.stopPropagation(); e.preventDefault();
-      off = !off; try { localStorage.setItem('bgm_off', off ? '1' : '0'); } catch (x) {}
-      paint(); kick();
-    };
+    btn.setAttribute('aria-label', 'Sonido');
+    btn.style.cssText = 'position:fixed;left:calc(6px + env(safe-area-inset-left,0px));bottom:calc(6px + env(safe-area-inset-bottom,0px));width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;font-size:16px;line-height:32px;text-align:center;z-index:99999;opacity:.6;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation';
+    btn.textContent = '🎚️';
     btn.addEventListener('pointerdown', function (e) { e.stopPropagation(); }, true);
     btn.addEventListener('touchstart', function (e) { e.stopPropagation(); }, { passive: true });
-    btn.addEventListener('click', tog);
+    btn.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); openPanel(); });
     D.body.appendChild(btn);
   };
-
-  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(function (ev) { W.addEventListener(ev, kick, { passive: true, once: false }); });
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(function (ev) { W.addEventListener(ev, kick, { passive: true }); });
   if (D.body) mkBtn(); else D.addEventListener('DOMContentLoaded', mkBtn);
-  W.__bgm = { set: function (k) { want = k; }, get on() { return !off; } };
+  W.__bgm = { set: function (k) { want = k; }, panel: openPanel, get on() { return SET.music > 0 && SET.master > 0; } };
 })();
