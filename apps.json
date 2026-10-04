@@ -215,6 +215,14 @@
    "icono": "🧸",
    "color": "#4b3a8f",
    "cat": "juegos"
+  },
+  {
+   "nombre": "Perro Ladrón",
+   "desc": "Eres el perro y robas cosas en el cuarto de tu hermana sin que te pille. Cuarto en 3D",
+   "href": "./hermana.html",
+   "icono": "🐶",
+   "color": "#ff6fae",
+   "cat": "juegos"
   }
  ]
 }
