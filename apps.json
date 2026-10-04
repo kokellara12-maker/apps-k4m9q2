@@ -1,6 +1,72 @@
 {
  "apps": [
   {
+   "nombre": "Ruleta",
+   "desc": "Ruleta neón con tus opciones: gira y decide 🎰",
+   "href": "ruleta.html",
+   "icono": "🎰",
+   "color": "#ff2bd6",
+   "cat": "herramientas",
+   "sub": "util",
+   "tags": "ruleta decidir suerte sorteo azar elegir wheel dado cara cruz",
+   "img": "img/ruleta.webp"
+  },
+  {
+   "nombre": "Sinte Neón",
+   "desc": "Sintetizador táctil con osciloscopio psicodélico. Dibuja tu onda 🎛️",
+   "href": "sinte.html",
+   "icono": "🎛️",
+   "color": "#39ff14",
+   "cat": "herramientas",
+   "sub": "musica",
+   "tags": "sintetizador sinte osciloscopio piano teclado ondas sonido musica theremin synth",
+   "img": "img/sinte.webp"
+  },
+  {
+   "nombre": "Memes y Cómics",
+   "desc": "Crea memes y cómics: texto, stickers y ¡BOOM! Guarda y comparte 😂",
+   "href": "memes.html",
+   "icono": "😂",
+   "color": "#ffe600",
+   "cat": "herramientas",
+   "sub": "foto",
+   "tags": "memes comics meme texto stickers editor imagen bam boom plantillas",
+   "img": "img/memes.webp"
+  },
+  {
+   "nombre": "Fluidos Neón",
+   "desc": "Toca y juega con fluidos, lava, galaxias y chispas ✨",
+   "href": "fluidos.html",
+   "icono": "🌌",
+   "color": "#00e5ff",
+   "cat": "herramientas",
+   "sub": "relax",
+   "tags": "fluidos particulas lava galaxia fisica antiestres neon chispas relajante simulador",
+   "img": "img/fluidos.webp"
+  },
+  {
+   "nombre": "Ambiente Chill",
+   "desc": "Lluvia, truenos, fuego, vinilo, cafetería y lofi. Mezcla a tu gusto 🌧️",
+   "href": "ambiente.html",
+   "icono": "🌧️",
+   "color": "#8ab4ff",
+   "cat": "herramientas",
+   "sub": "relax",
+   "tags": "ambiente lofi relax dormir lluvia truenos fuego sonidos chill estudiar ruido blanco cafe",
+   "img": "img/ambiente.webp"
+  },
+  {
+   "nombre": "Glitch Cam",
+   "desc": "Foto o cámara con efectos glitch, VHS y cyberpunk en directo 📼",
+   "href": "glitch.html",
+   "icono": "📼",
+   "color": "#00f0ff",
+   "cat": "herramientas",
+   "sub": "foto",
+   "tags": "glitch foto camara editor vhs cyberpunk filtros efectos pixel rgb crt retro",
+   "img": "img/glitch.webp"
+  },
+  {
    "nombre": "Taller de Electrónica",
    "desc": "Simulador de electrónica fácil: ESP32, Cardputer ADV, Flipper Zero, iPhone, Raspberry Pi… las piezas se conectan SOLAS 🪄",
    "href": "taller.html",
@@ -13,14 +79,14 @@
   },
   {
    "nombre": "Beat Maker",
-   "desc": "Caja de ritmos de 8 pistas con bajo y synth. Presets de trap, house, techno…",
+   "desc": "Estación de loops: graba tum-tan y se repite solo en bucle. Batería, bajo y lead 🥁🔁",
    "href": "beat.html",
    "icono": "🥁",
    "color": "#ff3bd4",
    "cat": "herramientas",
    "img": "img/beat.webp",
    "sub": "musica",
-   "tags": "ritmo beats drum machine trap house techno musica bateria"
+   "tags": "ritmo beats drum machine trap house techno musica bateria loop looper estacion ritmo grabar tum tan drum bateria"
   },
   {
    "nombre": "Pixel Art",
