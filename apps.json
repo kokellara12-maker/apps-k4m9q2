@@ -191,6 +191,14 @@
    "icono": "🤑",
    "color": "#2e9d52",
    "cat": "juegos"
+  },
+  {
+   "nombre": "Vecina Siniestra",
+   "desc": "SIGILO 3D en 1ª persona: cuela en la casa de Doña Remedios, roba las llaves y el Rodillo de Oro del sótano. ¡Te oye, te ve y aprende! (en horizontal)",
+   "href": "vecina.html",
+   "icono": "🥖",
+   "color": "#c2508a",
+   "cat": "juegos"
   }
  ]
 }
