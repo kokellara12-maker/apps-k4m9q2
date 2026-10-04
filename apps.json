@@ -143,7 +143,7 @@
    "icono": "⛏️",
    "color": "#4caf50",
    "cat": "juegos"
-   },
+  },
   {
    "nombre": "Block Blast",
    "desc": "Arrastra piezas al tablero 8x8, completa filas y columnas, encadena combos. Sin fin, a por el récord.",
@@ -151,7 +151,7 @@
    "icono": "🧩",
    "color": "#7b61ff",
    "cat": "juegos"
-   },
+  },
   {
    "nombre": "Grow a Garden",
    "desc": "EN 3D: camina por tu isla, planta, riega y cosecha. Mutaciones, eventos de clima, mascotas y huevos. Crece aunque cierres la app.",
@@ -167,6 +167,14 @@
    "icono": "🧠",
    "color": "#ff4081",
    "cat": "juegos"
-   }
+  },
+  {
+   "nombre": "El Búnker Perfecto",
+   "desc": "EN 3D: tienes 100 € y se acaba el mundo. Monta tu búnker y sobrevive a bombas, zombis, tsunamis y más.",
+   "href": "bunker.html",
+   "icono": "🏚️",
+   "color": "#e65100",
+   "cat": "juegos"
+  }
  ]
 }
