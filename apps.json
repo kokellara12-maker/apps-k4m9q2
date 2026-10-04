@@ -207,6 +207,14 @@
    "icono": "🛏️",
    "color": "#7c5cff",
    "cat": "juegos"
+  },
+  {
+   "nombre": "Turno de Noche",
+   "desc": "Sobrevive 5 noches vigilando una juguetería encantada 🔦",
+   "href": "noche.html",
+   "icono": "🧸",
+   "color": "#4b3a8f",
+   "cat": "juegos"
   }
  ]
 }
