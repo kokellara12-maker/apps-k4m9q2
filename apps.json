@@ -1,6 +1,42 @@
 {
  "apps": [
   {
+   "nombre": "Palabrita",
+   "desc": "Wordle en español: palabra diaria o modo libre, con estadísticas.",
+   "href": "palabrita.html",
+   "icono": "🔤",
+   "color": "#6aaa64",
+   "cat": "juegos",
+   "img": "img/palabrita.webp"
+  },
+  {
+   "nombre": "Agujero Negro",
+   "desc": "Estilo Hole.io: traga la ciudad entera y crece más que 8 rivales.",
+   "href": "hole.html",
+   "icono": "🕳️",
+   "color": "#222",
+   "cat": "juegos",
+   "img": "img/hole.webp"
+  },
+  {
+   "nombre": "Helix Fall",
+   "desc": "Baja la bola por la torre helicoidal. Esquiva lo rojo y rompe suelos con combos.",
+   "href": "helix.html",
+   "icono": "🌀",
+   "color": "#4aa3ff",
+   "cat": "juegos",
+   "img": "img/helix.webp"
+  },
+  {
+   "nombre": "Dash Beat",
+   "desc": "Estilo Geometry Dash: salta pinchos, bloques y pozos al ritmo. 5 niveles.",
+   "href": "dash.html",
+   "icono": "🔷",
+   "color": "#7c4dff",
+   "cat": "juegos",
+   "img": "img/dash.webp"
+  },
+  {
    "nombre": "Serpientes",
    "desc": "Estilo slither: come, crece y acorrala a 14 rivales. Boost, skins y clasificación.",
    "href": "serpientes.html",
