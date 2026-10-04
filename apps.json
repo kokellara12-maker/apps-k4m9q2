@@ -1,6 +1,15 @@
 {
  "apps": [
   {
+   "nombre": "Torre Infernal",
+   "desc": "Obby tipo Tower of Hell: sube la torre antes de que la lava te alcance. Saltos, spinners y ladrillos rojos.",
+   "href": "torre.html",
+   "icono": "🧗",
+   "color": "#ff5a1a",
+   "cat": "juegos",
+   "img": "img/torre.webp"
+  },
+  {
    "nombre": "Puertas",
    "desc": "Terror estilo Doors: habitaciones oscuras, llaves y un monstruo que te caza. Escóndete en los armarios.",
    "href": "puertas.html",
