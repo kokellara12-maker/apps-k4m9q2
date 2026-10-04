@@ -199,6 +199,14 @@
    "icono": "🥖",
    "color": "#c2508a",
    "cat": "juegos"
+  },
+  {
+   "nombre": "¡Que viene mamá!",
+   "desc": "Ordena TU cuarto en 3D antes de que llegue mamá 🧹",
+   "href": "./cuarto.html",
+   "icono": "🛏️",
+   "color": "#7c5cff",
+   "cat": "juegos"
   }
  ]
 }
