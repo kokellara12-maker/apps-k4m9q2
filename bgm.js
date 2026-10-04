@@ -38,6 +38,124 @@
     }
   } catch (e) {}
 
+  // ---- 1b) Efectos reales: cada "bip" sintetizado se cambia por una grabación parecida (CC0) ----
+  try {
+    var BANK = {}, bankLoad = 0, bbase = ((D.currentScript && D.currentScript.src) || '').replace(/[^\/]*$/, '') + 'audio/s/';
+    var NAMES = ['shot1','shot2','shot3','shot4','boom','punch1','punch2','punch3','metal1','metal2','metal3','metal4','soft1','glass','step1','step2','step3','step4','hitmark','dry','reload','coin','cash','coins','click','ok','err','tick','swoosh','win','ugh','camera','splash'];
+    var loadBank = function (ctx) {
+      if (bankLoad) return; bankLoad = 1;
+      NAMES.forEach(function (n) {
+        fetch(bbase + n + '.mp3').then(function (r) { return r.arrayBuffer(); }).then(function (ab) {
+          return new Promise(function (ok, no) { ctx.decodeAudioData(ab, ok, no); });
+        }).then(function (b) { BANK[n] = b; }).catch(function () {});
+      });
+    };
+    var ready = function () { return !!BANK.click && !!BANK.boom && !!BANK.coin; };
+    var AP = W.AudioParam && W.AudioParam.prototype;
+    ['setValueAtTime', 'linearRampToValueAtTime', 'exponentialRampToValueAtTime', 'setTargetAtTime'].forEach(function (fn) {
+      var o = AP[fn]; if (!o) return;
+      AP[fn] = function (v) {
+        var m = this.__m;
+        if (m) { if (m.first == null) m.first = v; m.last = v; if (v > m.max) m.max = v; }
+        return o.apply(this, arguments);
+      };
+    });
+    var vd = Object.getOwnPropertyDescriptor(AP, 'value');
+    if (vd && vd.set) Object.defineProperty(AP, 'value', { get: vd.get, set: function (v) { var m = this.__m; if (m) { if (m.first == null) m.first = v; m.last = v; if (v > m.max) m.max = v; } vd.set.call(this, v); }, configurable: true });
+    var cc = AN.connect; // ya parcheado arriba
+    var oc2 = AN.connect;
+    AN.connect = function (dst) {
+      if (this.__io) { (this.__conn = this.__conn || []).push(arguments); }
+      this.__dst = dst;
+      return oc2.apply(this, arguments);
+    };
+    var odis = AN.disconnect;
+    var CTXS = [];
+    [W.AudioContext && W.AudioContext.prototype, W.webkitAudioContext && W.webkitAudioContext.prototype, W.BaseAudioContext && W.BaseAudioContext.prototype].forEach(function (P) {
+      if (!P || CTXS.indexOf(P) >= 0) return; CTXS.push(P);
+      if (P.hasOwnProperty('createOscillator')) { var a = P.createOscillator; P.createOscillator = function () { var o = a.apply(this, arguments); o.__io = 1; o.__kind = 'osc'; o.frequency.__m = {max: 0}; loadBank(this); return o; }; }
+      if (P.hasOwnProperty('createBufferSource')) { var b = P.createBufferSource; P.createBufferSource = function () { var o = b.apply(this, arguments); o.__io = 1; o.__kind = 'buf'; loadBank(this); return o; }; }
+      if (P.hasOwnProperty('createGain')) { var g = P.createGain; P.createGain = function () { var o = g.apply(this, arguments); o.gain.__m = {max: 0}; loadBank(this); return o; }; }
+      if (P.hasOwnProperty('createBiquadFilter')) { var f = P.createBiquadFilter; P.createBiquadFilter = function () { var o = f.apply(this, arguments); o.frequency.__m = {max: 0}; return o; }; }
+    });
+    var isNoise = function (buf) {
+      if (!buf) return false; if (buf.__noise != null) return buf.__noise;
+      var d = buf.getChannelData(0), n = Math.min(d.length, 600), c = 0;
+      for (var i = 1; i < n; i++) if ((d[i] >= 0) !== (d[i - 1] >= 0)) c++;
+      return (buf.__noise = (c / n > 0.3 && d.length > 2000));
+    };
+    var batch = [], pending = 0, lastPlay = {}, cues = 0;
+    var chainInfo = function (node) {
+      var ff = null, pk = null, n = node, i = 0;
+      while (n && i < 4) {
+        var d = n.__dst; if (!d) break;
+        if (d.frequency && d.frequency.__m && d.type && ff == null) { var fm = d.frequency.__m; ff = fm.first != null ? fm.first : d.frequency.value; }
+        if (d.gain && d.gain.__m && d.gain.__m.max > 0 && pk == null) pk = d.gain.__m.max;
+        n = d; i++;
+      }
+      return { ff: ff, pk: pk };
+    };
+    var flush = function () {
+      pending = 0; var evs = batch; batch = [];
+      if (!evs.length) return;
+      var ctx = evs[0].n.context, now = ctx.currentTime, use = [];
+      evs.forEach(function (e) {
+        var dur = e.stop != null ? e.stop - e.t : e.dur;
+        if (e.n.loop || dur == null || dur > 1.6 || dur <= 0 || e.t - now > 3) { // no es un efecto corto: se queda como estaba
+          if (e.n.__conn) e.n.__conn.forEach(function (a) { try { oc2.apply(e.n, a); } catch (x) {} });
+          return;
+        }
+        e.dur2 = dur; use.push(e);
+      });
+      if (!use.length) return;
+      var t0 = Math.max(now, Math.min.apply(null, use.map(function (e) { return e.t; })));
+      var noises = use.filter(function (e) { return e.n.__kind === 'buf'; }), oscs = use.filter(function (e) { return e.n.__kind === 'osc'; });
+      var pk = 0, pc = 0; use.forEach(function (e) { var ci = chainInfo(e.n); if (ci.pk) { pk += ci.pk; pc++; } e.ff = ci.ff; });
+      var vol = Math.max(0.22, Math.min(0.85, (pc ? pk / pc : 0.12) * 5.5));
+      var pick = null, rate = 1, r = function (n) { return 1 + Math.floor(Math.random() * n); };
+      if (noises.length) {
+        var nz = noises.reduce(function (a, b) { return b.dur2 > a.dur2 ? b : a; }), ff = nz.ff == null ? 1500 : nz.ff;
+        if (nz.dur2 >= 0.4) { pick = 'boom'; rate = ff < 700 ? 0.8 : 1; }
+        else if (nz.dur2 >= 0.16) { pick = ff >= 2200 ? 'shot' + r(4) : (ff >= 1100 ? 'punch' + r(3) : 'metal' + r(4)); }
+        else { pick = ff >= 2500 ? 'tick' : 'step' + r(4); if (pick.indexOf('step') === 0) vol *= 0.9; }
+      } else {
+        oscs.sort(function (a, b) { return a.t - b.t; });
+        var starts = []; oscs.forEach(function (e) { if (!starts.length || e.t - starts[starts.length - 1].t > 0.015) starts.push(e); });
+        var fr = function (e) { var m = e.n.frequency.__m; return (m.first != null ? m.first : e.n.frequency.value) || 440; };
+        var up = 0, down = 0; for (var i = 1; i < starts.length; i++) { var d = fr(starts[i]) - fr(starts[i - 1]); if (d > 0) up++; else if (d < 0) down++; }
+        var o = starts[0], f0 = fr(o), m = o.n.frequency.__m, f1 = m.last != null ? m.last : f0;
+        if (starts.length >= 3) { pick = up >= down ? 'win' : 'ugh'; vol = Math.min(vol, 0.7); }
+        else if (starts.length === 2) { pick = up >= down ? 'coin' : 'err'; }
+        else if (f1 > f0 * 1.25) { pick = o.dur2 > 0.12 ? 'swoosh' : 'tick'; vol *= 0.8; }
+        else if (f1 < f0 * 0.8) { pick = f0 < 350 ? 'punch' + r(3) : (f0 < 800 ? 'soft1' : 'err'); }
+        else if (f0 > 900 && o.dur2 < 0.12) { pick = 'tick'; }
+        else if (o.dur2 < 0.2) { pick = f0 < 300 ? 'soft1' : 'click'; }
+        else { pick = f0 < 300 ? 'punch' + r(3) : 'ok'; }
+      }
+      var b = BANK[pick]; if (!b) { use.forEach(function (e) { if (e.n.__conn) e.n.__conn.forEach(function (a) { try { oc2.apply(e.n, a); } catch (x) {} }); }); return; }
+      var key = pick.replace(/\d$/, ''), tm = performance.now();
+      if (lastPlay[key] && tm - lastPlay[key] < 40) return;
+      lastPlay[key] = tm;
+      var s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = b; s.playbackRate.value = rate * (0.96 + Math.random() * 0.08); g.gain.value = vol;
+      s.connect(g); g.connect(ctx.destination); s.start(t0); cues++;
+    };
+    var wrap = function (P) {
+      if (!P) return; var os = P.start, ot = P.stop;
+      P.start = function (t) {
+        if (!this.__io || this.loop || !ready()) return os.apply(this, arguments);
+        if (this.__kind === 'buf' && !isNoise(this.buffer)) return os.apply(this, arguments);
+        var ev = { n: this, t: (t && t > 0) ? t : this.context.currentTime, dur: this.__kind === 'buf' && arguments[2] != null ? arguments[2] : null };
+        this.__ev = ev; batch.push(ev);
+        try { odis.call(this); } catch (x) {}
+        if (!pending) { pending = 1; Promise.resolve().then(flush); }
+        return os.apply(this, arguments);
+      };
+      P.stop = function (t) { if (this.__ev) this.__ev.stop = t; return ot.apply(this, arguments); };
+    };
+    wrap(W.OscillatorNode && W.OscillatorNode.prototype); wrap(W.AudioBufferSourceNode && W.AudioBufferSourceNode.prototype);
+    W.__sfx = { get cues() { return cues; }, get ready() { return ready(); } };
+  } catch (e) { try { console.warn('sfx shim', e); } catch (x) {} }
+
   // ---- 2) Música de fondo ----
   var sc = D.currentScript, track = sc && sc.getAttribute('data-track');
   if (!track) return;
