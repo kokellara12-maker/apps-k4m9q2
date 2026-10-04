@@ -1,6 +1,15 @@
 {
  "apps": [
   {
+   "nombre": "Noches en la Pizzería",
+   "desc": "Terror estilo Five Nights: sobrevive 5 noches vigilando cámaras, puertas y energía.",
+   "href": "noches.html",
+   "icono": "🍕",
+   "color": "#7a4a1e",
+   "cat": "juegos",
+   "img": "img/noches.webp"
+  },
+  {
    "nombre": "Backrooms",
    "desc": "Terror: laberinto amarillo infinito. Encuentra la salida verde mientras algo te persigue.",
    "href": "backrooms.html",
