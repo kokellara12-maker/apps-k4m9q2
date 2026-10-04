@@ -151,6 +151,22 @@
    "icono": "🧩",
    "color": "#7b61ff",
    "cat": "juegos"
+   },
+  {
+   "nombre": "Grow a Garden",
+   "desc": "Planta, riega y cosecha. Mutaciones, eventos de clima, mascotas y huevos. Crece aunque cierres la app.",
+   "href": "growgarden.html",
+   "icono": "🌱",
+   "color": "#43a047",
+   "cat": "juegos"
+  },
+  {
+   "nombre": "Steal a Brainrot",
+   "desc": "Compra brainrots en la cinta, cobra sin parar y róbalos a otros sin que el guardia te vea.",
+   "href": "stealbrainrot.html",
+   "icono": "🧠",
+   "color": "#ff4081",
+   "cat": "juegos"
    }
  ]
 }
