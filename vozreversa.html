@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script>
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -90,8 +90,12 @@ async function startRec(){
   unlock();
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('hint').innerHTML='<span class=err>Este navegador no deja usar el micro 😢</span>';return}
   let stream;
-  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
-  catch(e){$('hint').innerHTML='<span class=err>Sin permiso de micro. Actívalo en Ajustes → Safari → Micrófono 🙏</span>';return}
+  AS('play-and-record');let err=null;
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e1){err=e1;
+    try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});err=null}catch(e2){err=e2}}
+  if(!stream){const n=(err&&err.name)||'?';AS('playback');
+    const m=n==='NotAllowedError'||n==='SecurityError'?'🔒 Micro bloqueado. Cierra la app del todo (desliza hacia arriba) y ábrela otra vez; si no, Ajustes → Apps → Safari → Micrófono → «Preguntar» o «Permitir».':n==='NotFoundError'?'🎤 No encuentro ningún micro.':n==='NotReadableError'||n==='AbortError'?'⚠️ El micro está ocupado por otra app (llamada, Instagram…). Ciérrala y reintenta.':'⚠️ Error de micro.';
+    $('hint').innerHTML='<span class=err>'+m+' <small>('+n+')</small></span>';return}
   stopPlay();AS('play-and-record');
   const a=ctx();await a.resume();
   const src=a.createMediaStreamSource(stream),pr=a.createScriptProcessor(4096,1,1),mute=a.createGain();mute.gain.value=0;

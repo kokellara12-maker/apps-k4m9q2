@@ -7,7 +7,9 @@
    "icono": "🔌",
    "color": "#0f6a8a",
    "cat": "herramientas",
-   "img": "img/taller.webp"
+   "img": "img/taller.webp",
+   "sub": "electronica",
+   "tags": "esp32 arduino raspberry pi circuitos simulador electronica soldar desguace led sensores programar"
   },
   {
    "nombre": "Beat Maker",
@@ -16,7 +18,9 @@
    "icono": "🥁",
    "color": "#ff3bd4",
    "cat": "herramientas",
-   "img": "img/beat.webp"
+   "img": "img/beat.webp",
+   "sub": "musica",
+   "tags": "ritmo beats drum machine trap house techno musica bateria"
   },
   {
    "nombre": "Pixel Art",
@@ -25,7 +29,9 @@
    "icono": "🎨",
    "color": "#35e0ff",
    "cat": "herramientas",
-   "img": "img/pixel.webp"
+   "img": "img/pixel.webp",
+   "sub": "dibujo",
+   "tags": "dibujar dibujo pixelart sprite pintar"
   },
   {
    "nombre": "Voz Loca",
@@ -34,7 +40,9 @@
    "icono": "🎙️",
    "color": "#ff3b6b",
    "cat": "herramientas",
-   "img": "img/voz.webp"
+   "img": "img/voz.webp",
+   "sub": "voz",
+   "tags": "voz grabadora efectos ardilla robot cambiar voz"
   },
   {
    "nombre": "Noches en la Pizzería",
@@ -43,7 +51,9 @@
    "icono": "🍕",
    "color": "#7a4a1e",
    "cat": "juegos",
-   "img": "img/noches.webp"
+   "img": "img/noches.webp",
+   "sub": "terror",
+   "tags": "fnaf five nights at freddys freddy animatronicos pizzeria cinco noches"
   },
   {
    "nombre": "Backrooms",
@@ -52,7 +62,9 @@
    "icono": "🟨",
    "color": "#b8a94a",
    "cat": "juegos",
-   "img": "img/backrooms.webp"
+   "img": "img/backrooms.webp",
+   "sub": "terror",
+   "tags": "backrooms the backrooms liminal salas amarillo laberinto"
   },
   {
    "nombre": "Torre Infernal",
@@ -61,7 +73,9 @@
    "icono": "🧗",
    "color": "#ff5a1a",
    "cat": "juegos",
-   "img": "img/torre.webp"
+   "img": "img/torre.webp",
+   "sub": "roblox",
+   "tags": "tower of hell tow roblox obby parkour lava"
   },
   {
    "nombre": "Puertas",
@@ -70,7 +84,9 @@
    "icono": "🚪",
    "color": "#8a1c1c",
    "cat": "juegos",
-   "img": "img/puertas.webp"
+   "img": "img/puertas.webp",
+   "sub": "terror",
+   "tags": "doors roblox puertas monstruo rush"
   },
   {
    "nombre": "Metro Run",
@@ -79,7 +95,9 @@
    "icono": "🚇",
    "color": "#ff3b6b",
    "cat": "juegos",
-   "img": "img/metro.webp"
+   "img": "img/metro.webp",
+   "sub": "arcade",
+   "tags": "subway surfers surfers correr trenes endless runner"
   },
   {
    "nombre": "Palabrita",
@@ -88,7 +106,9 @@
    "icono": "🔤",
    "color": "#6aaa64",
    "cat": "juegos",
-   "img": "img/palabrita.webp"
+   "img": "img/palabrita.webp",
+   "sub": "puzzle",
+   "tags": "wordle palabra diaria adivinar"
   },
   {
    "nombre": "Agujero Negro",
@@ -97,7 +117,9 @@
    "icono": "🕳️",
    "color": "#222",
    "cat": "juegos",
-   "img": "img/hole.webp"
+   "img": "img/hole.webp",
+   "sub": "arcade",
+   "tags": "hole io holeio agujero negro tragar ciudad"
   },
   {
    "nombre": "Helix Fall",
@@ -106,7 +128,9 @@
    "icono": "🌀",
    "color": "#4aa3ff",
    "cat": "juegos",
-   "img": "img/helix.webp"
+   "img": "img/helix.webp",
+   "sub": "arcade",
+   "tags": "helix jump bola torre"
   },
   {
    "nombre": "Dash Beat",
@@ -115,7 +139,9 @@
    "icono": "🔷",
    "color": "#7c4dff",
    "cat": "juegos",
-   "img": "img/dash.webp"
+   "img": "img/dash.webp",
+   "sub": "arcade",
+   "tags": "geometry dash gd cubo ritmo"
   },
   {
    "nombre": "Serpientes",
@@ -124,7 +150,9 @@
    "icono": "🐍",
    "color": "#7c4dff",
    "cat": "juegos",
-   "img": "img/serpientes.webp"
+   "img": "img/serpientes.webp",
+   "sub": "arcade",
+   "tags": "slither io snake serpiente culebra"
   },
   {
    "nombre": "Escape",
@@ -133,7 +161,9 @@
    "icono": "🚗",
    "color": "#ff7a6b",
    "cat": "juegos",
-   "img": "img/escape.webp"
+   "img": "img/escape.webp",
+   "sub": "puzzle",
+   "tags": "rush hour atasco coches parking"
   },
   {
    "nombre": "Ordena los colores",
@@ -142,7 +172,9 @@
    "icono": "🧪",
    "color": "#a55eea",
    "cat": "juegos",
-   "img": "img/colores.webp"
+   "img": "img/colores.webp",
+   "sub": "puzzle",
+   "tags": "water sort ordenar liquidos tubos"
   },
   {
    "nombre": "Tower",
@@ -151,7 +183,9 @@
    "icono": "🏗️",
    "color": "#ff6b4a",
    "cat": "juegos",
-   "img": "img/tower.webp"
+   "img": "img/tower.webp",
+   "sub": "arcade",
+   "tags": "tower blocks apilar"
   },
   {
    "nombre": "Multi-Color Fill",
@@ -160,7 +194,9 @@
    "icono": "🌈",
    "color": "#34e0ff",
    "cat": "juegos",
-   "img": "img/multicolor.webp"
+   "img": "img/multicolor.webp",
+   "sub": "puzzle",
+   "tags": "flow free conectar puntos colores"
   },
   {
    "nombre": "Flappy Jump",
@@ -169,7 +205,9 @@
    "icono": "🏀",
    "color": "#ff9a1f",
    "cat": "juegos",
-   "img": "img/flappy.webp"
+   "img": "img/flappy.webp",
+   "sub": "deportes",
+   "tags": "flappy bird basket baloncesto balon"
   },
   {
    "nombre": "Block Fill",
@@ -178,7 +216,9 @@
    "icono": "🟪",
    "color": "#ff6bcb",
    "cat": "juegos",
-   "img": "img/blockfill.webp"
+   "img": "img/blockfill.webp",
+   "sub": "puzzle",
+   "tags": "camino casillas puzzle"
   },
   {
    "nombre": "Buscador de palabras",
@@ -187,7 +227,9 @@
    "icono": "🔤",
    "color": "#13a89e",
    "cat": "juegos",
-   "img": "img/palabras.webp"
+   "img": "img/palabras.webp",
+   "sub": "puzzle",
+   "tags": "wordscapes crucigrama letras palabras"
   },
   {
    "nombre": "Happy Glass",
@@ -196,7 +238,9 @@
    "icono": "🥛",
    "color": "#4bb7ff",
    "cat": "juegos",
-   "img": "img/glass.webp"
+   "img": "img/glass.webp",
+   "sub": "puzzle",
+   "tags": "happy glass vaso agua"
   },
   {
    "nombre": "Skate Park",
@@ -205,7 +249,9 @@
    "icono": "🛹",
    "color": "#ff7a1a",
    "cat": "juegos",
-   "img": "img/skate.webp"
+   "img": "img/skate.webp",
+   "sub": "deportes",
+   "tags": "tony hawk skate patinar thps"
   },
   {
    "nombre": "Contraseñas",
@@ -214,7 +260,9 @@
    "icono": "key",
    "color": "#4f8cff",
    "cat": "herramientas",
-   "img": "img/contrasenas.webp"
+   "img": "img/contrasenas.webp",
+   "sub": "util",
+   "tags": "password seguridad clave generador"
   },
   {
    "nombre": "Carreras 3D",
@@ -223,7 +271,9 @@
    "icono": "🏎️",
    "color": "#ff4d3d",
    "cat": "juegos",
-   "img": "img/carreras3d.webp"
+   "img": "img/carreras3d.webp",
+   "sub": "carreras",
+   "tags": "coches carreras drift"
   },
   {
    "nombre": "Pengu Ice",
@@ -232,7 +282,9 @@
    "icono": "🐧",
    "color": "#35e0ff",
    "cat": "juegos",
-   "img": "img/pengu.webp"
+   "img": "img/pengu.webp",
+   "sub": "arcade",
+   "tags": "pengo pinguino hielo"
   },
   {
    "nombre": "Slide Ice",
@@ -241,7 +293,9 @@
    "icono": "🧊",
    "color": "#35e0ff",
    "cat": "juegos",
-   "img": "img/slideice.webp"
+   "img": "img/slideice.webp",
+   "sub": "puzzle",
+   "tags": "pinguino igloo hielo"
   },
   {
    "nombre": "Ninja Slice",
@@ -250,7 +304,9 @@
    "icono": "🥷",
    "color": "#ff4d6d",
    "cat": "juegos",
-   "img": "img/ninja.webp"
+   "img": "img/ninja.webp",
+   "sub": "arcade",
+   "tags": "fruit ninja fruta cortar"
   },
   {
    "nombre": "Color Rush",
@@ -259,7 +315,9 @@
    "icono": "🌈",
    "color": "#b05cff",
    "cat": "juegos",
-   "img": "img/colorrush.webp"
+   "img": "img/colorrush.webp",
+   "sub": "arcade",
+   "tags": "color switch"
   },
   {
    "nombre": "Merge Planets",
@@ -268,7 +326,9 @@
    "icono": "🪐",
    "color": "#ffa300",
    "cat": "juegos",
-   "img": "img/planets.webp"
+   "img": "img/planets.webp",
+   "sub": "puzzle",
+   "tags": "suika watermelon game fusionar planetas"
   },
   {
    "nombre": "Survivors",
@@ -277,7 +337,9 @@
    "icono": "🧙",
    "color": "#ff004d",
    "cat": "juegos",
-   "img": "img/survivors.webp"
+   "img": "img/survivors.webp",
+   "sub": "accion",
+   "tags": "vampire survivors hordas supervivientes"
   },
   {
    "nombre": "Last Hill",
@@ -286,7 +348,9 @@
    "icono": "🏰",
    "color": "#00e436",
    "cat": "juegos",
-   "img": "img/lasthill.webp"
+   "img": "img/lasthill.webp",
+   "sub": "accion",
+   "tags": "tower defense torres defensa"
   },
   {
    "nombre": "Gravity Flip",
@@ -295,7 +359,9 @@
    "icono": "🌀",
    "color": "#b05cff",
    "cat": "juegos",
-   "img": "img/gravityflip.webp"
+   "img": "img/gravityflip.webp",
+   "sub": "arcade",
+   "tags": "gravity runner tunel"
   },
   {
    "nombre": "Orbit",
@@ -304,7 +370,9 @@
    "icono": "🛰️",
    "color": "#35e0ff",
    "cat": "juegos",
-   "img": "img/orbit.webp"
+   "img": "img/orbit.webp",
+   "sub": "arcade",
+   "tags": "orbit espacio planetas"
   },
   {
    "nombre": "Basket Flick",
@@ -313,7 +381,9 @@
    "icono": "🏀",
    "color": "#ff8a1a",
    "cat": "juegos",
-   "img": "img/basket.webp"
+   "img": "img/basket.webp",
+   "sub": "deportes",
+   "tags": "baloncesto basket tiros"
   },
   {
    "nombre": "Drift King",
@@ -322,7 +392,9 @@
    "icono": "🏎️",
    "color": "#ff004d",
    "cat": "juegos",
-   "img": "img/driftking.webp"
+   "img": "img/driftking.webp",
+   "sub": "carreras",
+   "tags": "drift derrape parking coches"
   },
   {
    "nombre": "Royale Island",
@@ -331,7 +403,9 @@
    "icono": "🏝️",
    "color": "#7a3cff",
    "cat": "juegos",
-   "img": "img/royale.webp"
+   "img": "img/royale.webp",
+   "sub": "accion",
+   "tags": "fortnite battle royale bus construir"
   },
   {
    "nombre": "Drift Runner",
@@ -340,7 +414,9 @@
    "icono": "🏎️",
    "color": "#ff2bd6",
    "cat": "juegos",
-   "img": "img/driftrunner.webp"
+   "img": "img/driftrunner.webp",
+   "sub": "carreras",
+   "tags": "drift coches volante"
   },
   {
    "nombre": "Voz Reversa",
@@ -348,8 +424,10 @@
    "href": "vozreversa.html",
    "icono": "⏪",
    "color": "#ff2bd6",
-   "cat": "aplicaciones",
-   "img": "img/vozreversa.webp"
+   "cat": "herramientas",
+   "img": "img/vozreversa.webp",
+   "sub": "voz",
+   "tags": "voz al reves reverse grabadora"
   },
   {
    "nombre": "El Impostor",
@@ -358,7 +436,9 @@
    "icono": "🕵️",
    "color": "#ff3b5c",
    "cat": "juegos",
-   "img": "img/impostor.webp"
+   "img": "img/impostor.webp",
+   "sub": "fiesta",
+   "tags": "among us impostor fiesta amigos palabra secreta"
   },
   {
    "nombre": "CubeCraft",
@@ -367,7 +447,9 @@
    "icono": "⛏️",
    "color": "#4caf50",
    "cat": "juegos",
-   "img": "img/cubecraft.webp"
+   "img": "img/cubecraft.webp",
+   "sub": "roblox",
+   "tags": "minecraft cubos bloques survival craft"
   },
   {
    "nombre": "Block Blast",
@@ -376,7 +458,9 @@
    "icono": "🧩",
    "color": "#7b61ff",
    "cat": "juegos",
-   "img": "img/blockblast.webp"
+   "img": "img/blockblast.webp",
+   "sub": "puzzle",
+   "tags": "block blast tetris 1010 piezas"
   },
   {
    "nombre": "Grow a Garden",
@@ -385,7 +469,9 @@
    "icono": "🌱",
    "color": "#43a047",
    "cat": "juegos",
-   "img": "img/growgarden.webp"
+   "img": "img/growgarden.webp",
+   "sub": "roblox",
+   "tags": "grow a garden roblox jardin plantar"
   },
   {
    "nombre": "Steal a Brainrot",
@@ -394,7 +480,9 @@
    "icono": "🧠",
    "color": "#ff4081",
    "cat": "juegos",
-   "img": "img/stealbrainrot.webp"
+   "img": "img/stealbrainrot.webp",
+   "sub": "roblox",
+   "tags": "steal a brainrot roblox brainrot italian"
   },
   {
    "nombre": "El Búnker Perfecto",
@@ -403,7 +491,9 @@
    "icono": "🏚️",
    "color": "#e65100",
    "cat": "juegos",
-   "img": "img/bunker.webp"
+   "img": "img/bunker.webp",
+   "sub": "roblox",
+   "tags": "bunker apocalipsis supervivencia 100 euros"
   },
   {
    "nombre": "Laboratorio de Pruebas",
@@ -412,7 +502,9 @@
    "icono": "🧪",
    "color": "#00acc1",
    "cat": "juegos",
-   "img": "img/lab.webp"
+   "img": "img/lab.webp",
+   "sub": "roblox",
+   "tags": "lab pruebas experimentos prensa physics"
   },
   {
    "nombre": "De Vagabundo a Millonario",
@@ -421,7 +513,9 @@
    "icono": "🤑",
    "color": "#2e9d52",
    "cat": "juegos",
-   "img": "img/casa.webp"
+   "img": "img/casa.webp",
+   "sub": "roblox",
+   "tags": "casa millonario dinero tycoon vagabundo"
   },
   {
    "nombre": "Vecina Siniestra",
@@ -430,7 +524,9 @@
    "icono": "🥖",
    "color": "#c2508a",
    "cat": "juegos",
-   "img": "img/vecina.webp"
+   "img": "img/vecina.webp",
+   "sub": "terror",
+   "tags": "granny abuela vecina hello neighbor sigilo terror"
   },
   {
    "nombre": "¡Que viene mamá!",
@@ -439,7 +535,9 @@
    "icono": "🛏️",
    "color": "#7c5cff",
    "cat": "juegos",
-   "img": "img/cuarto.webp"
+   "img": "img/cuarto.webp",
+   "sub": "roblox",
+   "tags": "mama cuarto ordenar limpiar"
   },
   {
    "nombre": "Turno de Noche",
@@ -448,7 +546,9 @@
    "icono": "🧸",
    "color": "#4b3a8f",
    "cat": "juegos",
-   "img": "img/noche.webp"
+   "img": "img/noche.webp",
+   "sub": "terror",
+   "tags": "fnaf five nights jugueteria"
   },
   {
    "nombre": "Perro Ladrón",
@@ -457,7 +557,9 @@
    "icono": "🐶",
    "color": "#ff6fae",
    "cat": "juegos",
-   "img": "img/hermana.webp"
+   "img": "img/hermana.webp",
+   "sub": "roblox",
+   "tags": "teckel perro ladron dog sigilo"
   },
   {
    "nombre": "Benalmádena Sim",
@@ -466,7 +568,9 @@
    "icono": "🛴",
    "color": "#00b8d4",
    "cat": "juegos",
-   "img": "img/benalmadena.webp"
+   "img": "img/benalmadena.webp",
+   "sub": "roblox",
+   "tags": "gta patinete benalmadena grand theft auto"
   },
   {
    "nombre": "Teoría Musical",
@@ -475,7 +579,9 @@
    "icono": "🎹",
    "color": "#ff3d7f",
    "cat": "herramientas",
-   "img": "img/musica.webp"
+   "img": "img/musica.webp",
+   "sub": "musica",
+   "tags": "musica teoria piano notas escalas"
   }
  ]
 }
