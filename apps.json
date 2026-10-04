@@ -223,6 +223,14 @@
    "icono": "🐶",
    "color": "#ff6fae",
    "cat": "juegos"
+  },
+  {
+   "nombre": "Benalmádena Sim",
+   "desc": "GTA en patinete eléctrico por Benalmádena: repartidor, camello, robos, armas y policía. 3D",
+   "href": "./benalmadena.html",
+   "icono": "🛴",
+   "color": "#00b8d4",
+   "cat": "juegos"
   }
  ]
 }
