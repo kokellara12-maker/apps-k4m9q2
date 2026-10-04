@@ -172,7 +172,11 @@
     ic.className = 'ic';
     ic.style.background = 'linear-gradient(145deg, rgba(255,255,255,.22), rgba(0,0,0,.3)), ' + color;
     var key = a.icono || '';
-    if (ICONS[key]) {
+    if (a.img) {
+      ic.style.background = color; ic.style.overflow = 'hidden';
+      var im = document.createElement('img'); im.src = a.img; im.alt = ''; im.decoding = 'async'; im.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+      ic.appendChild(im);
+    } else if (ICONS[key]) {
       ic.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[key] + '</svg>';
     } else {
       var b = document.createElement('b');

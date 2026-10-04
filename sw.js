@@ -1,6 +1,6 @@
 // Mis Apps: modo offline.
 // Cambia el número de versión si quieres forzar una recarga completa.
-const CORE = 'mis-juegos-core-v52';
+const CORE = 'mis-juegos-core-v53';
 const RUN = 'mis-juegos-run-v3';
 const PRECACHE = [
   './',
@@ -8,6 +8,7 @@ const PRECACHE = [
   './apps.json',
   './contrasenas.html',
   './carreras3d.html','./pengu.html','./slideice.html','./ninja.html','./colorrush.html','./planets.html','./survivors.html','./lasthill.html','./gravityflip.html','./orbit.html','./basket.html','./driftking.html','./royale.html','./driftrunner.html','./vozreversa.html','./impostor.html','./cubecraft.html','./blockblast.html','./growgarden.html','./stealbrainrot.html','./bunker.html','./lab.html','./casa.html','./vecina.html','./cuarto.html','./noche.html','./hermana.html','./benalmadena.html',
+  './bgm.js','./img/benalmadena.webp','./img/colorrush.webp','./img/driftking.webp','./img/ninja.webp','./img/pengu.webp','./img/planets.webp','./img/slideice.webp','./img/survivors.webp','./audio/m_accion.mp3','./audio/m_alegre.mp3','./audio/m_atraco.mp3','./audio/m_aventura.mp3','./audio/m_batalla.mp3','./audio/m_bitloop.mp3','./audio/m_bunker.mp3','./audio/m_carretera.mp3','./audio/m_castillo.mp3','./audio/m_comico.mp3','./audio/m_espacio.mp3','./audio/m_espacio2.mp3','./audio/m_funky.mp3','./audio/m_hielo.mp3','./audio/m_hielo2.mp3','./audio/m_isla.mp3','./audio/m_jardin.mp3','./audio/m_lab.mp3','./audio/m_misterio.mp3','./audio/m_ninja.mp3','./audio/m_noche.mp3','./audio/m_persecucion.mp3','./audio/m_playa.mp3','./audio/m_pueblo.mp3','./audio/m_siniestro.mp3','./audio/m_techno.mp3','./audio/m_travieso.mp3',
   './manifest.webmanifest',
   './icon-180.png',
   './icon-192.png',
@@ -38,6 +39,16 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
+
+  // música e imágenes pesadas: primero lo guardado (no cambian)
+  if (/\/(audio|img)\//.test(new URL(req.url).pathname)) {
+    e.respondWith(
+      caches.match(req, { ignoreSearch: true }).then((hit) =>
+        hit || fetch(req).then((res) => { if (res.ok) { const copy = res.clone(); caches.open(RUN).then((c) => c.put(req, copy)); } return res; })
+      )
+    );
+    return;
+  }
 
   e.respondWith(
     new Promise((resolve) => {
