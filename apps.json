@@ -175,6 +175,14 @@
    "icono": "🏚️",
    "color": "#e65100",
    "cat": "juegos"
+  },
+  {
+   "nombre": "Laboratorio de Pruebas",
+   "desc": "EN 3D: prensa hidráulica, microondas, horno, torre, lava/ácido/nitrógeno y moldes. Prueba objetos y seres vivos en todo.",
+   "href": "lab.html",
+   "icono": "🧪",
+   "color": "#00acc1",
+   "cat": "juegos"
   }
  ]
 }
