@@ -2,7 +2,7 @@
  "apps": [
   {
    "nombre": "Taller de Electrónica",
-   "desc": "Simulador: ESP32 y Arduino, placa de pruebas, LEDs, sensores, pantallas y código. Monta circuitos y prográmalos.",
+   "desc": "Simulador de electrónica: ESP32, Arduino, Raspberry Pi… ¡desguaza un móvil o un PC, guarda las piezas y suéldalas! 🔥",
    "href": "taller.html",
    "icono": "🔌",
    "color": "#0f6a8a",
