@@ -2,14 +2,14 @@
  "apps": [
   {
    "nombre": "Taller de Electrónica",
-   "desc": "Simulador de electrónica: ESP32, Arduino, Raspberry Pi… ¡desguaza un móvil o un PC, guarda las piezas y suéldalas! 🔥",
+   "desc": "Simulador de electrónica fácil: toca una pieza (cámara, pantalla, sensores…) y se conecta SOLA al ESP32 con su código 🪄",
    "href": "taller.html",
    "icono": "🔌",
    "color": "#0f6a8a",
    "cat": "herramientas",
    "img": "img/taller.webp",
    "sub": "electronica",
-   "tags": "esp32 arduino raspberry pi circuitos simulador electronica soldar desguace led sensores programar"
+   "tags": "esp32 arduino raspberry pi circuitos simulador electronica soldar desguace led sensores programar camara pantalla sensores facil conectar esp32 raspberry"
   },
   {
    "nombre": "Beat Maker",
