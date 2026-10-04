@@ -7,3 +7,4 @@ Efectos (CC0): Kenney (impactos, interfaz), kurt/OpenGameArt (disparos), Still N
 motores: ATG-Simulator/VehicleNoiseSynthesizer (MIT)
 
 MODELOS 3D (CC0): KayKit (Kay Lousberg) Adventurers/Skeletons/Medieval Hexagon, Quaternius, Kenney. Sin copyright.
+Personas y coches 3D: Quaternius (Ultimate Modular Men/Women, CC0) y Kenney Car Kit (CC0).
