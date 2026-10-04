@@ -6,7 +6,7 @@
   var SET = { master: 1, music: 1, fx: 1, eng: 1 }, CH = [];
   try { var sv = JSON.parse(localStorage.getItem('mis_snd') || 'null'); if (sv) for (var k0 in SET) if (typeof sv[k0] === 'number') SET[k0] = Math.max(0, Math.min(1, sv[k0])); } catch (e) {}
   var saveSet = function () { try { localStorage.setItem('mis_snd', JSON.stringify(SET)); } catch (e) {} };
-  var applyVol = function () { CH.forEach(function (c) { c.inp.gain.value = SET.fx; c.out.gain.value = 1.1 * SET.master; }); if (W.__engApply) W.__engApply(); };
+  var applyVol = function () { CH.forEach(function (c) { c.inp.gain.value = SET.fx; c.out.gain.value = 2.1 * SET.master; }); if (W.__engApply) W.__engApply(); };
 
   // ---- 1) Pulido de los efectos sintetizados: filtro suave + compresor + un pelín de reverb ----
   try {
@@ -20,7 +20,7 @@
           wet = ctx.createGain(), conv = ctx.createConvolver(), out = ctx.createGain();
         lp.type = 'lowpass'; lp.frequency.value = 9500; lp.Q.value = 0.4;
         comp.threshold.value = -20; comp.knee.value = 18; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.2;
-        wet.gain.value = 0.13; out.gain.value = 1.1 * SET.master; inp.gain.value = SET.fx;
+        wet.gain.value = 0.13; out.gain.value = 2.1 * SET.master; inp.gain.value = SET.fx;
         var len = Math.floor(ctx.sampleRate * 0.55), buf = ctx.createBuffer(2, len, ctx.sampleRate);
         for (var ch = 0; ch < 2; ch++) { var d = buf.getChannelData(ch); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.8); }
         conv.buffer = buf;
@@ -236,7 +236,7 @@
   var tick = function (t) {
     var dt = Math.min(0.1, (t - last) / 1000); last = t;
     if (el) {
-      var tg = (D.hidden || !want) ? 0 : 0.3 * SET.music * SET.master;
+      var tg = (D.hidden || !want) ? 0 : 0.5 * SET.music * SET.master;
       if (want && want !== cur && !loading) {
         if (!D.hidden && tg > 0) { if (vol < 0.02 || !cur) swap(want); else vol = Math.max(0, vol - dt * 1.6); }
       } else vol += (tg - vol) * Math.min(1, dt * (tg > vol ? 0.7 : 2.5));
