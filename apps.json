@@ -1,6 +1,87 @@
 {
  "apps": [
   {
+   "nombre": "Serpientes",
+   "desc": "Estilo slither: come, crece y acorrala a 14 rivales. Boost, skins y clasificación.",
+   "href": "serpientes.html",
+   "icono": "🐍",
+   "color": "#7c4dff",
+   "cat": "juegos",
+   "img": "img/serpientes.webp"
+  },
+  {
+   "nombre": "Escape",
+   "desc": "Desatasca el atasco: desliza coches y camiones y saca el rojo. 72 niveles con pistas.",
+   "href": "escape.html",
+   "icono": "🚗",
+   "color": "#ff7a6b",
+   "cat": "juegos",
+   "img": "img/escape.webp"
+  },
+  {
+   "nombre": "Ordena los colores",
+   "desc": "Water sort: vierte líquidos hasta que cada tubo tenga un solo color. Niveles infinitos.",
+   "href": "colores.html",
+   "icono": "🧪",
+   "color": "#a55eea",
+   "cat": "juegos",
+   "img": "img/colores.webp"
+  },
+  {
+   "nombre": "Tower",
+   "desc": "Apila bloques en isométrico, clava el timing y sube lo más alto posible.",
+   "href": "tower.html",
+   "icono": "🏗️",
+   "color": "#ff6b4a",
+   "cat": "juegos",
+   "img": "img/tower.webp"
+  },
+  {
+   "nombre": "Multi-Color Fill",
+   "desc": "Une los puntos del mismo color y rellena todo el tablero. Niveles infinitos.",
+   "href": "multicolor.html",
+   "icono": "🌈",
+   "color": "#34e0ff",
+   "cat": "juegos",
+   "img": "img/multicolor.webp"
+  },
+  {
+   "nombre": "Flappy Jump",
+   "desc": "Un balón con alas: aletea y encesta en los aros con swish y combos.",
+   "href": "flappy.html",
+   "icono": "🏀",
+   "color": "#ff9a1f",
+   "cat": "juegos",
+   "img": "img/flappy.webp"
+  },
+  {
+   "nombre": "Block Fill",
+   "desc": "Dibuja un camino que rellene todas las casillas libres sin repetir.",
+   "href": "blockfill.html",
+   "icono": "🟪",
+   "color": "#ff6bcb",
+   "cat": "juegos",
+   "img": "img/blockfill.webp"
+  },
+  {
+   "nombre": "Buscador de palabras",
+   "desc": "Conecta letras, forma palabras y completa el crucigrama. 200 niveles.",
+   "href": "palabras.html",
+   "icono": "🔤",
+   "color": "#13a89e",
+   "cat": "juegos",
+   "img": "img/palabras.webp"
+  },
+  {
+   "nombre": "Happy Glass",
+   "desc": "Dibuja líneas para guiar el agua y llenar el vaso feliz.",
+   "href": "glass.html",
+   "icono": "🥛",
+   "color": "#4bb7ff",
+   "cat": "juegos",
+   "img": "img/glass.webp"
+  },
+  {
    "nombre": "Skate Park",
    "desc": "Skate 3D: skater real, halfpipe, rampas, rails, grinds, ollie, flips y combos. 2 minutos para batir tu récord.",
    "href": "skate.html",
