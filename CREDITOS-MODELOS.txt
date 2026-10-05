@@ -19,6 +19,15 @@ VEHICULOS Y OBJETOS
 - firetruck.glb  "Fire Truck" de codexito, CC BY 4.0  https://skfb.ly/KzqZ
 - milktruck.glb  "Cesium Milk Truck" de Cesium, CC BY 4.0 (Khronos glTF Sample Assets)
 - buoy.glb       "Buoy" de OzzyDan, CC BY 4.0
+- corvette.glb   "2005 Chevrolet Corvette C6" de ddiaz-design, CC BY 4.0
+                 https://sketchfab.com/3d-models/7ff74ce1324c4dbb9f3d830b71525096
+- countach.glb   "1989 Lamborghini Countach 25th Anniversary" de ddiaz-design, CC BY 4.0
+                 https://sketchfab.com/3d-models/75acd9a580574e128c0886d2bc5a2b21
+- porsche.glb    "Porsche 911 (930) Turbo 1975" de Lexyc16, CC BY 4.0
+                 https://sketchfab.com/3d-models/de1ffd344c41481892511f7fd332c136
+- taxi_cv.glb    "2001 Crown Victoria Taxi Game Prop" de haoliu95, CC BY 4.0
+                 https://sketchfab.com/3d-models/2429a825ff1646568e8e6e1453f9c501
+                 (los cuatro, simplificados/recomprimidos para el juego; obtenidos del repo ubyjvovk/asciicity)
 - props/*.glb    KayKit "City Builder Bits 1.0" de Kay Lousberg (taxi, banco, hidrante,
                  contenedor, arbusto, deposito de agua...). CC0.
 

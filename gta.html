@@ -4570,10 +4570,10 @@ async function loadAll(onProg){
  const add=(url,fn)=>jobs.push(loader.loadAsync(url).then(g=>{fn(g);onProg(++done/jobs.length);}));
  Object.keys(PEOPLE).forEach(n=>add('models/net/'+n+'.glb',g=>{assets.people[n]=g;}));
  CARNAMES.forEach(n=>add('models/cars/'+n+'.glb',g=>{assets.cars[n]=g;}));
- ['helicopter','firetruck','milktruck','buoy'].forEach(n=>add('models/net/'+n+'.glb',g=>{assets.net[n]=g;}));
+ ['helicopter','firetruck','milktruck','buoy','corvette','porsche','countach','taxi_cv'].forEach(n=>add('models/net/'+n+'.glb',g=>{assets.net[n]=g;}));
  ['bench','bush','car_taxi','dumpster','firehydrant','box_A','watertower'].forEach(n=>add('models/net/props/'+n+'.glb',g=>{assets.props[n]=g;}));
  ['furn','rest'].forEach(n=>add('models/net/'+n+'.glb',g=>{assets.kit[n]=g;}));
- await Promise.all(jobs);assets.net.taxi=assets.props.car_taxi;
+ await Promise.all(jobs);assets.net.taxi=assets.net.taxi_cv;
 }
 /* ---------- animaciones compartidas (retarget por huesos) ---------- */
 const _qa=new THREE.Quaternion(),_qb=new THREE.Quaternion(),_qc=new THREE.Quaternion(),_va=new THREE.Vector3(),_vb=new THREE.Vector3(),_vc=new THREE.Vector3(),_fw=new THREE.Vector3(),_tg=new THREE.Vector3();
@@ -5414,7 +5414,7 @@ function randomRoadSpot(minD,maxD){
 function trafficPick(){
  const r=Math.random();let nb=0,nt=0;for(const v of vehicles)if(v.mode==='traffic'){if(v.type==='bus')nb++;if(v.type==='truck')nt++;}
  let nf=0;for(const v of vehicles)if(v.mode==='traffic'&&v.type==='firetruck')nf++;
- if(r<.035&&nf<1)return'firetruck';if(r<.07&&nb<3)return'bus';if(r<.14&&nt<3)return'truck';if(r<.3)return'taxi';return pick(['sedan','sedan','compact','compact','sport','van','pickup']);
+ if(r<.035&&nf<1)return'firetruck';if(r<.07&&nb<3)return'bus';if(r<.14&&nt<3)return'truck';if(r<.3)return'taxi';return pick(['sedan','sedan','compact','compact','sport','van','pickup','corvette','porsche']);
 }
 function spawnTrafficCar(minD,maxD){
  const spot=randomRoadSpot(minD,maxD);if(!spot)return null;
@@ -5430,7 +5430,7 @@ function spawnParkedCar(near){
   if(near){const d=dist2(x,z,player.x,player.z);if(d<40||d>230)continue;}
   if(vehicles.some(o=>dist2(o.x,o.z,x,z)<6))continue;
   const h=horiz?(side>0?Math.PI/2:-Math.PI/2):(side>0?0:Math.PI);
-  return spawnVehicle(pick(['sedan','compact','sport','van','pickup','sedan','compact']),x,z,h+(Math.random()<.5?0:Math.PI),'parked');
+  return spawnVehicle(pick(['sedan','compact','sport','van','pickup','sedan','compact','corvette','porsche','countach']),x,z,h+(Math.random()<.5?0:Math.PI),'parked');
  }
 }
 /* ===================== PEATONES ===================== */
@@ -5826,7 +5826,7 @@ const MENUS={
   ['💥 Escopeta + 16 cartuchos','Devastadora de cerca',1800,p=>{if(save.inv.shotgun.have)return false;save.inv.shotgun.have=true;save.inv.shotgun.ammo+=16;}],
   ['💥 Cartuchos','+16 cartuchos',160,p=>{if(!save.inv.shotgun.have)return false;save.inv.shotgun.ammo+=16;}],
   ['🦺 Chaleco antibalas','Armadura +100',300,p=>{player.armor=100;}]]},
- conce:{t:'🚘 AUTOS PREMIUM',items:[['🚕 Taxi','Amarillo clásico',1200,p=>buyCar('taxi')],['🚙 Compacto','Barato y ágil',900,p=>buyCar('compact')],['🚗 Sedán','El de toda la vida',1500,p=>buyCar('sedan')],['🛻 Pickup','Robusta',2500,p=>buyCar('pickup')],['🚐 Furgoneta','Con mucho aguante',2200,p=>buyCar('van')],['🏍️ Moto','Rapidísima',1300,p=>buyCar('moto')],['🛵 Scooter','Ágil y económico',900,p=>buyCar('scooter')],['🚲 Bicicleta','Sin gasolina',150,p=>buyCar('bici')],['🛴 Patinete eléctrico','Silencioso y rápido',420,p=>buyCar('epat')],['🛴 Patinete','Para ir tirando',70,p=>buyCar('patinete')],['🏎️ Deportivo','El más veloz',5500,p=>buyCar('sport')],['🚚 Camión','Pesado y resistente',4000,p=>buyCar('truck')],['🚌 Autobús','Para llevar a la banda',3500,p=>buyCar('bus')]]},
+ conce:{t:'🚘 AUTOS PREMIUM',items:[['🚕 Taxi','Amarillo clásico',1200,p=>buyCar('taxi')],['🚙 Compacto','Barato y ágil',900,p=>buyCar('compact')],['🚗 Sedán','El de toda la vida',1500,p=>buyCar('sedan')],['🛻 Pickup','Robusta',2500,p=>buyCar('pickup')],['🚐 Furgoneta','Con mucho aguante',2200,p=>buyCar('van')],['🏍️ Moto','Rapidísima',1300,p=>buyCar('moto')],['🛵 Scooter','Ágil y económico',900,p=>buyCar('scooter')],['🚲 Bicicleta','Sin gasolina',150,p=>buyCar('bici')],['🛴 Patinete eléctrico','Silencioso y rápido',420,p=>buyCar('epat')],['🛴 Patinete','Para ir tirando',70,p=>buyCar('patinete')],['🏎️ Deportivo','El más veloz',5500,p=>buyCar('sport')],['🏎️ Corvette','Músculo americano',7500,p=>buyCar('corvette')],['🏎️ Porsche 911 Turbo','Clásico alemán',8500,p=>buyCar('porsche')],['🏎️ Lamborghini Countach','El póster de tu cuarto',14000,p=>buyCar('countach')],['🚚 Camión','Pesado y resistente',4000,p=>buyCar('truck')],['🚌 Autobús','Para llevar a la banda',3500,p=>buyCar('bus')]]},
  ropa:{t:'👕 MODA KOKE',dyn:'ropa'},
  casino:{t:'🎰 CASINO DORADO',items:[['🎲 Apostar $100','Doble o nada · 47% de ganar',100,p=>gamble(100)],['🎲 Apostar $500','Doble o nada · 47% de ganar',500,p=>gamble(500)],['🎲 Apostar $2.000','Doble o nada · 47% de ganar',2000,p=>gamble(2000)],['🎲 Apostar $10.000','Los grandes jugadores',10000,p=>gamble(10000)]]},
  bar:{t:'🍺 BAR EL RINCÓN',items:[['🍺 Cerveza','+10 de vida',15,p=>healP(10)],['🥃 Whisky','+25 de vida y mareo',35,p=>{healP(25);player.drunk=16;}],['🥜 Tapas','+30 de vida',22,p=>healP(30)]]},
@@ -5929,7 +5929,10 @@ function updateStores(dt){
 const CAR_SPEC={
  sedan:{kind:'car',max:31,acc:13,hp:100,name:'Sedán'},compact:{kind:'car',max:28,acc:12,hp:80,name:'Compacto'},sport:{kind:'car',max:41,acc:18,hp:90,name:'Deportivo'},
  van:{kind:'car',max:26,acc:10,hp:140,name:'Furgoneta'},pickup:{kind:'car',max:29,acc:12,hp:120,name:'Pickup'},police:{kind:'car',max:38,acc:16,hp:130,name:'Policía'},tractor:{kind:'car',max:11,acc:6,hp:170,name:'Tractor'},
- taxi:{kind:'car',net:'taxi',scale:4.8,wheelNodes:1,wr:.41,len:4.5,wid:2.0,hgt:2.1,max:30,acc:13,hp:100,name:'Taxi'},
+ taxi:{kind:'car',net:'taxi',fit:1,len:5,wid:1.95,hgt:1.5,max:30,acc:13,hp:100,name:'Taxi'},
+ corvette:{kind:'car',net:'corvette',fit:1,len:4.5,wid:1.85,hgt:1.25,max:41,acc:18,hp:90,name:'Corvette'},
+ porsche:{kind:'car',net:'porsche',fit:1,len:4.3,wid:1.8,hgt:1.3,max:39,acc:17,hp:90,name:'Porsche 911 Turbo'},
+ countach:{kind:'car',net:'countach',fit:1,len:4.2,wid:2.0,hgt:1.1,max:44,acc:19,hp:85,name:'Lamborghini Countach'},
  bus:{kind:'bus',proc:1,len:11,wid:2.9,hgt:3.3,max:20,acc:6,hp:260,wb:6.4,steer:.5,sk:.06,rad:1.5,name:'Autobús',cd:13,ch:2.4},
  truck:{kind:'truck',net:'milktruck',scale:1.25,wheelsAnim:1,len:6.1,wid:3.2,hgt:3.3,max:25,acc:8.5,hp:220,wb:4.4,steer:.55,sk:.065,rad:1.5,name:'Camión de reparto',cd:11,ch:2.3},
  firetruck:{kind:'truck',net:'firetruck',scale:1,len:7.7,wid:2.6,hgt:2.9,max:27,acc:9,hp:260,wb:5.4,steer:.5,sk:.06,rad:1.3,name:'Bomberos',cd:11,ch:2.4},
@@ -5961,7 +5964,7 @@ function makeNetMesh(type,paint,mode){
  const sp=CAR_SPEC[type],src=assets.net[sp.net],inner=SkeletonUtils.clone(src.scene);
  inner.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.castShadow=true;o.frustumCulled=true;
   if(mode==='copheli'&&o.material.color)o.material.color.multiplyScalar(.4).lerp(new THREE.Color(0x203060),.35);}});
- inner.scale.multiplyScalar(sp.scale);
+ if(sp.fit){const b0=new THREE.Box3().setFromObject(inner),z0=b0.getSize(new THREE.Vector3());inner.scale.multiplyScalar(sp.len/Math.max(z0.x,z0.z));}else inner.scale.multiplyScalar(sp.scale);
  const holder=new THREE.Group();holder.add(inner);
  const box=new THREE.Box3().setFromObject(inner);inner.position.y=-box.min.y;
  const g=new THREE.Group();g.add(holder);
@@ -6160,7 +6163,7 @@ Object.assign(CAR_SPEC,{
  epat:{kind:'bike',proc:1,len:1.3,wid:.55,hgt:1.2,max:11.5,acc:6,hp:30,wb:.95,steer:1,sk:.04,rad:.35,name:'Patinete eléctrico',cd:4,ch:1.7,fh:1.5,ff:.1,silent:1,hum:1,rider:{base:.2,z:.0,pose:'scoot'}},
  patinete:{kind:'bike',proc:1,len:1.1,wid:.5,hgt:1.1,max:5.8,acc:3,hp:25,wb:.85,steer:1,sk:.04,rad:.3,name:'Patinete',cd:3.8,ch:1.6,fh:1.45,ff:.1,silent:1,rider:{base:.16,z:-.04,pose:'scoot'}},
 });
-const CAR_VAL={sedan:2400,compact:1600,sport:9000,van:2800,pickup:3600,taxi:2200,police:0,tractor:900,bus:4000,truck:5000,firetruck:0,moto:2200,heli:30000,boat:6000,scooter:900,bici:80,epat:260,patinete:45};
+const CAR_VAL={sedan:2400,compact:1600,sport:9000,van:2800,pickup:3600,taxi:2200,police:0,tractor:900,bus:4000,truck:5000,firetruck:0,moto:2200,heli:30000,boat:6000,scooter:900,corvette:9500,porsche:11000,countach:18000,bici:80,epat:260,patinete:45};
 function tube(g,a,b,r,mat){
  const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A),L=d.length();
  const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,8),mat);m.position.copy(A).add(B).multiplyScalar(.5);
