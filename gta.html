@@ -6344,9 +6344,13 @@ const STORY=[
   stages:()=>[killStage(m=>spawnTargets('rich',7,{boss:{model:'victor',tint:undefined,hp:260,scale:1.1,dmg:7,gun:'smg',boss:true},guard:{model:'soldier',tint:0x1f232b,hp:120,dmg:6}}),'Acaba con el capo y su guardia en Colinas Doradas 👑')]},
 ];
 function randomJob(n){
- const reward=Math.round((900+n*220)/50)*50,t=Math.floor(Math.random()*4);
+ const reward=Math.round((900+n*220)/50)*50,t=Math.floor(Math.random()*6);
  if(t===0)return{title:'Encargo urgente',desc:'Llévale un paquete a un cliente al otro lado de la ciudad.',reward,giver:()=>spotIn(['down','mid','res'],'walk',player,100,500),
   stages:()=>{const A=spotIn(['mid','down','res'],'walk',player,120,380),B=spotIn(['res','mid','down','ind'],'walk',A,300,700);return[gotoStage(A,'Recoge el paquete 📦',{r:4,veh:'foot'}),gotoStage(B,'Entrégalo a toda prisa 🏁',{r:5,time:()=>dist2(A.x,A.z,B.x,B.z)/9+30})];}};
+ if(t===4)return{title:'Reparto de pizzas',desc:'Recoge el pedido en la pizzería y llévalo caliente a su dueño.',reward:reward-200,giver:()=>spotIn(['down','mid','res'],'walk',player,100,500),
+  stages:()=>{let B=null;return[gotoStage(m=>{const s=nearestStoreOf('pizza',player)||nearestStoreOf('burger',player);return s.L2W(0,3);},'Recoge el pedido en la pizzería 🍕',{r:5}),gotoStage(m=>{B=spotIn(['res','mid','down'],'walk',player,200,520);return B;},'Entrega el pedido antes de que se enfríe 🛵',{r:5,time:()=>dist2(player.x,player.z,B.x,B.z)/6+25})];}};
+ if(t===5)return{title:'Turno de taxi',desc:'Roba (o consigue) un taxi, recoge a un cliente y llévalo adonde diga.',reward:reward-100,giver:()=>spotIn(['down','mid','res'],'walk',player,100,500),
+  stages:()=>{let A=null,B=null;return[enterStage(()=>spawnMissionCar('taxi',['mid','down','res']),'Sube a un taxi 🚕'),gotoStage(m=>{A=spotIn(['down','mid','res'],'road',player,100,380);return A;},'Recoge al cliente 🧍',{r:7,veh:'road'}),gotoStage(m=>{B=spotIn(['mid','down','rich','res'],'road',A,320,700);return B;},'Llévalo a su destino 🏁',{r:8,veh:'road',time:()=>dist2(A.x,A.z,B.x,B.z)/9+30})];}};
  if(t===1)return{title:'Carrera clandestina',desc:'Otra carrera por las calles. ¿Te atreves?',reward:reward+400,giver:()=>spotIn(['down','mid'],'walk',player,100,500),
   stages:()=>{let route=null;return[gotoStage(m=>{route=raceRoute(spotIn(['down','mid','res'],'road',player,100,500),9);return route[0];},'Ve a la salida con un vehículo 🏁',{r:10,veh:'road'}),cpStage(()=>route.slice(1),'¡A correr!',{r:12,veh:'road',time:()=>pathLen(route)/18+22})];}};
  if(t===2)return{title:'Recompensa',desc:'Hay recompensa por una banda del Barrio Bajo. Cobra.',reward:reward+300,giver:()=>spotIn(['mid','res'],'walk',player,100,500),
@@ -7241,6 +7245,7 @@ function drawMap(ctx,size,rad,rot,full){
  const dot=(x,z,r,c,sq)=>{ctx.fillStyle=c;ctx.beginPath();if(sq)ctx.rect(MAPOFF+x-r,MAPOFF+z-r,r*2,r*2);else ctx.arc(MAPOFF+x,MAPOFF+z,r,0,TAU);ctx.fill();};
  const rr=full?9:Math.max(4.5,4.5/sc*1.2);
  for(const s of stores){ctx.lineWidth=rr*.25;ctx.strokeStyle='#000';dot(s.ox,s.oz,rr,POI_COL[s.s.type]||'#fff');ctx.stroke();}
+ for(const h of HOUSES)if(h.trap){ctx.lineWidth=rr*.2;ctx.strokeStyle='#000';dot(h.dx,h.dz,rr*.75,'#3cff6a');ctx.stroke();}
  for(const v of vehicles){if(v.mode==='parked'&&v.kind==='heli')dot(v.x,v.z,rr*.7,'#c28bff');else if(v.kind==='boat'&&v.mode==='parked')dot(v.x,v.z,rr*.6,'#33d0ff');else if(v.keep&&v!==player.veh&&!v.dead)dot(v.x,v.z,rr*.5,'#ffffff',true);}
  for(const v of vehicles)if((v.mode==='cop'||v.mode==='copheli')&&!v.dead)dot(v.x,v.z,rr*.7,(gameT*4|0)%2?'#ff3b3b':'#3b6bff',true);
  for(const c of cops)if(!c.dead&&!c.gang)dot(c.x,c.z,rr*.55,(gameT*4|0)%2?'#ff3b3b':'#3b6bff');
