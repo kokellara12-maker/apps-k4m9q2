@@ -5490,8 +5490,10 @@ function updatePeds(dt){
   if(o.dead){o.dying+=dt;o.p.mixer.update(dt);
    if(o.dying<.7){o.x+=o.kx*dt;o.z+=o.kz*dt;o.kx*=.9;o.kz*=.9;resolveCircle(o,.4);}
    o.p.root.position.set(o.x,0,o.z);o.p.root.visible=dp<105&&inView(o.x,1,o.z,1.6);if(o.dying>9){o.p.root.position.y-=(o.dying-9)*.5;}if(o.dying>11){scene.remove(o.p.root);peds.splice(i,1);}continue;}
+  if(o.state==='talk'){o.wait-=dt;if(o.wait<=0){o.p.setPose(null);o.state='walk';o.nav=null;}}
   const far=dp>130;
   if(o.p.pose&&o.state==='flee')o.p.setPose(null);
+  if(o.state==='walk'&&!far&&dp<60&&Math.random()<dt*.012){o.state='talk';o.wait=rnd(5,10);o.p.play('idle');o.p.setPose('phone');}
   if(o.state==='walk'){
    let n=o.nav;if(!n){const [ix,iz]=nearestNode(o.x,o.z),B=nodePos(ix,iz);n=o.nav={ix,iz,nx:ix,nz:iz,t:0,fx:o.x,fz:o.z,len:dist2(o.x,o.z,B.x,B.z)+.01,lat:0};}
    // esperar si viene un coche al cruzar
@@ -5936,10 +5938,10 @@ function updateStores(dt){
 const CAR_SPEC={
  sedan:{kind:'car',max:31,acc:13,hp:100,name:'Sedán'},compact:{kind:'car',max:28,acc:12,hp:80,name:'Compacto'},sport:{kind:'car',max:41,acc:18,hp:90,name:'Deportivo'},
  van:{kind:'car',max:26,acc:10,hp:140,name:'Furgoneta'},pickup:{kind:'car',max:29,acc:12,hp:120,name:'Pickup'},police:{kind:'car',max:38,acc:16,hp:130,name:'Policía'},tractor:{kind:'car',max:11,acc:6,hp:170,name:'Tractor'},
- taxi:{kind:'car',net:'taxi',fit:1,len:5,wid:1.95,hgt:1.5,max:30,acc:13,hp:100,name:'Taxi'},
- corvette:{kind:'car',net:'corvette',fit:1,len:4.5,wid:1.85,hgt:1.25,max:41,acc:18,hp:90,name:'Corvette'},
- porsche:{kind:'car',net:'porsche',fit:1,len:4.3,wid:1.8,hgt:1.3,max:39,acc:17,hp:90,name:'Porsche 911 Turbo'},
- countach:{kind:'car',net:'countach',fit:1,len:4.2,wid:2.0,hgt:1.1,max:44,acc:19,hp:85,name:'Lamborghini Countach'},
+ taxi:{kind:'car',net:'taxi',fit:1,spin:1,len:5,wid:1.95,hgt:1.5,max:30,acc:13,hp:100,name:'Taxi'},
+ corvette:{kind:'car',net:'corvette',fit:1,spin:1,len:4.5,wid:1.85,hgt:1.25,max:41,acc:18,hp:90,name:'Corvette'},
+ porsche:{kind:'car',net:'porsche',fit:1,spin:1,len:4.3,wid:1.8,hgt:1.3,max:39,acc:17,hp:90,name:'Porsche 911 Turbo'},
+ countach:{kind:'car',net:'countach',fit:1,spin:1,len:4.2,wid:2.0,hgt:1.1,max:44,acc:19,hp:85,name:'Lamborghini Countach'},
  bus:{kind:'bus',proc:1,len:11,wid:2.9,hgt:3.3,max:20,acc:6,hp:260,wb:6.4,steer:.5,sk:.06,rad:1.5,name:'Autobús',cd:13,ch:2.4},
  truck:{kind:'truck',net:'milktruck',scale:1.25,wheelsAnim:1,len:6.1,wid:3.2,hgt:3.3,max:25,acc:8.5,hp:220,wb:4.4,steer:.55,sk:.065,rad:1.5,name:'Camión de reparto',cd:11,ch:2.3},
  firetruck:{kind:'truck',net:'firetruck',scale:1,len:7.7,wid:2.6,hgt:2.9,max:27,acc:9,hp:260,wb:5.4,steer:.5,sk:.06,rad:1.3,name:'Bomberos',cd:11,ch:2.4},
@@ -5968,7 +5970,7 @@ function makeCarMesh(type,paint){
 }
 /* --- modelos descargados (frente = +z) --- */
 function makeNetMesh(type,paint,mode){
- const sp=CAR_SPEC[type],src=assets.net[sp.net],inner=SkeletonUtils.clone(src.scene);
+ const sp=CAR_SPEC[type];if(sp.spin)prepCarWheels(sp.net);const src=assets.net[sp.net],inner=SkeletonUtils.clone(src.scene);
  inner.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.castShadow=true;o.frustumCulled=true;
   if(mode==='copheli'&&o.material.color)o.material.color.multiplyScalar(.4).lerp(new THREE.Color(0x203060),.35);}});
  if(sp.fit){const b0=new THREE.Box3().setFromObject(inner),z0=b0.getSize(new THREE.Vector3());inner.scale.multiplyScalar(sp.len/Math.max(z0.x,z0.z));}else inner.scale.multiplyScalar(sp.scale);
@@ -5977,6 +5979,7 @@ function makeNetMesh(type,paint,mode){
  const g=new THREE.Group();g.add(holder);
  const out={g,inner:holder,wheels:[],mats:{},proc:true};
  if(type==='heli'){out.rotor=findNode(inner,'propellar');out.tail=findNode(inner,'backrotor');out.blur={material:{opacity:0}};}
+ if(sp.spin){const k=inner.scale.x;inner.traverse(o=>{if(o.userData&&o.userData.wheel){o.rotation.order='YXZ';out.wheels.push({n:o,front:o.userData.front,px:1,r:o.userData.r*k});}});}
  if(sp.wheelNodes){inner.traverse(o=>{if(o.name&&o.name.includes('wheel')&&!o.isMesh||(o.name&&o.name.includes('wheel')&&o.parent===inner)){if(!out.wheels.some(w=>w.n===o)){o.rotation.order='YXZ';out.wheels.push({n:o,front:o.name.includes('front'),px:1,r:sp.wr});}}});}
  if(sp.wheelsAnim&&src.animations[0]){out.mixer=new THREE.AnimationMixer(inner);out.mixer.clipAction(src.animations[0]).play();out.wdur=src.animations[0].duration;}
  return out;
@@ -6233,6 +6236,77 @@ function buildTwo(type,paint){
  return{g,inner,wheels,mats,proc:true};
 }
 
+/* ===================== RUEDAS QUE GIRAN EN LOS COCHES REALES ===================== */
+// Los modelos descargados traen las ruedas fusionadas con la carroceria: se separan por componentes conectados.
+const wheelPrepped=new Set();
+function prepCarWheels(name){
+ if(wheelPrepped.has(name))return;wheelPrepped.add(name);
+ const sc=assets.net[name].scene;sc.updateMatrixWorld(true);
+ const inv=new THREE.Matrix4().copy(sc.matrixWorld).invert();
+ const meshes=[];sc.traverse(o=>{if(o.isMesh)meshes.push(o);});
+ // 1) hornear transformaciones en la geometria (compartida entre clones)
+ for(const m of meshes){
+  const g=m.geometry.clone();g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv,m.matrixWorld));
+  if(!g.index){const n=g.attributes.position.count,ix=new Uint32Array(n);for(let i=0;i<n;i++)ix[i]=i;g.setIndex(new THREE.BufferAttribute(ix,1));}
+  m.geometry=g;m.position.set(0,0,0);m.quaternion.identity();m.scale.set(1,1,1);m.updateMatrix();
+ }
+ const box=new THREE.Box3();for(const m of meshes){m.geometry.computeBoundingBox();box.union(m.geometry.boundingBox);}
+ const size=box.getSize(new THREE.Vector3()),L=Math.max(size.x,size.z),W=Math.min(size.x,size.z);
+ const alongZ=size.z>=size.x; // el coche mira a +z en el juego
+ // 2) componentes conectados por malla (union-find sobre posiciones soldadas)
+ const comps=[]; // {mesh,tris:[],box,c}
+ for(const m of meshes){
+  const pos=m.geometry.attributes.position,ix=m.geometry.index.array,nV=pos.count,q=L*1e-4,map=new Map(),rep=new Int32Array(nV);
+  for(let i=0;i<nV;i++){const k=Math.round(pos.getX(i)/q)+','+Math.round(pos.getY(i)/q)+','+Math.round(pos.getZ(i)/q);let r=map.get(k);if(r===undefined){map.set(k,i);r=i;}rep[i]=r;}
+  const par=new Int32Array(nV);for(let i=0;i<nV;i++)par[i]=i;
+  const find=a=>{while(par[a]!==a){par[a]=par[par[a]];a=par[a];}return a;};
+  for(let t=0;t<ix.length;t+=3){const a=find(rep[ix[t]]),b=find(rep[ix[t+1]]),c=find(rep[ix[t+2]]);par[b]=a;par[find(c)]=find(a);}
+  const byR=new Map();
+  for(let t=0;t<ix.length;t+=3){const r=find(rep[ix[t]]);let c=byR.get(r);if(!c){c={mesh:m,tris:[],box:new THREE.Box3()};byR.set(r,c);comps.push(c);}c.tris.push(t);
+   for(let k=0;k<3;k++)c.box.expandByPoint(_v3.fromBufferAttribute(pos,ix[t+k]));}
+ }
+ for(const c of comps){c.c=c.box.getCenter(new THREE.Vector3());c.s=c.box.getSize(new THREE.Vector3());}
+ // 3) neumaticos candidatos: delgados en x, circulares en yz, colocados en las esquinas
+ const hw=W/2,lat=alongZ?'x':'z',lon_=alongZ?'z':'x',bc=box.getCenter(new THREE.Vector3());
+ const tires=comps.filter(c=>{const a=c.s[lat],d1=Math.max(c.s.y,alongZ?c.s.z:c.s.x),d2=Math.min(c.s.y,alongZ?c.s.z:c.s.x);const dia=c.s.y,lon=alongZ?c.s.z:c.s.x;
+  return Math.abs(c.c[lat]-bc[lat])>hw*.55&&dia>L*.1&&dia<L*.24&&lon>dia*.8&&lon<dia*1.25&&a<dia*.7&&c.c.y<size.y*.5+box.min.y;});
+ // un neumatico por esquina (el mayor de cada cuadrante)
+ const wheels=[];
+ for(const sx of[-1,1])for(const sz of[-1,1]){
+  let best=null;for(const c of tires){const lx=(c.c[lat]-bc[lat])*sx>0,lz=(c.c[lon_]-bc[lon_])*sz>0;if(lx&&lz&&(!best||c.s.y*c.tris.length>best.s.y*best.tris.length))best=c;}
+  if(best)wheels.push({tire:best,sx,sz,parts:[best]});
+ }
+ if(wheels.length<4){console.warn('ruedas no detectadas',name,wheels.length);return;}
+ // 4) asignar piezas cercanas (llantas, discos, bujes) al eje de cada rueda
+ for(const c of comps){
+  if(wheels.some(w=>w.tire===c))continue;
+  for(const w of wheels){const t=w.tire,dy=c.c.y-t.c.y,dl=(alongZ?c.c.z-t.c.z:c.c.x-t.c.x),dx=c.c[lat]-t.c[lat];
+   if(Math.hypot(dy,dl)<t.s.y*.28&&Math.abs(dx)<t.s.y*.55&&c.s.y<t.s.y*1.05){w.parts.push(c);break;}}
+ }
+ // 5) crear un pivote por rueda con las piezas extraidas
+ const front=wheels.map(w=>w.tire.c[alongZ?'z':'x']*(alongZ?1:1));
+ const zmax=Math.max(...wheels.map(w=>alongZ?w.tire.c.z:w.tire.c.x));
+ for(const w of wheels){
+  const t=w.tire,piv=new THREE.Group();piv.rotation.order='YXZ';piv.position.copy(t.c);
+  piv.userData.wheel=true;piv.userData.front=(alongZ?t.c.z:t.c.x)>(zmax+Math.min(...wheels.map(q=>alongZ?q.tire.c.z:q.tire.c.x)))/2;piv.userData.r=t.s.y/2;
+  for(const c of w.parts){
+   const g0=c.mesh.geometry,pos=g0.attributes.position,nor=g0.attributes.normal,uv=g0.attributes.uv,ix=g0.index.array;
+   const P=[],N=[],U=[];
+   for(const t0 of c.tris)for(let k=0;k<3;k++){const i=ix[t0+k];P.push(pos.getX(i)-t.c.x,pos.getY(i)-t.c.y,pos.getZ(i)-t.c.z);if(nor)N.push(nor.getX(i),nor.getY(i),nor.getZ(i));if(uv)U.push(uv.getX(i),uv.getY(i));}
+   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));if(nor)g.setAttribute('normal',new THREE.Float32BufferAttribute(N,3));if(uv)g.setAttribute('uv',new THREE.Float32BufferAttribute(U,2));
+   const mm=new THREE.Mesh(g,c.mesh.material);mm.castShadow=true;piv.add(mm);c.removed=true;
+  }
+  sc.add(piv);
+ }
+ // 6) quitar de las mallas originales los triangulos extraidos
+ for(const m of meshes){
+  const ix=m.geometry.index.array,drop=new Set();for(const c of comps)if(c.mesh===m&&c.removed)for(const t of c.tris)drop.add(t);
+  if(!drop.size)continue;const keep=[];for(let t=0;t<ix.length;t+=3)if(!drop.has(t))keep.push(ix[t],ix[t+1],ix[t+2]);
+  m.geometry.setIndex(keep);
+ }
+}
+const _v3=new THREE.Vector3();
+
 /* ===================== MISIONES ===================== */
 const mis={cur:null,giver:null,idx:save.misIdx||0,bannerT:0,done:save.misDone||0};
 const BEACON_N=10,beacons=[];
@@ -6344,13 +6418,19 @@ const STORY=[
   stages:()=>[killStage(m=>spawnTargets('rich',7,{boss:{model:'victor',tint:undefined,hp:260,scale:1.1,dmg:7,gun:'smg',boss:true},guard:{model:'soldier',tint:0x1f232b,hp:120,dmg:6}}),'Acaba con el capo y su guardia en Colinas Doradas 👑')]},
 ];
 function randomJob(n){
- const reward=Math.round((900+n*220)/50)*50,t=Math.floor(Math.random()*6);
+ const reward=Math.round((900+n*220)/50)*50,t=Math.floor(Math.random()*9);
  if(t===0)return{title:'Encargo urgente',desc:'Llévale un paquete a un cliente al otro lado de la ciudad.',reward,giver:()=>spotIn(['down','mid','res'],'walk',player,100,500),
   stages:()=>{const A=spotIn(['mid','down','res'],'walk',player,120,380),B=spotIn(['res','mid','down','ind'],'walk',A,300,700);return[gotoStage(A,'Recoge el paquete 📦',{r:4,veh:'foot'}),gotoStage(B,'Entrégalo a toda prisa 🏁',{r:5,time:()=>dist2(A.x,A.z,B.x,B.z)/9+30})];}};
  if(t===4)return{title:'Reparto de pizzas',desc:'Recoge el pedido en la pizzería y llévalo caliente a su dueño.',reward:reward-200,giver:()=>spotIn(['down','mid','res'],'walk',player,100,500),
   stages:()=>{let B=null;return[gotoStage(m=>{const s=nearestStoreOf('pizza',player)||nearestStoreOf('burger',player);return s.L2W(0,3);},'Recoge el pedido en la pizzería 🍕',{r:5}),gotoStage(m=>{B=spotIn(['res','mid','down'],'walk',player,200,520);return B;},'Entrega el pedido antes de que se enfríe 🛵',{r:5,time:()=>dist2(player.x,player.z,B.x,B.z)/6+25})];}};
  if(t===5)return{title:'Turno de taxi',desc:'Roba (o consigue) un taxi, recoge a un cliente y llévalo adonde diga.',reward:reward-100,giver:()=>spotIn(['down','mid','res'],'walk',player,100,500),
   stages:()=>{let A=null,B=null;return[enterStage(()=>spawnMissionCar('taxi',['mid','down','res']),'Sube a un taxi 🚕'),gotoStage(m=>{A=spotIn(['down','mid','res'],'road',player,100,380);return A;},'Recoge al cliente 🧍',{r:7,veh:'road'}),gotoStage(m=>{B=spotIn(['mid','down','rich','res'],'road',A,320,700);return B;},'Llévalo a su destino 🏁',{r:8,veh:'road',time:()=>dist2(A.x,A.z,B.x,B.z)/9+30})];}};
+ if(t===6)return{title:'Atraco por encargo',desc:'Un cliente quiere el género de cierta tienda. Atraca y desaparece.',reward:reward+500,giver:()=>spotIn(['down','mid','res'],'walk',player,100,500),
+  stages:()=>[robStage(m=>{const c=stores.filter(s=>['joya','movil','licor','pawn','farma','h24'].includes(s.s.type)&&s.s.rob).sort((a,b)=>dist2(a.ox,a.oz,player.x,player.z)-dist2(b.ox,b.oz,player.x,player.z));return c[Math.min(c.length-1,1+Math.floor(Math.random()*3))];},'Atraca la tienda marcada 🔫'),escapeStage('Pierde a la policía 🚔')]};
+ if(t===7)return{title:'Mensajero exprés',desc:'Tres entregas urgentes por la ciudad. Cuanto más rápido, mejor.',reward:reward-100,giver:()=>spotIn(['down','mid','res'],'walk',player,100,500),
+  stages:()=>{let A=null,B=null,C=null;return[gotoStage(m=>{A=spotIn(['down','mid','res'],'walk',player,100,300);return A;},'Entrega 1/3 📦',{r:5,time:()=>dist2(player.x,player.z,A.x,A.z)/6+20}),gotoStage(m=>{B=spotIn(['mid','res','down'],'walk',A,100,300);return B;},'Entrega 2/3 📦',{r:5,time:()=>dist2(A.x,A.z,B.x,B.z)/6+20}),gotoStage(m=>{C=spotIn(['res','mid','poor','down'],'walk',B,100,320);return C;},'Entrega 3/3 📦',{r:5,time:()=>dist2(B.x,B.z,C.x,C.z)/6+20})];}};
+ if(t===8)return{title:'Transporte de carga',desc:'Lleva un camión del polígono hasta el súper antes de que cierre.',reward:reward+200,giver:()=>spotIn(['ind','mid','res'],'walk',player,100,500),
+  stages:()=>[enterStage(()=>spawnMissionCar('truck',['ind','port','mid']),'Sube al camión 🚚'),gotoStage(m=>nearestStoreOf('super',m.car).L2W(0,9),'Llévalo al súper 🛒',{r:7,veh:'road',time:(m,st)=>dist2(m.car.x,m.car.z,st.p.x,st.p.z)/8+45})]};
  if(t===1)return{title:'Carrera clandestina',desc:'Otra carrera por las calles. ¿Te atreves?',reward:reward+400,giver:()=>spotIn(['down','mid'],'walk',player,100,500),
   stages:()=>{let route=null;return[gotoStage(m=>{route=raceRoute(spotIn(['down','mid','res'],'road',player,100,500),9);return route[0];},'Ve a la salida con un vehículo 🏁',{r:10,veh:'road'}),cpStage(()=>route.slice(1),'¡A correr!',{r:12,veh:'road',time:()=>pathLen(route)/18+22})];}};
  if(t===2)return{title:'Recompensa',desc:'Hay recompensa por una banda del Barrio Bajo. Cobra.',reward:reward+300,giver:()=>spotIn(['mid','res'],'walk',player,100,500),
@@ -6838,6 +6918,15 @@ function offerDrugs(c){
 MENUS.super.items=[['🥤 Refresco','A la mochila · +15 de vida',10,()=>giveItem('cola')],['🥪 Bocadillo','A la mochila · +30 de vida',18,()=>giveItem('bocata')],['🍱 Menú sano','A la mochila · vida completa',55,()=>giveItem('menu')],['🩹 Botiquín','A la mochila · vida completa',70,()=>giveItem('botiq')],['🚬 Cartón de tabaco','Para revender en bares y empeños',45,()=>giveItem('tabaco')],['🥃 Botella de ron','Para revender donde pagan más',40,()=>giveItem('ron')]];
 MENUS.farma.items=[['🩹 Botiquín','A la mochila · vida completa',80,()=>giveItem('botiq')],['🦺 Chaleco antibalas','A la mochila · armadura +100',260,()=>giveItem('chaleco')]];
 
+/* gestos del jugador (N): bailar - hablar por movil - manos arriba - nada */
+function cycleEmote(){
+ if(player.veh||player.dead||shopOpen)return;
+ const seq=[null,'dance','phone','handsup'];player.emoteI=((player.emoteI||0)+1)%seq.length;const e=seq[player.emoteI];
+ player.person.setPose(null);player.dance=0;player.emote=0;
+ if(e==='dance'){startDance();toast('💃 Bailando (N: siguiente gesto)');}
+ else if(e){player.person.setPose(e);player.emote=e;toast(e==='phone'?'📱 Hablando por el móvil':'🙌 Manos arriba');}
+}
+
 /* ===================== DESGUACE Y VIDA EN LAS TIENDAS ===================== */
 function chopCheck(st){
  const v=player.veh;if(!v||st.cool>0)return;
@@ -6921,6 +7010,7 @@ addEventListener('keydown',e=>{
  if(k==='KeyB')openInventory();
  if(k==='KeyG'){const st=nearStore();if(st)startRob(st);}
  if(k==='KeyC')cycleCam();
+ if(k==='KeyN')cycleEmote();
  if(k==='KeyR')cycleRadio();
  if(k==='KeyH')horn();
  if(k==='KeyM')toggleMap();
@@ -7018,6 +7108,7 @@ function walkPlayer(dt){
  const sp=Math.hypot(P_.vx,P_.vz);P_.speed=sp;
  // orientacion
  const armed=P_.curW!=='fists';
+ if(P_.emote&&(sp>.8||P_.veh)){P_.emote=0;P_.person.setPose(null);}
  if(P_.dance>0)P_.yaw+=dt*5;
  else if((P_.aim&&camMode!==2)||camMode===1||(armed&&P_.gunT>0))P_.yaw+=angDiff(P_.yaw,camYaw)*clamp(dt*14,0,1);
  else if(sp>.4)P_.yaw+=angDiff(P_.yaw,Math.atan2(P_.vx,P_.vz))*clamp(dt*11,0,1);
