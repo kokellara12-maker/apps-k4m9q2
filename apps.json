@@ -2,13 +2,13 @@
  "apps": [
   {
    "nombre": "Koke City",
-   "desc": "Mundo abierto 3D estilo GTA: atraca tiendas, roba coches, Club Tacón y huye de la policía 🚔",
+   "desc": "GTA 3D gigante: misiones con historia, atracos, coches, motos, helicóptero, lanchas, Club Tacón y policía 🚔",
    "href": "gta.html",
    "icono": "🌆",
    "color": "#ff2fa0",
    "cat": "juegos",
    "sub": "accion",
-   "tags": "gta mundo abierto ciudad coches robar atracos tiendas policia banco club tacon conducir pistola 3d grand theft auto sandbox",
+   "tags": "gta mundo abierto ciudad coches robar atracos tiendas policia banco club tacon conducir pistola 3d grand theft auto sandbox misiones helicoptero lancha moto taxi autobus casino puerto",
    "img": "img/gta.webp"
   },
   {
