@@ -6393,6 +6393,8 @@ function prepCarWheels(name){
   if(!g.index){const n=g.attributes.position.count,ix=new Uint32Array(n);for(let i=0;i<n;i++)ix[i]=i;g.setIndex(new THREE.BufferAttribute(ix,1));}
   m.geometry=g;m.position.set(0,0,0);m.quaternion.identity();m.scale.set(1,1,1);m.updateMatrix();
  }
+ // la geometria ya incluye las transformaciones de los nodos padre: se cuelgan las mallas directamente de la escena
+ for(const m of meshes){m.removeFromParent();sc.add(m);}
  const box=new THREE.Box3();for(const m of meshes){m.geometry.computeBoundingBox();box.union(m.geometry.boundingBox);}
  const size=box.getSize(new THREE.Vector3()),L=Math.max(size.x,size.z),W=Math.min(size.x,size.z);
  const alongZ=size.z>=size.x; // el coche mira a +z en el juego
@@ -8108,7 +8110,7 @@ $('bmClose').onclick=()=>toggleMap();$('bmX').onclick=()=>toggleMap();$('bmGo').
 $('bGuide').onclick=()=>{openGuide();};
 $('bMusic').onclick=()=>{musicEnabled=!musicEnabled;try{localStorage.setItem('kc_music',musicEnabled?'1':'0');}catch(e){}$('bMusic').textContent='🎵 Música de persecución: '+(musicEnabled?'SÍ':'NO');if(!musicEnabled){musEl.pause();musV=0;if(musGain)musGain.gain.value=0;musCur=null;}};
 try{if(localStorage.getItem('kc_music')==='0'){musicEnabled=false;$('bMusic').textContent='🎵 Música de persecución: NO';}}catch(e){}
-$('bVer').textContent='Koke City · versión 121';$('bGuide2').onclick=()=>{toggleMap();openGuide();};
+$('bVer').textContent='Koke City · versión 122';$('bGuide2').onclick=()=>{toggleMap();openGuide();};
 addEventListener('beforeunload',persist);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){persist();if(state==='play')togglePause();}});
 window.__gta={music:()=>({paused:musEl.paused,gain:musGain?+musGain.gain.value.toFixed(2):null,cur:musCur,src:musEl.src.split('/').pop()}),toast,toggleMap,togglePause,openGuide,decalHit,DEC,PEOPLE,LOOSE,spawnLoose,pickLoose,throwHeld,FXS,get HELD(){return HELD;},nearLoose,streetInteract,streetPrompt,useDrug,smokeCig,sitBench,nearBench,propPos,nearDumpster,searchDumpster,WX,get AC(){return AC;},sfxBuf,hurtPed:(...a)=>hurtPed(...a),killPed,set camOv(v){_camOv=v;},IN,HOUSES,enterHouse,leaveHouse,giveItem,ITEMS,openInventory,interactWorld,interactPrompt,nearHouseDoor,makePlayerPerson,getGun:()=>handGun,removeVehicle,exitVehicle,mis,STORY,startMission,placeGiver,abortMission,nearGiver,missionDef,killCop,spawnVehicle,lightState,zoneAt,step:(n,dt=.05)=>{for(let i=0;i<n;i++){stepGame(dt);fxTick(dt);tracerTick(dt);updateCamera(dt);}updateFrustum();},hurtPlayer,openShop,respawn,MENUS,spawnCop,spawnPed,castRay,player,vehicles,peds,cops,stores,get wanted(){return wanted;},setWanted,startGame,get state(){return state;},tp:(x,z)=>{player.x=x;player.z=z;},camera,scene,renderer,setTime,get camMode(){return camMode;},cycleCam,selectWeapon,playerFire,keys,save,startRob,enterVehicle,nearestVehicle,toggleVehicle,env,set camYaw(v){camYaw=v;},set camPitch(v){camPitch=v;},colliders,commitCrime,nearStore};
