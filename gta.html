@@ -4490,7 +4490,7 @@ function followSky(){
 
 /* ---------- audio ---------- */
 let AC=null,sfxGain=null,muted=false;const sfxBuf={};
-const SFXN=['boom','cash','coin','coins','glass','hitmark','metal1','metal2','metal3','punch1','punch2','punch3','shot1','shot2','shot3','shot4','ugh','swoosh','step1','step2','step3','err','ok','win','click','reload','dry'];
+const SFXN=['boom','cash','coin','coins','glass','hitmark','metal1','metal2','metal3','punch1','punch2','punch3','shot1','shot2','shot3','shot4','ugh','swoosh','step1','step2','step3','err','ok','win','click','reload','dry','wstep1','wstep2','wstep3','wstep4','door','dooropen','yell1','yell2','yell3','yell4','hey','ugh2','ugh3','radio','sizzle','stash'];
 const eng={};
 function initAudio(){
  if(AC)return;
@@ -4505,10 +4505,17 @@ function initAudio(){
  eng.so=AC.createOscillator();eng.so.type='triangle';eng.sg=AC.createGain();eng.sg.gain.value=0;eng.so.connect(eng.sg);eng.sg.connect(AC.destination);eng.so.start();
 }
 function sfx(n,vol=1,rate=1,x,z){
+ if(n==='ugh')n=pick(['ugh','ugh2','ugh3']);
  if(!AC||muted||!sfxBuf[n])return;let g=vol;
  if(x!==undefined){const d=dist2(x,z,camera.position.x,camera.position.z);g*=Math.pow(clamp(1-d/110,0,1),1.6);if(g<.02)return;}
  const s=AC.createBufferSource();s.buffer=sfxBuf[n];s.playbackRate.value=rate*(0.94+Math.random()*.12);
  const gn=AC.createGain();gn.gain.value=g;s.connect(gn);gn.connect(sfxGain);s.start();
+}
+const LOOPS={};
+function loopSet(n,vol){
+ if(!AC||!sfxBuf[n])return;let L=LOOPS[n];
+ if(!L){if(vol<.01)return;const s=AC.createBufferSource();s.buffer=sfxBuf[n];s.loop=true;const g=AC.createGain();g.gain.value=0;s.connect(g);g.connect(sfxGain);s.start();L=LOOPS[n]={s,g};}
+ L.g.gain.setTargetAtTime(muted?0:vol,AC.currentTime,.15);
 }
 const musWant={};
 const musEl=new Audio();musEl.loop=true;musEl.preload='auto';musEl.volume=0;let musCur=null;
@@ -4525,7 +4532,7 @@ function musicTick(dt){ // un solo reproductor (compatible con iOS): fundido al 
   }
  }else if(best){musEl.volume=clamp(lerp(musEl.volume,bv,clamp(dt*1.6,0,1)),0,1);if(musEl.paused){const p=musEl.play();if(p&&p.catch)p.catch(()=>{});}}
 }
-const RADIOS=[{n:'funky',t:'📻 Radio Funky'},{n:'techno',t:'📻 Radio Techno'},{n:'playa',t:'📻 Radio Playa'},{n:'noche',t:'📻 Radio Noche'},{n:'alegre',t:'📻 Radio Alegre'},{n:null,t:'📻 Radio apagada'}];
+const RADIOS=[{n:'g_rock',t:'📻 Rock FM'},{n:'g_hiphop',t:'📻 Koke Hip-Hop'},{n:'funky',t:'📻 Radio Funky'},{n:'g_jazz',t:'📻 Jazz Gitano'},{n:'g_calle',t:'📻 Radio Calle'},{n:'techno',t:'📻 Radio Techno'},{n:'playa',t:'📻 Radio Playa'},{n:'alegre',t:'📻 Radio Alegre'},{n:null,t:'📻 Radio apagada'}];
 
 /* ---------- efectos (sprites) ---------- */
 const fxTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.35,'rgba(255,255,255,.55)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);const t=new THREE.CanvasTexture(c);t.colorSpace=SRGB;return t;})();
@@ -5920,7 +5927,7 @@ function updateStores(dt){
   clubLights.forEach((l,i)=>{l.intensity=act*(420+200*Math.sin(gameT*4+i*2));});
   tileMats.forEach(t=>{const k=(Math.sin(gameT*3+t.ph)+1)/2;t.m.color.setHSL(((gameT*.25)+t.ph*.1)%1,1,.35+k*.2*(t.neon?1:1)).multiplyScalar(.4+act*.9);});
   clubDancers.forEach(p=>{const pv=act>0&&inView(p.root.position.x,1,p.root.position.z,1.5);p.root.visible=pv;if(!pv)return;p.mixer.update(dt);p.root.rotation.y+=dt*.5*Math.sin(gameT*.7+p.ph);});
-  musWant.techno=Math.max(musWant.techno||0,clamp((1-d/48),0,1)*.75);
+  musWant.g_club=Math.max(musWant.g_club||0,clamp((1-d/48),0,1)*.75);
  }
 }
 
@@ -6639,14 +6646,14 @@ function enterHouse(h){
  player.inside=true;player.hold=null;cancelRob('');
  player.x=IN.spawn.x;player.z=IN.spawn.z;player.y=0;player.vx=player.vz=0;player.yaw=Math.PI;camYaw=Math.PI;camPitch=.12;
  worldGroup.visible=false;
- sfx('click',.8);toast(h.trap?'🌿 Entras en un piso sospechoso…':'🏠 Has entrado en una casa'+(IN.res.length?'':' vacía'),'');
+ sfx('dooropen',.7);toast(h.trap?'🌿 Entras en un piso sospechoso…':'🏠 Has entrado en una casa'+(IN.res.length?'':' vacía'),'');
  if(IN.res.some(r=>r.role==='sleep'))toast('😴 Alguien duerme… ve con cuidado');
 }
 function leaveHouse(silent){
  if(!player.inside)return;
  const h=IN.h;
  if(h&&h.resetAt===undefined)h.resetAt=gameT+900;
- player.inside=false;worldGroup.visible=true;
+ player.inside=false;worldGroup.visible=true;loopSet('sizzle',0);if(!silent)sfx('door',.6);
  if(!silent&&IN.ret){player.x=IN.ret.x;player.z=IN.ret.z;player.yaw=IN.ret.yaw;camYaw=IN.ret.yaw;player.vx=player.vz=0;}
  cancelRob('');
  clearRoom();
@@ -6660,7 +6667,7 @@ function lootTable(h){
 }
 function searchStash(s){
  if(s.done){toast('Ya lo has registrado','warn');return;}
- s.done=true;const h=IN.h;if(h.looted)h.looted[IN.stash.indexOf(s)]=true;
+ s.done=true;sfx('stash',.7);const h=IN.h;if(h.looted)h.looted[IN.stash.indexOf(s)]=true;
  const tb=lootTable(h),r=Math.random();
  sfx('click',.6);
  if(r<.38){const c=irnd(25,h.rich?400:140);addMoney(c);sfx('coins',.8);toast('💵 +'+money$(c)+' en '+s.label.toLowerCase(),'ok');save.loot+=c;}
@@ -6695,7 +6702,7 @@ function scareRes(r){
  if(r.state==='scared'||r.state==='flee'||r.state==='fleeHide'||r.state==='phone'||r.state==='waking')return;
  r.state='scared';r.t=0;r.tScared=0;r.p.setPose('handsup');r.p.play('idle');
  r.p.root.position.y=0;
- sfx('ugh',.4,1.3,r.x,r.z);
+ sfx(pick(['yell1','yell2','yell3','hey']),.6,1,r.x,r.z);
 }
 const _hurt0=hurtPed;
 hurtPed=function(o,d,fx,fz,byPlayer){
@@ -6714,7 +6721,9 @@ function updateResidents(dt){
  const dark=env.night>.5?1:.55;
  IN.lights[0].intensity=130*dark+60;IN.lights[1].intensity=110*dark+50;
  hemi.intensity=Math.max(hemi.intensity,1.15);
+ musWant[IN.h&&IN.h.trap?'g_calle':'g_house']=.55;
  if(IN.tv){const k=Math.floor(IN.t*2.2)%5;IN.tv.material.color.setHex([0x6aa8ff,0xff9a6a,0x8aff9a,0xffffff,0xb08aff][k]);}
+ let sz=0;for(const r of IN.res)if(r.role==='cook'&&!r.dead&&r.state==='idle'){sz=Math.max(sz,clamp(1-dist2(r.x,r.z,player.x,player.z)/9,0,1)*.5);}loopSet('sizzle',sz);
  const shotRecent=gameT-(player.lastShot||-99)<1.2;
  for(const r of IN.res){
   const p=r.p,d=dist2(r.x,r.z,player.x,player.z);
@@ -6883,6 +6892,7 @@ function updateStoreLife(){
   if(!st.life)continue;
   const d=dist2(st.ox,st.oz,player.x,player.z);
   st.life.visible=d<75&&!player.inside;
+  if(d<9&&!player.veh&&!player.inside){const t=st.s.type;musWant[t==='burger'||t==='pizza'?'g_resto':t==='bar'?'g_pub':'g_mall']=.5;}
   if(d<70&&!st.folkSpawned&&!player.inside)spawnFolk(st);
   else if(d>230&&st.folkSpawned){st.folkSpawned=false;st.folk=[];}
  }
@@ -6927,7 +6937,7 @@ addEventListener('mousemove',e=>{if(document.pointerLockElement===canvas&&state=
 addEventListener('wheel',e=>{if(state==='play'&&!shopOpen)cycleWeapon(e.deltaY>0?1:-1);},{passive:true});
 document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&state==='play'&&!shopOpen&&!mapOpen&&!TOUCH)togglePause(true);});
 function cycleCam(){camMode=(camMode+1)%4;camPitch=camMode===3?.4:(camMode===1?0:-.06);toast('🎥 '+camNames[camMode]);}
-function cycleRadio(){if(!player.veh)return;radioIdx=(radioIdx+1)%RADIOS.length;toast(RADIOS[radioIdx].t);}
+function cycleRadio(){if(!player.veh)return;radioIdx=(radioIdx+1)%RADIOS.length;sfx('radio',.35);toast(RADIOS[radioIdx].t);}
 function toggleVehicle(){if(player.dead||player.busted>0)return;if(player.veh)exitVehicle();else{const v=nearestVehicle(4.2);if(v)enterVehicle(v);}}
 function selectWeapon(n){if(player.veh)return;if(n!=='fists'&&!save.inv[n].have){toast('No tienes '+WEAPONS[n].n,'warn');return;}player.curW=n;refreshGuns();toast(WEAPONS[n].ico+' '+WEAPONS[n].n);sfx('click',.4);}
 function cycleWeapon(d){const own=WORDER.filter(w=>w==='fists'||save.inv[w].have);let i=own.indexOf(player.curW);i=(i+d+own.length)%own.length;selectWeapon(own[i]);}
@@ -7016,7 +7026,7 @@ function walkPlayer(dt){
  else pe.play(P_.aim&&armed?'gunIdle':'idle');
  pe.aimPitch=clamp(camPitch,-.9,.9);pe.root.position.set(P_.x,P_.y,P_.z);pe.root.rotation.y=P_.yaw;pe.mixer.update(dt);
  // pasos
- if(P_.onGround&&sp>.8){P_.stepT-=dt*sp;if(P_.stepT<=0){P_.stepT=3.2;sfx('step'+irnd(1,3),.25,1+sp*.03);}}
+ if(P_.onGround&&sp>.8){P_.stepT-=dt*sp;if(P_.stepT<=0){P_.stepT=3.2;sfx(P_.inside?'wstep'+irnd(1,4):'step'+irnd(1,3),.3,1+sp*.03);}}
  // disparo continuo
  const w=WEAPONS[P_.curW];
  if((mouseL||touch.fire)&&(w.auto||w.melee))playerFire();
@@ -7294,10 +7304,10 @@ function stepGame(dt){
  if(fountain){}
  // radio / musica
  if(player.veh&&RADIOS[radioIdx].n)musWant[RADIOS[radioIdx].n]=Math.max(musWant[RADIOS[radioIdx].n]||0,.55);
- else if(wanted)musWant.persecucion=.5;
+ else if(wanted)musWant.g_chase=.5;
  else if(player.rob)musWant.atraco=.5;
  else musWant.pueblo=Math.max(musWant.pueblo||0,.3);
- if(wanted&&player.veh&&RADIOS[radioIdx].n)musWant.persecucion=.3;
+ if(wanted&&player.veh&&RADIOS[radioIdx].n)musWant.g_chase=.3;
  if(!player.veh&&eng.g)eng.g.gain.value=0;
  // luces nocturnas
  const n=env.night;

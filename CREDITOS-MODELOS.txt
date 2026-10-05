@@ -36,3 +36,12 @@ VEHICULOS Y OBJETOS
 
 Otros modelos del juego (coches, edificios pequenos, etc.): Kenney / Quaternius / KayKit, CC0.
 Los autobuses, motos, lanchas y edificios de la ciudad estan hechos a mano para este juego.
+
+MUSICA Y SONIDO DE KOKE CITY (todo CC0 / dominio publico, recomprimido a mp3 mono)
+- audio/m_g_*.mp3  Pistas de la coleccion CC0 "SoundSafari/CC0-1.0-Music": Komiku (Car chasing pew pew,
+                   In the restaurant, Interview in a pub, Mall, Quiet Saturday, Quelques rues sombres),
+                   John Bartmann (Secret Agent Rock, Tupac Lives, Robot Gypsy Jazz, Mellow Cafe Vibe) y
+                   Dancefloor is Lava (Tinnitus Dance). Recortadas a 2 minutos.
+- audio/s/*.mp3    Efectos sonoros CC0 (via bonesvt/GodotFall, que los recopila de OpenGameArt y Kenney):
+                   rubberduck, qubodup, HaelDB, bart, BMacZero, AntumDeluge, EZduzziteh, mujtaba-io,
+                   Kenney (Impact Sounds) y otros autores CC0.
