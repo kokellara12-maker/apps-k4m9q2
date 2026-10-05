@@ -129,7 +129,18 @@
   .tile h2 { margin: 2px 0 0; font-size: 13.5px; line-height: 1.15; font-weight: 800; overflow-wrap: anywhere; text-align: center; }
   .tile p { margin: 0; color: var(--dim); font-size: 11px; line-height: 1.3; text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-  @media (prefers-reduced-motion: reduce) { .tile { transition: none; } }
+  #sp { position: fixed; inset: 0; z-index: 120; background: radial-gradient(90% 70% at 50% 40%, #2a1c55, #0a0614 75%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .45s ease, transform .45s ease; }
+  #sp.out { opacity: 0; transform: scale(1.08); pointer-events: none; }
+  #sp img { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 0 0 0 rgba(160,120,255,.6), 0 14px 50px rgba(0,0,0,.6); animation: spl .7s cubic-bezier(.2,1.6,.4,1) both, spg 1.4s ease-out .5s both; }
+  @keyframes spl { from { opacity: 0; transform: scale(.3) rotate(-14deg); } to { opacity: 1; transform: none; } }
+  @keyframes spg { 0% { box-shadow: 0 0 0 0 rgba(160,120,255,.6), 0 14px 50px rgba(0,0,0,.6); } 100% { box-shadow: 0 0 0 46px rgba(160,120,255,0), 0 14px 50px rgba(0,0,0,.6); } }
+  #sp b { font: 900 38px/1 var(--font); letter-spacing: .06em; color: #fff; display: flex; }
+  #sp b i { font-style: normal; display: inline-block; opacity: 0; animation: spt .5s cubic-bezier(.2,1.5,.4,1) both; animation-delay: calc(.55s + var(--k) * 70ms); }
+  #sp b i.s { width: .35em; }
+  #sp b i:nth-child(n+6) { background: linear-gradient(180deg, #d8c5ff, #8a63ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  @keyframes spt { from { opacity: 0; transform: translateY(26px) scale(.6); } to { opacity: 1; transform: none; } }
+  .sp-on .tile, .sp-on header, .sp-on .hero { animation-delay: calc(var(--i, 0) * 30ms + 1.9s); }
+  @media (prefers-reduced-motion: reduce) { #sp { display: none; } .tile { transition: none; } }
 
   @keyframes pop { from { opacity: 0; transform: translateY(22px) scale(.72); } to { opacity: 1; transform: none; } }
   .tile { animation: pop .55s cubic-bezier(.2,1.5,.4,1) both; animation-delay: calc(var(--i, 0) * 30ms); }
@@ -146,6 +157,12 @@
 </style>
 </head>
 <body>
+<div id="sp"><img src="icon-192.png" alt=""><b aria-label="Koke Apps"></b></div>
+<script>(function(){var sp=document.getElementById('sp'),on=1;try{if(sessionStorage.getItem('sp1'))on=0;else sessionStorage.setItem('sp1','1')}catch(e){}
+if(!on){sp.remove();return}
+var b=sp.querySelector('b');'KOKE APPS'.split('').forEach(function(c,k){var i=document.createElement('i');i.textContent=c;if(c==' ')i.className='s';i.style.setProperty('--k',k);b.appendChild(i)});
+document.documentElement.classList.add('sp-on');
+setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.remove();document.documentElement.classList.remove('sp-on')},2250)})()</script>
 <div id="sc">
 <main>
   <header>
