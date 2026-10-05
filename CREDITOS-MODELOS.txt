@@ -1,0 +1,26 @@
+MODELOS 3D DE KOKE CITY (gta.html)
+==================================
+Descargados de repositorios publicos de GitHub y optimizados (menos poligonos,
+texturas WebP reducidas). Cada autor mantiene sus derechos; respeta su licencia.
+
+PERSONAJES
+- mpfb.glb       Avatar "mpfb" (TalkingHead, met4citizen), creado con Blender + MPFB.  CC0.
+- avaturn.glb    Avatar "avaturn" (TalkingHead). Creado en Avaturn, SOLO USO NO COMERCIAL.
+- brunette.glb   Avatar "brunette" (TalkingHead). Creado en Ready Player Me. CC BY-NC 4.0 (NO comercial).
+- victor.glb     Avatar "readyplayer.me" (ejemplos de three.js). Ready Player Me (NO comercial).
+- michelle.glb   "Michelle" (ejemplos de three.js), personaje de Mixamo (Adobe), uso libre en proyectos.
+- soldier.glb    "Soldier" (ejemplos de three.js), personaje de Mixamo (Adobe), uso libre en proyectos.
+- xbot.glb       "X Bot" (ejemplos de three.js), personaje de Mixamo (Adobe). Sus animaciones
+                 (idle/walk/run) y la de baile de Michelle se reutilizan en todos los personajes.
+
+VEHICULOS Y OBJETOS
+- helicopter.glb "Helicopter" (AW101) de Gigantic Burger, CC BY 4.0  https://skfb.ly/6XBwS
+                 (via github.com/srcejon/sdrangel-3d-models)
+- firetruck.glb  "Fire Truck" de codexito, CC BY 4.0  https://skfb.ly/KzqZ
+- milktruck.glb  "Cesium Milk Truck" de Cesium, CC BY 4.0 (Khronos glTF Sample Assets)
+- buoy.glb       "Buoy" de OzzyDan, CC BY 4.0
+- props/*.glb    KayKit "City Builder Bits 1.0" de Kay Lousberg (taxi, banco, hidrante,
+                 contenedor, arbusto, deposito de agua...). CC0.
+
+Otros modelos del juego (coches, edificios pequenos, etc.): Kenney / Quaternius / KayKit, CC0.
+Los autobuses, motos, lanchas y edificios de la ciudad estan hechos a mano para este juego.
