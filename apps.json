@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Koke City",
+   "desc": "Mundo abierto 3D estilo GTA: atraca tiendas, roba coches, Club Tacón y huye de la policía 🚔",
+   "href": "gta.html",
+   "icono": "🌆",
+   "color": "#ff2fa0",
+   "cat": "juegos",
+   "sub": "accion",
+   "tags": "gta mundo abierto ciudad coches robar atracos tiendas policia banco club tacon conducir pistola 3d grand theft auto sandbox",
+   "img": "img/gta.webp"
+  },
+  {
    "nombre": "Infierno 3D",
    "desc": "Shooter en 3D estilo Doom: demonios, escopeta y niveles infinitos 🔫👹",
    "href": "infierno.html",
