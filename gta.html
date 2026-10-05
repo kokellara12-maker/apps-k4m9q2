@@ -129,6 +129,29 @@ body.touch #prompt{left:calc(env(safe-area-inset-left) + 14px);transform:none;bo
 #bMap{right:calc(env(safe-area-inset-right) + 152px);top:calc(env(safe-area-inset-top) + 8px);width:42px;height:42px;font-size:18px;display:flex}
 body.touch #topR{top:calc(env(safe-area-inset-top) + 58px);right:calc(env(safe-area-inset-right) + 140px)}
 @media (max-height:480px){.panel{padding:14px 18px}.logo{font-size:38px}.panel .sub{margin:4px 0 8px;font-size:12px}.btn{padding:11px 14px;margin:5px 0;font-size:16px}#skins{margin-bottom:6px}body.touch #mmWrap{width:92px;height:92px;top:calc(env(safe-area-inset-top) + 100px)}body.touch #mm{width:92px;height:92px}}
+
+/* ===== ajustes de pantalla pequena / iPhone / iPad / PC ===== */
+.toast{white-space:normal;max-width:min(92vw,520px);text-align:center;font-size:13px;padding:7px 14px;border-radius:14px;line-height:1.25}
+#prompt{white-space:normal;text-align:center;max-width:min(92vw,560px);border-radius:16px;line-height:1.25}
+body.touch #misBox{top:calc(env(safe-area-inset-top) + 112px);left:calc(env(safe-area-inset-left) + 12px);right:auto;width:min(46vw,240px);padding:7px 10px;font-size:11px;border-radius:12px;background:rgba(14,12,26,.5)}
+body.touch #misT{font-size:12px}body.touch #misO{font-size:11px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}body.touch #misTm{font-size:15px;margin-top:2px}
+body.touch #zoneT{top:calc(env(safe-area-inset-top) + 210px);left:auto;right:calc(env(safe-area-inset-right) + 14px);text-align:right;font-size:10px;max-width:120px}
+body.touch #mission{font-size:11px;padding:5px 9px}
+body.touch #topR{top:calc(env(safe-area-inset-top) + 52px)}
+body.touch #money{font-size:28px}body.touch #stars{font-size:20px}
+body.touch #toasts{top:calc(env(safe-area-inset-top) + 6px)}
+body.touch #misBanner{top:18%}
+@media (max-height:480px){
+ body.touch #money{font-size:22px}body.touch #stars{font-size:16px;margin-top:0}body.touch #clock{font-size:11px}
+ body.touch #topR{top:calc(env(safe-area-inset-top) + 52px);right:calc(env(safe-area-inset-right) + 140px)}
+ body.touch #misBox{top:calc(env(safe-area-inset-top) + 100px);width:min(34vw,230px)}
+ body.touch #prompt{bottom:calc(env(safe-area-inset-bottom) + 14px);left:50%;transform:translateX(-50%);max-width:44vw;text-align:center;font-size:12px;padding:6px 12px}
+ body.touch #mission{top:calc(env(safe-area-inset-top) + 42px)}
+ .toast{font-size:12px;padding:5px 12px;max-width:60vw}
+ body.touch #misBanner b{font-size:clamp(20px,5vw,34px)}body.touch #misBanner small{font-size:13px}
+ body.touch #zoneT{top:calc(env(safe-area-inset-top) + 160px)}
+}
+@media (min-width:900px) and (min-height:700px){#toasts .toast{font-size:15px}#misBox{font-size:14px}}
 </style>
 </head>
 <body>
@@ -5356,7 +5379,7 @@ const player={x:0,z:0,y:0,vy:0,yaw:0,hp:100,armor:0,money:save.money,person:null
 const later=[];let wanted=0,wantedT=0,lastSeen=0,crimeCool=0,gameT=0;
 const keys={};let camMode=0,camYaw=0,camPitch=.15,camDist=4.4,lastLook=0;
 let radioIdx=0;
-const toast=(txt,cls)=>{const d=document.createElement('div');d.className='toast '+(cls||'');d.textContent=txt;$('toasts').appendChild(d);setTimeout(()=>d.classList.add('out'),2600);setTimeout(()=>d.remove(),3200);};
+const toast=(txt,cls)=>{const box=$('toasts');while(box.children.length>=3)box.firstChild.remove();const d=document.createElement('div');d.className='toast '+(cls||'');d.textContent=txt;box.appendChild(d);setTimeout(()=>d.classList.add('out'),2300);setTimeout(()=>d.remove(),2800);};
 
 /* ===================== ARMAS (modelos) ===================== */
 function makeGun(kind){
@@ -6794,8 +6817,8 @@ function openInventory(){
   const rows=[];
   for(const k of ownedKeys()){const it=ITEMS[k],n=itemCount(k);
    if(it.use)rows.push({a:it.ico+' '+it.n+' ×'+n,b:'Pulsa para usar'+(it.cat==='drug'?' (¡cuidado con las dosis!)':''),c:'USAR',act:()=>{if(it.use()===false)return false;takeItem(k);closeShop();}});
-   if(it.throwType&&!HELD)rows.push({a:it.ico+' Coger '+it.n+' en la mano',b:'Para lanzarlo (clic o T)',c:'COGER',act:()=>{if(!takeItem(k))return false;const o=spawnLoose(it.throwType,player.x,1.2,player.z);if(!o){giveItem(k);return false;}o.age=1;pickLoose(o);closeShop();}});
-   else rows.push({a:it.ico+' '+it.n+' ×'+n,b:it.cat==='drug'?'Véndelo en la calle o a un camello':it.cat==='goods'?'Véndelo en bares y licorerías':'Véndelo en empeños, joyerías o tiendas de móviles',c:'≈'+money$(it.val),act:()=>{}});}
+   else rows.push({a:it.ico+' '+it.n+' ×'+n,b:it.cat==='drug'?'Véndelo en la calle o a un camello':it.cat==='goods'?'Véndelo en bares y licorerías':'Véndelo en empeños, joyerías o tiendas de móviles',c:'≈'+money$(it.val),act:()=>{}});
+   if(it.throwType&&!HELD)rows.push({a:it.ico+' Coger '+it.n+' en la mano',b:'Para lanzarlo (clic o T)',c:'COGER',act:()=>{if(!takeItem(k))return false;const o=spawnLoose(it.throwType,player.x,1.2,player.z);if(!o){giveItem(k);return false;}o.age=1;pickLoose(o);closeShop();}});}
   const wl=save.inv;rows.push({a:'💥 Armas',b:'Pistola '+(wl.pistol.have?wl.pistol.ammo:'—')+' · Subfusil '+(wl.smg.have?wl.smg.ammo:'—')+' · Escopeta '+(wl.shotgun.have?wl.shotgun.ammo:'—'),c:'',act:()=>{}});
   return rows;
  });
@@ -8062,7 +8085,7 @@ function startGame(fresh){
  $('menu').classList.remove('show');document.body.classList.add('playing');state='play';
  if(!TOUCH)canvas.requestPointerLock&&canvas.requestPointerLock();
  toast('Bienvenido a Koke City 🌆');
- setTimeout(()=>toast('🎯 Habla con el contacto (baliza verde) para empezar misiones'),2200);setTimeout(()=>toast(TOUCH?'O acércate a una tienda con arma y pulsa 💰':'O entra a una tienda con la pistola y pulsa G para atracarla'),5200);
+ setTimeout(()=>toast('🎯 Habla con el contacto (baliza verde)'),2200);
 }
 $('bPlay').onclick=()=>startGame(false);
 $('bNew').onclick=()=>{if(confirm('¿Empezar de cero? Se borrará tu progreso.'))startGame(true);};
@@ -8075,7 +8098,7 @@ $('bmClose').onclick=()=>toggleMap();$('bmX').onclick=()=>toggleMap();$('bmGo').
 $('bGuide').onclick=()=>{openGuide();};$('bGuide2').onclick=()=>{toggleMap();openGuide();};
 addEventListener('beforeunload',persist);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){persist();if(state==='play')togglePause();}});
-window.__gta={decalHit,DEC,PEOPLE,LOOSE,spawnLoose,pickLoose,throwHeld,FXS,get HELD(){return HELD;},nearLoose,streetInteract,streetPrompt,useDrug,smokeCig,sitBench,nearBench,propPos,nearDumpster,searchDumpster,WX,get AC(){return AC;},sfxBuf,hurtPed:(...a)=>hurtPed(...a),killPed,set camOv(v){_camOv=v;},IN,HOUSES,enterHouse,leaveHouse,giveItem,ITEMS,openInventory,interactWorld,interactPrompt,nearHouseDoor,makePlayerPerson,getGun:()=>handGun,removeVehicle,exitVehicle,mis,STORY,startMission,placeGiver,abortMission,nearGiver,missionDef,killCop,spawnVehicle,lightState,zoneAt,step:(n,dt=.05)=>{for(let i=0;i<n;i++){stepGame(dt);fxTick(dt);tracerTick(dt);updateCamera(dt);}updateFrustum();},hurtPlayer,openShop,respawn,MENUS,spawnCop,spawnPed,castRay,player,vehicles,peds,cops,stores,get wanted(){return wanted;},setWanted,startGame,get state(){return state;},tp:(x,z)=>{player.x=x;player.z=z;},camera,scene,renderer,setTime,get camMode(){return camMode;},cycleCam,selectWeapon,playerFire,keys,save,startRob,enterVehicle,nearestVehicle,toggleVehicle,env,set camYaw(v){camYaw=v;},set camPitch(v){camPitch=v;},colliders,commitCrime,nearStore};
+window.__gta={toast,toggleMap,togglePause,openGuide,decalHit,DEC,PEOPLE,LOOSE,spawnLoose,pickLoose,throwHeld,FXS,get HELD(){return HELD;},nearLoose,streetInteract,streetPrompt,useDrug,smokeCig,sitBench,nearBench,propPos,nearDumpster,searchDumpster,WX,get AC(){return AC;},sfxBuf,hurtPed:(...a)=>hurtPed(...a),killPed,set camOv(v){_camOv=v;},IN,HOUSES,enterHouse,leaveHouse,giveItem,ITEMS,openInventory,interactWorld,interactPrompt,nearHouseDoor,makePlayerPerson,getGun:()=>handGun,removeVehicle,exitVehicle,mis,STORY,startMission,placeGiver,abortMission,nearGiver,missionDef,killCop,spawnVehicle,lightState,zoneAt,step:(n,dt=.05)=>{for(let i=0;i<n;i++){stepGame(dt);fxTick(dt);tracerTick(dt);updateCamera(dt);}updateFrustum();},hurtPlayer,openShop,respawn,MENUS,spawnCop,spawnPed,castRay,player,vehicles,peds,cops,stores,get wanted(){return wanted;},setWanted,startGame,get state(){return state;},tp:(x,z)=>{player.x=x;player.z=z;},camera,scene,renderer,setTime,get camMode(){return camMode;},cycleCam,selectWeapon,playerFire,keys,save,startRob,enterVehicle,nearestVehicle,toggleVehicle,env,set camYaw(v){camYaw=v;},set camPitch(v){camPitch=v;},colliders,commitCrime,nearStore};
 requestAnimationFrame(frame);
 boot();
 })();
