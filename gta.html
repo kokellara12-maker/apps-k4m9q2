@@ -152,6 +152,12 @@ body.touch #misBanner{top:18%}
  body.touch #zoneT{top:calc(env(safe-area-inset-top) + 160px)}
 }
 @media (min-width:900px) and (min-height:700px){#toasts .toast{font-size:15px}#misBox{font-size:14px}}
+
+/* mision compacta en movil: una linea, sin tapar la vista */
+body.touch #misBox{top:calc(env(safe-area-inset-top) + 98px);left:calc(env(safe-area-inset-left) + 12px);right:auto;width:auto;max-width:42vw;padding:4px 9px;border-radius:10px;background:rgba(14,12,26,.45);display:none}
+body.touch #misT{display:none}
+body.touch #misO{font-size:11px;margin:0;line-height:1.2;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw}
+body.touch #misTm{display:inline;font-size:12px;margin:0 0 0 6px}
 </style>
 </head>
 <body>
