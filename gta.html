@@ -201,7 +201,7 @@ body.touch #misTm{display:inline;font-size:12px;margin:0 0 0 6px}
  <div class="touchonly sub" style="margin-top:12px">Joystick izquierdo para moverte · arrastra a la derecha para mirar · acércate a una tienda y pulsa 💰 con tu arma</div>
 </div></div>
 <div id="pause" class="overlay"><div class="panel"><div class="logo" style="font-size:40px">PAUSA</div><div class="sub">Tu progreso se guarda solo</div>
- <button class="btn" id="bResume">▶ Seguir jugando</button><button class="btn alt" id="bAbort" style="display:none">⛔ Abandonar misión</button><button class="btn alt" id="bGuide">❓ Guía: dónde conseguir cada cosa</button><button class="btn alt" id="bMute">🔊 Sonido: SÍ</button><button class="btn alt" id="bQuit">‹ Volver al menú de apps</button></div></div>
+ <button class="btn" id="bResume">▶ Seguir jugando</button><button class="btn alt" id="bAbort" style="display:none">⛔ Abandonar misión</button><button class="btn alt" id="bMusic">🎵 Música de persecución: SÍ</button><button class="btn alt" id="bGuide">❓ Guía: dónde conseguir cada cosa</button><button class="btn alt" id="bMute">🔊 Sonido: SÍ</button><button class="btn alt" id="bQuit">‹ Volver al menú de apps</button><div id="bVer" class="sub" style="margin:6px 0 0;font-size:11px"></div></div></div>
 <div id="shop" class="overlay"><div class="panel"><h2 id="shopT"></h2><div id="shopItems"></div><button class="btn alt" id="shopClose">Salir</button></div></div>
 <div id="bigmap" class="overlay"><div class="panel"><button id="bmX">✕</button><canvas id="bm" width="900" height="900"></canvas>
  <div id="bmSide"><h3>📍 Mapa · toca un sitio</h3><div id="bmSel">Toca un icono del mapa o elige abajo para <b>teletransportarte</b>.</div><button class="btn" id="bmGo" style="display:none;margin:0">⚡ Ir allí</button>
@@ -4558,21 +4558,22 @@ function loopSet(n,vol){
  L.g.gain.setTargetAtTime(muted?0:vol,AC.currentTime,.15);
 }
 const musWant={};
-const musEl=new Audio();musEl.loop=true;musEl.preload='auto';let musCur=null,musV=0,musGain=null;
+const musEl=new Audio();musEl.loop=true;musEl.preload='auto';let musCur=null,musV=0,musGain=null,musicEnabled=true;
 // en iPhone el volumen del <audio> no se puede cambiar: se controla con WebAudio (ganancia) y se pausa de verdad
-function musicUnlock(){try{if(AC&&!musGain){musGain=AC.createGain();musGain.gain.value=0;AC.createMediaElementSource(musEl).connect(musGain);musGain.connect(AC.destination);}musGain.gain.value=0;musEl.src='audio/m_g_mall.mp3';const pr=musEl.play();if(pr&&pr.then)pr.then(()=>{setTimeout(()=>{if(!musCur)musEl.pause();},120);}).catch(()=>{});}catch(e){}}
+function musicUnlock(){try{if(AC&&!musGain){musGain=AC.createGain();musGain.gain.value=0;AC.createMediaElementSource(musEl).connect(musGain);musGain.connect(AC.destination);}musGain.gain.value=0;musEl.muted=true;musEl.src='audio/m_g_mall.mp3';const pr=musEl.play();if(pr&&pr.then)pr.then(()=>{setTimeout(()=>{musEl.pause();musEl.muted=false;musCur=null;},150);}).catch(()=>{musEl.muted=false;});}catch(e){}}
 function musicTick(dt){
- let best=null,bv=0;if(!muted)for(const k in musWant)if(musWant[k]>bv){bv=musWant[k];best=k;}
+ let best=null,bv=0;if(!muted&&musicEnabled)for(const k in musWant)if(musWant[k]>bv){bv=musWant[k];best=k;}
  for(const k in musWant)musWant[k]=0;
  if(!AC||!musGain)return;
+ if(!best&&musV<=.02&&!musEl.paused&&!musEl.muted)musEl.pause();
  if(best!==musCur){
   musV=Math.max(0,musV-dt*1.6);musGain.gain.value=musV;
   if(musV<=.02){
    musGain.gain.value=0;musV=0;
-   if(best){musCur=best;musEl.src='audio/m_'+best+'.mp3';const p=musEl.play();if(p&&p.catch)p.catch(()=>{});}
+   if(best&&musicEnabled){musCur=best;musEl.muted=false;musEl.src='audio/m_'+best+'.mp3';const p=musEl.play();if(p&&p.catch)p.catch(()=>{});}
    else{musCur=null;if(!musEl.paused)musEl.pause();}
   }
- }else if(best){musV=clamp(lerp(musV,bv,clamp(dt*1.6,0,1)),0,1);musGain.gain.value=musV;if(musEl.paused){const p=musEl.play();if(p&&p.catch)p.catch(()=>{});}}
+ }else if(best&&musicEnabled){musV=clamp(lerp(musV,bv,clamp(dt*1.6,0,1)),0,1);musGain.gain.value=musV;if(musEl.paused){const p=musEl.play();if(p&&p.catch)p.catch(()=>{});}}
  else if(!musEl.paused&&musV<=.02)musEl.pause();
 }
 const RADIOS=[{n:'g_rock',t:'📻 Rock FM'},{n:'g_hiphop',t:'📻 Koke Hip-Hop'},{n:'funky',t:'📻 Radio Funky'},{n:'g_jazz',t:'📻 Jazz Gitano'},{n:'g_calle',t:'📻 Radio Calle'},{n:'techno',t:'📻 Radio Techno'},{n:'playa',t:'📻 Radio Playa'},{n:'alegre',t:'📻 Radio Alegre'},{n:null,t:'📻 Radio apagada'}];
@@ -8104,7 +8105,10 @@ $('bQuit').onclick=()=>{persist();location.href='index.html';};
 $('bMute').onclick=()=>{muted=!muted;$('bMute').textContent=muted?'🔇 Sonido: NO':'🔊 Sonido: SÍ';if(eng.g)eng.g.gain.value=0;};
 $('shopClose').onclick=closeShop;
 $('bmClose').onclick=()=>toggleMap();$('bmX').onclick=()=>toggleMap();$('bmGo').onclick=()=>teleportTo(mapSel);$('bm').addEventListener('pointerdown',mapClick);
-$('bGuide').onclick=()=>{openGuide();};$('bGuide2').onclick=()=>{toggleMap();openGuide();};
+$('bGuide').onclick=()=>{openGuide();};
+$('bMusic').onclick=()=>{musicEnabled=!musicEnabled;try{localStorage.setItem('kc_music',musicEnabled?'1':'0');}catch(e){}$('bMusic').textContent='🎵 Música de persecución: '+(musicEnabled?'SÍ':'NO');if(!musicEnabled){musEl.pause();musV=0;if(musGain)musGain.gain.value=0;musCur=null;}};
+try{if(localStorage.getItem('kc_music')==='0'){musicEnabled=false;$('bMusic').textContent='🎵 Música de persecución: NO';}}catch(e){}
+$('bVer').textContent='Koke City · versión 120';$('bGuide2').onclick=()=>{toggleMap();openGuide();};
 addEventListener('beforeunload',persist);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){persist();if(state==='play')togglePause();}});
 window.__gta={music:()=>({paused:musEl.paused,gain:musGain?+musGain.gain.value.toFixed(2):null,cur:musCur,src:musEl.src.split('/').pop()}),toast,toggleMap,togglePause,openGuide,decalHit,DEC,PEOPLE,LOOSE,spawnLoose,pickLoose,throwHeld,FXS,get HELD(){return HELD;},nearLoose,streetInteract,streetPrompt,useDrug,smokeCig,sitBench,nearBench,propPos,nearDumpster,searchDumpster,WX,get AC(){return AC;},sfxBuf,hurtPed:(...a)=>hurtPed(...a),killPed,set camOv(v){_camOv=v;},IN,HOUSES,enterHouse,leaveHouse,giveItem,ITEMS,openInventory,interactWorld,interactPrompt,nearHouseDoor,makePlayerPerson,getGun:()=>handGun,removeVehicle,exitVehicle,mis,STORY,startMission,placeGiver,abortMission,nearGiver,missionDef,killCop,spawnVehicle,lightState,zoneAt,step:(n,dt=.05)=>{for(let i=0;i<n;i++){stepGame(dt);fxTick(dt);tracerTick(dt);updateCamera(dt);}updateFrustum();},hurtPlayer,openShop,respawn,MENUS,spawnCop,spawnPed,castRay,player,vehicles,peds,cops,stores,get wanted(){return wanted;},setWanted,startGame,get state(){return state;},tp:(x,z)=>{player.x=x;player.z=z;},camera,scene,renderer,setTime,get camMode(){return camMode;},cycleCam,selectWeapon,playerFire,keys,save,startRob,enterVehicle,nearestVehicle,toggleVehicle,env,set camYaw(v){camYaw=v;},set camPitch(v){camPitch=v;},colliders,commitCrime,nearStore};

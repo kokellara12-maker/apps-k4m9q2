@@ -1,7 +1,8 @@
 // Mis Apps: modo offline.
 // Cambia el número de versión si quieres forzar una recarga completa.
-const CORE = 'mis-juegos-core-v119';
+const CORE = 'mis-juegos-core-v120';
 const RUN = 'mis-juegos-run-v3';
+const HEAVY_CACHE = 'mis-juegos-heavy-v1';
 const PRECACHE = [
   './',
   './index.html',
@@ -18,29 +19,58 @@ const PRECACHE = [
   './icon-512.png',
 ];
 
+// Lo pesado (modelos 3D y sonidos) se guarda aparte y en segundo plano, para que una actualización
+// nunca se quede atascada descargando decenas de MB. Lo ligero (páginas, imágenes) va en la instalación.
+const isHeavy = (u) => /^\.\/(models|audio)\//.test(u);
+const LIGHT = PRECACHE.filter((u) => !isHeavy(u));
+const HEAVY = PRECACHE.filter(isHeavy);
+
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches
       .open(CORE)
-      .then((c) => c.addAll(PRECACHE.map((u) => new Request(u, { cache: 'reload' }))))
+      .then((c) => c.addAll(LIGHT.map((u) => new Request(u, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
+
+let warming = false;
+function warmHeavy() {
+  if (warming) return;
+  warming = true;
+  caches
+    .open(HEAVY_CACHE)
+    .then(async (c) => {
+      for (const u of HEAVY) {
+        if (await c.match(u)) continue;
+        try {
+          const r = await fetch(u);
+          if (r.ok) await c.put(u, r);
+        } catch (err) {
+          return;
+        }
+      }
+    })
+    .catch(() => {})
+    .then(() => { warming = false; });
+}
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches
       .keys()
       .then((keys) =>
-        Promise.all(keys.filter((k) => k.startsWith('mis-juegos-') && k !== CORE && k !== RUN).map((k) => caches.delete(k)))
+        Promise.all(keys.filter((k) => k.startsWith('mis-juegos-') && k !== CORE && k !== RUN && k !== HEAVY_CACHE).map((k) => caches.delete(k)))
       )
       .then(() => self.clients.claim())
+      .then(() => warmHeavy())
   );
 });
 
 // Con internet: usa lo último y lo guarda. Sin internet (o muy lento): usa lo guardado.
 self.addEventListener('fetch', (e) => {
   const req = e.request;
+  if (req.mode === 'navigate') warmHeavy();
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
 
   // música e imágenes pesadas: primero lo guardado (no cambian)
@@ -56,7 +86,7 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     new Promise((resolve) => {
       let done = false;
-      const fromCache = () => caches.match(req, { ignoreSearch: true });
+      const fromCache = () => caches.open(RUN).then((c) => c.match(req, { ignoreSearch: true })).then((h) => h || caches.match(req, { ignoreSearch: true }));
 
       const timer = setTimeout(async () => {
         const hit = await fromCache();
@@ -64,7 +94,7 @@ self.addEventListener('fetch', (e) => {
           done = true;
           resolve(hit);
         }
-      }, 3000);
+      }, 7000);
 
       fetch(req, { cache: 'no-cache' })
         .then((res) => {
