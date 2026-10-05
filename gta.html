@@ -5829,7 +5829,7 @@ function enterVehicle(v){
  if(viewGun)viewGun.visible=false;
  if(handGun)handGun.visible=false;
  sfx('door',.5);
- if(v.kind!=='heli'){radioIdx=Math.floor(Math.random()*4);toast(RADIOS[radioIdx].t);}
+ if(v.kind!=='heli'){radioIdx=RADIOS.length-1;toast('📻 Radio apagada · R para encenderla');}
  else toast('🚁 W/S avanzar · A/D girar · Espacio subir · Shift bajar');
 }
 function exitVehicle(forced){
@@ -5961,7 +5961,7 @@ function updateStores(dt){
   clubLights.forEach((l,i)=>{l.intensity=act*(420+200*Math.sin(gameT*4+i*2));});
   tileMats.forEach(t=>{const k=(Math.sin(gameT*3+t.ph)+1)/2;t.m.color.setHSL(((gameT*.25)+t.ph*.1)%1,1,.35+k*.2*(t.neon?1:1)).multiplyScalar(.4+act*.9);});
   clubDancers.forEach(p=>{const pv=act>0&&inView(p.root.position.x,1,p.root.position.z,1.5);p.root.visible=pv;if(!pv)return;p.mixer.update(dt);p.root.rotation.y+=dt*.5*Math.sin(gameT*.7+p.ph);});
-  musWant.g_club=Math.max(musWant.g_club||0,clamp((1-d/48),0,1)*.75);
+ 
  }
 }
 
@@ -7025,7 +7025,7 @@ function updateResidents(dt){
  const dark=env.night>.5?1:.55;
  IN.lights[0].intensity=130*dark+60;IN.lights[1].intensity=110*dark+50;
  hemi.intensity=Math.max(hemi.intensity,1.15);
- musWant[IN.h&&IN.h.trap?'g_calle':'g_house']=.55;
+
  if(IN.tv){const k=Math.floor(IN.t*2.2)%5;IN.tv.material.color.setHex([0x6aa8ff,0xff9a6a,0x8aff9a,0xffffff,0xb08aff][k]);}
  let sz=0;for(const r of IN.res)if(r.role==='cook'&&!r.dead&&r.state==='idle'){sz=Math.max(sz,clamp(1-dist2(r.x,r.z,player.x,player.z)/9,0,1)*.5);}loopSet('sizzle',sz);
  const shotRecent=gameT-(player.lastShot||-99)<1.2;
@@ -7207,7 +7207,7 @@ function updateStoreLife(){
   if(!st.life)continue;
   const d=dist2(st.ox,st.oz,player.x,player.z);
   st.life.visible=d<75&&!player.inside;
-  if(d<9&&!player.veh&&!player.inside){const t=st.s.type;musWant[t==='burger'||t==='pizza'?'g_resto':t==='bar'?'g_pub':'g_mall']=.5;}
+ 
   if(d<70&&!st.folkSpawned&&!player.inside)spawnFolk(st);
   else if(d>230&&st.folkSpawned){st.folkSpawned=false;st.folk=[];}
  }
@@ -7945,11 +7945,11 @@ function stepGame(dt){
  else{updateMission(dt);updateBeacons(dt);updateVehicles(dt);updateSignals(dt);updatePeds(dt);updateCops(dt);updateStores(dt);updateDrops(dt);}
  if(fountain){}
  // radio / musica
- if(player.veh&&RADIOS[radioIdx].n)musWant[RADIOS[radioIdx].n]=Math.max(musWant[RADIOS[radioIdx].n]||0,.55);
- else if(wanted)musWant.g_chase=.5;
+ if(wanted)musWant.g_chase=.55;
+ else if(player.veh&&RADIOS[radioIdx].n)musWant[RADIOS[radioIdx].n]=Math.max(musWant[RADIOS[radioIdx].n]||0,.55);
  else if(player.rob)musWant.atraco=.5;
- else musWant.pueblo=Math.max(musWant.pueblo||0,.3);
- if(wanted&&player.veh&&RADIOS[radioIdx].n)musWant.g_chase=.3;
+
+
  if(!player.veh&&eng.g){eng.g.gain.value=0;engineQuiet();}
  ambienceTick(dt);
  // luces nocturnas
