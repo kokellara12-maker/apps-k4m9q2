@@ -1,6 +1,50 @@
 {
  "apps": [
   {
+   "nombre": "Fábrica de Fondos",
+   "desc": "Fondos de pantalla únicos para tu iPhone: aurora, atardecer, cristal 🌈",
+   "href": "fondos.html",
+   "icono": "🌈",
+   "color": "#ff9a3c",
+   "cat": "herramientas",
+   "sub": "foto",
+   "tags": "fondos wallpaper fondo pantalla bonito generador aurora degradado iphone",
+   "img": "img/fondos.webp"
+  },
+  {
+   "nombre": "Luces de Disco",
+   "desc": "Pantalla de fiesta que baila con tu música 🪩",
+   "href": "disco.html",
+   "icono": "🪩",
+   "color": "#ff2bd6",
+   "cat": "herramientas",
+   "sub": "musica",
+   "tags": "disco luces fiesta visualizador musica ecualizador estroboscopica rave micro cancion",
+   "img": "img/disco.webp"
+  },
+  {
+   "nombre": "Caleidoscopio",
+   "desc": "Dibuja y se multiplica en mandalas neón 🔮",
+   "href": "caleido.html",
+   "icono": "🔮",
+   "color": "#ff2bd6",
+   "cat": "herramientas",
+   "sub": "dibujo",
+   "tags": "caleidoscopio mandala dibujo simetria neon pintar espejo arte relajante",
+   "img": "img/caleido.webp"
+  },
+  {
+   "nombre": "Pinta-Música",
+   "desc": "Pinta con el dedo y tu dibujo suena. Hasta con fotos 🎨🎶",
+   "href": "pintamusica.html",
+   "icono": "🎨",
+   "color": "#ff6bd6",
+   "cat": "herramientas",
+   "sub": "musica",
+   "tags": "pinta musica componer canciones dibujar sonido kandinsky chrome music lab piano crear melodia foto",
+   "img": "img/pintamusica.webp"
+  },
+  {
    "nombre": "Escáner 3D",
    "desc": "Foto → modelo 3D con IA. Gíralo y expórtalo para imprimir 🧊📷",
    "href": "escaner3d.html",
