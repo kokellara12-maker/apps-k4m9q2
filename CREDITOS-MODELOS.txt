@@ -52,3 +52,5 @@ ANIMACIONES
 - models/net/ual.glb  Universal Animation Library de Quaternius (CC0): sentado, hablando, muerte, baile, etc.
                       Obtenidas del release "animation-assets" de jonit-dev/threenative-asset-mcp y
                       reasignadas a los personajes del juego.
+
+- qc_cop.glb / qc_copsuv.glb  Quaternius "Realistic Car Pack" (coche de policia y SUV de policia), CC0.
