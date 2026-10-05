@@ -100,7 +100,7 @@ body.touch #botL{left:auto;right:auto;bottom:auto;top:calc(env(safe-area-inset-t
 body.touch #bars{width:104px;padding:0}
 body.touch #mission{top:calc(env(safe-area-inset-top) + 44px)}
 body.touch #botR{bottom:auto;top:calc(env(safe-area-inset-top) + 64px);right:calc(env(safe-area-inset-right) + 16px);display:none}
-body.touch #prompt{bottom:calc(env(safe-area-inset-bottom) + 118px)}
+body.touch #prompt{left:calc(env(safe-area-inset-left) + 14px);transform:none;bottom:calc(env(safe-area-inset-bottom) + 178px);max-width:58vw;white-space:normal;text-align:left;border-radius:16px}
 #joy{position:fixed;left:calc(env(safe-area-inset-left) + 18px);bottom:calc(env(safe-area-inset-bottom) + 22px);width:128px;height:128px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.25);z-index:20;touch-action:none}
 #joyk{position:absolute;left:34px;top:34px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.4)}
 .tb{position:fixed;z-index:20;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(14,12,26,.55);border:2px solid rgba(255,255,255,.3);font-size:22px;color:#fff;touch-action:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
@@ -4869,18 +4869,19 @@ water2.rotation.x=-Math.PI/2;water2.position.y=-0.3;worldGroup.add(water2);
 
 const roadCv=mkCanvas(256,64);{const g=roadCv.getContext('2d');g.drawImage(noiseTex('#50545c',.07,256,64),0,0);g.fillStyle='#dcdcdc';g.fillRect(0,3,256,3);g.fillRect(0,58,256,3);g.fillStyle='#e8c93a';for(let x=0;x<256;x+=64)g.fillRect(x+8,31,34,3);}
 const roadTexX=canvasTex(roadCv,1,1,8);
-const roadMat=new THREE.MeshStandardMaterial({map:roadTexX,roughness:.92});
+const roadMat=new THREE.MeshStandardMaterial({map:roadTexX,roughness:.92});const WETMATS=[];
 const plainMat=new THREE.MeshStandardMaterial({map:canvasTex(noiseTex('#50545c',.07,128,128),2,2),roughness:.92});
 const walkMat=new THREE.MeshStandardMaterial({map:(()=>{const c=mkCanvas(128,128),g=c.getContext('2d');g.drawImage(noiseTex('#b9b6ae',.08,128,128),0,0);g.strokeStyle='rgba(0,0,0,.18)';g.lineWidth=2;g.strokeRect(1,1,126,126);g.beginPath();g.moveTo(64,0);g.lineTo(64,128);g.moveTo(0,64);g.lineTo(128,64);g.stroke();return canvasTex(c,15,15,8);})(),roughness:.95});
 { // calles
  const len=2*HALF+ROAD;
  for(let k=0;k<=N;k++){
   const gx=new THREE.PlaneGeometry(len,ROAD);gx.rotateX(-Math.PI/2);
-  const m1=new THREE.Mesh(gx,roadMat.clone());m1.material.map=roadTexX.clone();m1.material.map.needsUpdate=true;m1.material.map.repeat.set(len/16,1);m1.position.set(0,0.03,rcoord(k));m1.receiveShadow=true;worldGroup.add(m1);
+  const m1=new THREE.Mesh(gx,roadMat.clone());m1.material.map=roadTexX.clone();m1.material.map.needsUpdate=true;m1.material.map.repeat.set(len/16,1);m1.position.set(0,0.03,rcoord(k));m1.receiveShadow=true;worldGroup.add(m1);WETMATS.push(m1.material);
   const gz=new THREE.PlaneGeometry(len,ROAD);gz.rotateX(-Math.PI/2);
-  const m2=new THREE.Mesh(gz,m1.material.clone());m2.material.map=roadTexX.clone();m2.material.map.needsUpdate=true;m2.material.map.repeat.set(len/16,1);m2.rotation.y=Math.PI/2;m2.position.set(rcoord(k),0.03,0);m2.receiveShadow=true;worldGroup.add(m2);
+  const m2=new THREE.Mesh(gz,m1.material.clone());m2.material.map=roadTexX.clone();m2.material.map.needsUpdate=true;m2.material.map.repeat.set(len/16,1);m2.rotation.y=Math.PI/2;m2.position.set(rcoord(k),0.03,0);m2.receiveShadow=true;worldGroup.add(m2);WETMATS.push(m2.material);
  }
  const ig=new THREE.PlaneGeometry(ROAD,ROAD);ig.rotateX(-Math.PI/2);
+ WETMATS.push(plainMat,walkMat);
  const inter=new THREE.InstancedMesh(ig,plainMat,(N+1)*(N+1));let q=0;const mt=new THREE.Matrix4();
  for(let a=0;a<=N;a++)for(let b=0;b<=N;b++){mt.makeTranslation(rcoord(a),0.045,rcoord(b));inter.setMatrixAt(q++,mt);}
  inter.receiveShadow=true;worldGroup.add(inter);
@@ -6480,6 +6481,7 @@ function weatherTick(dt){
  // cielo mas oscuro y niebla cercana con lluvia
  scene.fog.near=lerp(90,40,r);scene.fog.far=lerp(560,300,r);
  sun.intensity*=1-.55*r;hemi.intensity*=1-.25*r;
+ for(const m of WETMATS){if(m.userData.r0===undefined)m.userData.r0=m.roughness;m.roughness=lerp(m.userData.r0,.22,r);m.metalness=.12*r;m.color.setScalar(1-.3*r);}
  if(r>.1){scene.fog.color.lerp(_grayRain.setHex(0x79808c),r*.6);}
 }
 const _grayRain=new THREE.Color();
@@ -7264,7 +7266,7 @@ function updateLoose(dt){
 }
 /* ---------- usar objetos: fumar, beber, comer, drogas ---------- */
 function startUse(pose,dur){FXS.useT=dur;FXS.usePose=pose;player.person.setPose(pose);}
-function smokePuff(){const pe=player.person.bones.rHand;if(!pe)return;pe.getWorldPosition(_lp);fx(_lp.x,_lp.y+.1,_lp.z,{vx:rnd(-.1,.1),vy:rnd(.2,.5),vz:rnd(-.1,.1),life:1.6,s0:.08,s1:.5,a:.35,c:0xdddddd});}
+function smokePuff(){const pe=player.person.bones.rHand;if(!pe)return;pe.getWorldPosition(_lp);fx(_lp.x,_lp.y+.1,_lp.z,{vx:rnd(-.15,.15),vy:rnd(.35,.8),vz:rnd(-.15,.15),life:rnd(2,3),s0:.15,s1:.9,a:.6,c:0xf2f2f2});}
 function smokeCig(){
  if(player.veh||player.inside&&false){toast('Bájate del coche primero','warn');return false;}
  startUse('smoke',7);toast('🚬 Fumando…');healP(-1);FXS.smoking=7;return true;
@@ -7293,7 +7295,7 @@ function streetPre(dt){ // devuelve true si el jugador esta inmovil (sentado/des
 }
 function sitBench(b){
  const P_=player;P_.x=b.x;P_.z=b.z;P_.y=0;P_.yaw=b.rot;P_.vx=P_.vz=0;P_.sitting=b;camYaw=b.rot+Math.PI;
- P_.person.setPose('sit');toast('🪑 Te sientas · cualquier tecla de movimiento para levantarte');
+ P_.person.setPose('sit');P_.person.holder.position.y=.03;toast('🪑 Te sientas · cualquier tecla de movimiento para levantarte');
 }
 function nearBench(){if(player.veh||player.inside||player.sitting)return null;let bb=null,bd=1.9;for(const b of propPos.bench){const d=dist2(b.x,b.z,player.x,player.z);if(d<bd){bd=d;bb=b;}}return bb;}
 const DUMP={};
@@ -7316,7 +7318,7 @@ function streetInteract(){
  return false;
 }
 function streetPrompt(){
- if(HELD)return(TOUCH?'✋ ':'')+'Clic / T: lanzar · E: soltar';
+ if(HELD)return TOUCH?'✋ 🤾 lanzar · 🛍 soltar':'Clic / T: lanzar · E: soltar';
  if(player.veh||player.dead||player.sitting)return'';
  const o=nearLoose();if(o)return(TOUCH?'✋ ':'E: ')+'Coger '+LNAME[o.type];
  const bn=nearBench();if(bn)return(TOUCH?'🪑 ':'E: ')+'Sentarte en el banco';
@@ -7326,7 +7328,7 @@ function streetPrompt(){
 /* ---------- efectos de estado ---------- */
 function streetTick(dt){
  const P_=player;
- if(FXS.useT>0){FXS.useT-=dt;if(FXS.smoking>0){FXS.smoking-=dt;if(Math.random()<dt*2.2)smokePuff();}if(FXS.useT<=0){FXS.usePose=null;P_.person.setPose(HELD?'carry':null);}}
+ if(FXS.useT>0){FXS.useT-=dt;if(FXS.smoking>0){FXS.smoking-=dt;if(Math.random()<dt*5)smokePuff();}if(FXS.useT<=0){FXS.usePose=null;P_.person.setPose(HELD?'carry':null);}}
  let flt='',spd=1;
  if(FXS.stone>0){FXS.stone-=dt;const k=clamp(FXS.stone/8,0,1);P_.drunk=Math.max(P_.drunk,8*k);spd*=.78;flt+='hue-rotate('+(Math.sin(gameT*.7)*28)+'deg) saturate(1.5) blur('+(.4+.5*Math.sin(gameT*1.3)*k)+'px) ';}
  if(FXS.rush>0){FXS.rush-=dt;spd*=1.28;flt+='saturate(1.8) contrast(1.08) ';}
