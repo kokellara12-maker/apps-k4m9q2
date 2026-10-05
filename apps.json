@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Escáner 3D",
+   "desc": "Foto → modelo 3D con IA. Gíralo y expórtalo para imprimir 🧊📷",
+   "href": "escaner3d.html",
+   "icono": "🧊",
+   "color": "#4dd0ff",
+   "cat": "herramientas",
+   "sub": "foto",
+   "tags": "escaner 3d scanner foto relieve profundidad ia stl obj imprimir impresora lidar modelo",
+   "img": "img/escaner3d.webp"
+  },
+  {
    "nombre": "Machaca al Pupi",
    "desc": "Descarga tu estrés con 12 armas: martillo, bombas, rayos, yunques… 🔨💥",
    "href": "muneco.html",
