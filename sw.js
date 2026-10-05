@@ -1,6 +1,6 @@
 // Mis Apps: modo offline.
 // Cambia el número de versión si quieres forzar una recarga completa.
-const CORE = 'mis-juegos-core-v110';
+const CORE = 'mis-juegos-core-v111';
 const RUN = 'mis-juegos-run-v3';
 const PRECACHE = [
   './',
