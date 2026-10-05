@@ -22,5 +22,8 @@ VEHICULOS Y OBJETOS
 - props/*.glb    KayKit "City Builder Bits 1.0" de Kay Lousberg (taxi, banco, hidrante,
                  contenedor, arbusto, deposito de agua...). CC0.
 
+- furn.glb / rest.glb  KayKit "Furniture Bits 1.0" y "Restaurant Bits 1.0" de Kay Lousberg (sofas,
+                 camas, cocinas, mesas, cajas...). CC0. Empaquetados en un solo GLB cada uno.
+
 Otros modelos del juego (coches, edificios pequenos, etc.): Kenney / Quaternius / KayKit, CC0.
 Los autobuses, motos, lanchas y edificios de la ciudad estan hechos a mano para este juego.
