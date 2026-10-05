@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Infierno 3D",
+   "desc": "Shooter en 3D estilo Doom: demonios, escopeta y niveles infinitos 🔫👹",
+   "href": "infierno.html",
+   "icono": "👹",
+   "color": "#ff3b1f",
+   "cat": "juegos",
+   "sub": "accion",
+   "tags": "doom fps shooter disparos demonios infierno boomer 3d escopeta pistola matar monstruos wolfenstein quake terror",
+   "img": "img/infierno.webp"
+  },
+  {
    "nombre": "Afinador y Metrónomo",
    "desc": "Afina guitarra, ukelele, bajo o violín y marca el ritmo 🎸⏱️",
    "href": "afinador.html",
