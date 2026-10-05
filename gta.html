@@ -4580,6 +4580,7 @@ async function loadAll(onProg){
  ['helicopter','firetruck','milktruck','buoy','corvette','porsche','countach','taxi_cv'].forEach(n=>add('models/net/'+n+'.glb',g=>{assets.net[n]=g;}));
  ['bench','bush','car_taxi','dumpster','firehydrant','box_A','watertower'].forEach(n=>add('models/net/props/'+n+'.glb',g=>{assets.props[n]=g;}));
  ['furn','rest'].forEach(n=>add('models/net/'+n+'.glb',g=>{assets.kit[n]=g;}));
+ add('models/net/ual.glb',g=>{assets.ual=g;});
  await Promise.all(jobs);assets.net.taxi=assets.net.taxi_cv;
 }
 /* ---------- animaciones compartidas (retarget por huesos) ---------- */
@@ -4591,27 +4592,32 @@ const CHAIN=[['Spine','Spine1'],['Spine1','Spine2'],['Spine2','Neck'],['Neck','H
  ['RightShoulder','RightArm'],['RightArm','RightForeArm'],['RightForeArm','RightHand'],['RightHand','RightHandMiddle1'],
  ['LeftUpLeg','LeftLeg'],['LeftLeg','LeftFoot'],['LeftFoot','LeftToeBase'],['RightUpLeg','RightLeg'],['RightLeg','RightFoot'],['RightFoot','RightToeBase']];
 // "hornea" una animacion de otro esqueleto: cada hueso apunta en la misma direccion mundial que el original
+const UAL_KEYS={sit:'Sitting_Idle_Loop',sitTalk:'Sitting_Talking_Loop',talk:'Idle_Talking_Loop',death:'Death01',hit:'Hit_Chest',hitHead:'Hit_Head',crouch:'Crouch_Idle_Loop',dance2:'Dance_Loop',interact:'Interact',pickup:'PickUp_Table',jab:'Punch_Jab',cross:'Punch_Cross',walkF:'Walk_Formal_Loop',jog:'Jog_Fwd_Loop',sprint:'Sprint_Loop',push:'Push_Loop',roll:'Roll',pistolIdle:'Pistol_Idle_Loop',sitEnter:'Sitting_Enter'};
+const UAL_MAP={Hips:'pelvis',Spine:'spine_01',Spine1:'spine_02',Spine2:'spine_03',Neck:'neck_01',Head:'Head'};
+for(const [a,b] of[['Shoulder','clavicle'],['Arm','upperarm'],['ForeArm','lowerarm'],['Hand','hand'],['HandMiddle1','middle_01'],['UpLeg','thigh'],['Leg','calf'],['Foot','foot'],['ToeBase','ball']]){UAL_MAP['Left'+a]=b+'_l';UAL_MAP['Right'+a]=b+'_r';}
 function getClip(key,tgt){
  const ck=key+'|'+tgt;if(clipCache[ck])return clipCache[ck];
- const srcName=key==='samba'?'michelle':'xbot',srcG=assets.people[srcName];
- const raw=srcG.animations.find(a=>a.name===(key==='samba'?'SambaDance':key));
- const tdef=PEOPLE[tgt],sdef=PEOPLE[srcName];
+ const ual=UAL_KEYS[key]&&assets.ual;
+ const srcName=ual?'michelle':(key==='samba'?'michelle':'xbot'),srcG=ual?assets.ual:assets.people[srcName];
+ const raw=ual?srcG.animations.find(a=>a.name===UAL_KEYS[key]):srcG.animations.find(a=>a.name===(key==='samba'?'SambaDance':key));
+ const tdef=PEOPLE[tgt],sdef=ual?{h:1.8}:PEOPLE[srcName];
+ const findS=(root,n)=>{if(!ual)return findBone(root,n);const m=UAL_MAP[n];return m?root.getObjectByName(m):null;};
  const sInst=SkeletonUtils.clone(srcG.scene),sRest=SkeletonUtils.clone(srcG.scene),tInst=SkeletonUtils.clone(assets.people[tgt].scene);
  sInst.updateMatrixWorld(true);sRest.updateMatrixWorld(true);tInst.updateMatrixWorld(true);
  const sm=new THREE.AnimationMixer(sInst);sm.clipAction(raw).play();
  const names=['Hips',...CHAIN.map(c=>c[0])],sb={},tb={},rest={};
  const all=new Set(CHAIN.flat());all.add('Hips');
- for(const n of all){sb[n]=findBone(sInst,n);tb[n]=findBone(tInst,n);}
+ for(const n of all){sb[n]=findS(sInst,n);tb[n]=findBone(tInst,n);}
  const tn=n=>tdef.rpm?'':'mixamorig';  // prefijo del esqueleto destino
  const prefix=tdef.rpm?'':'mixamorig';
- const sHipsRest=findBone(sRest,'Hips'),sHipsQ0=sHipsRest.getWorldQuaternion(new THREE.Quaternion()),sHipsP0=sHipsRest.getWorldPosition(new THREE.Vector3());
+ const sHipsRest=findS(sRest,'Hips'),sHipsQ0=sHipsRest.getWorldQuaternion(new THREE.Quaternion()),sHipsP0=sHipsRest.getWorldPosition(new THREE.Vector3());
  for(const n of names)if(tb[n])rest[n]=tb[n].quaternion.clone();
  const th=tb.Hips,thRest=th.position.clone(),tHipsQ0=th.getWorldQuaternion(new THREE.Quaternion());
  const tPInv=th.parent.getWorldQuaternion(new THREE.Quaternion()).invert(),tSc=th.parent.getWorldScale(new THREE.Vector3()).x;
  const F=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),tdef.flip?Math.PI:0);
  const Finv=F.clone().invert();
  const hr=tdef.h/sdef.h;
- const htr=raw.tracks.find(t=>/Hips\.quaternion$/.test(t.name)),times=Float32Array.from(htr.times),N=times.length;
+ const htr=raw.tracks.find(t=>ual?/pelvis\.quaternion$/.test(t.name):/Hips\.quaternion$/.test(t.name)),times=Float32Array.from(htr.times),N=times.length;
  const out={};for(const n of names)out[n]=new Float32Array(N*4);const hp=new Float32Array(N*3);
  const wq=new THREE.Quaternion(),dq=new THREE.Quaternion(),pa=new THREE.Vector3(),pb=new THREE.Vector3(),dir=new THREE.Vector3();
  for(let i=0;i<N;i++){
@@ -4745,6 +4751,7 @@ function makePerson(name,opt){
  const bones={rArm:findBone(model,'RightArm'),rFore:findBone(model,'RightForeArm'),rHand:findBone(model,'RightHand'),rMid:findBone(model,'RightHandMiddle1'),lArm:findBone(model,'LeftArm'),lFore:findBone(model,'LeftForeArm'),lHand:findBone(model,'LeftHand'),lUp:findBone(model,'LeftUpLeg'),lLeg:findBone(model,'LeftLeg'),lFoot:findBone(model,'LeftFoot'),rUp:findBone(model,'RightUpLeg'),rLeg:findBone(model,'RightLeg'),rFoot:findBone(model,'RightFoot')};
  const o={root,holder,model,act,bones,cur:null,onceK:null,name,dead:false,deathT:0,fallDir:1,armMode:'none',armW:0,holdGun:false,twoHand:false,punchT:0,kick:0,aimPitch:0};
  o.mixer={real,update(dt){
+  if(o.dead&&o.deathClip){o.deathT+=dt;real.update(dt);return;}
   if(o.dead){o.deathT+=dt;const e=Math.min(1,o.deathT/.55),s=1-(1-e)*(1-e);holder.rotation.x=-o.fallDir*Math.PI/2*s;holder.rotation.z=.35*s*o.fallDir;holder.position.y=.09*s;real.update(dt*.15);return;}
   real.update(o.pose==='sleep'?0:dt);if(o.punchT>0)o.punchT-=dt;if(o.kick>0)o.kick-=dt;armsOverlay(o,dt);if(o.pose)poseOverlay(o,dt);
  }};
@@ -4752,15 +4759,19 @@ function makePerson(name,opt){
  o.play=(k,sp=1,fade=.16)=>{
   if(o.dead)return;
   const aim=(k==='gunIdle'||k==='gunShoot'),base=aim?'idle':k;
+  if(!act[base]&&UAL_KEYS[base]&&assets.ual)act[base]=real.clipAction(getClip(base,name));
   o.armMode=aim?'aim':(o.holdGun?'low':'none');
   if(o.cur===base){act[base].setEffectiveTimeScale(sp);return;}
   const n=act[base];if(!n)return;n.reset();n.setEffectiveTimeScale(sp);n.setEffectiveWeight(1);
   if(o.cur&&act[o.cur])act[o.cur].fadeOut(fade);n.fadeIn(fade).play();o.cur=base;
  };
  o.once=k=>{if(k==='punch')o.punchT=.38;else if(k==='gunShoot')o.kick=.14;};
- o.die=()=>{o.dead=true;o.deathT=0;o.fallDir=Math.random()<.5?-1:1;o.armMode='none';};
- o.revive=()=>{o.dead=false;o.deathT=0;holder.rotation.set(0,0,0);holder.position.set(0,0,0);o.cur=null;o.armW=0;o.armMode=o.holdGun?'low':'none';o.play('idle');};
+ o.die=()=>{o.dead=true;o.deathT=0;o.fallDir=Math.random()<.5?-1:1;o.armMode='none';
+  o.deathClip=null;if(assets.ual&&!o.pose&&!holder.rotation.x){try{const a=real.clipAction(getClip('death',name));real.stopAllAction();a.reset();a.setLoop(THREE.LoopOnce,1);a.clampWhenFinished=true;a.play();o.deathClip=a;}catch(e){o.deathClip=null;}}};
+ o.revive=()=>{if(o.deathClip){real.stopAllAction();o.deathClip=null;}o.dead=false;o.deathT=0;holder.rotation.set(0,0,0);holder.position.set(0,0,0);o.cur=null;o.armW=0;o.armMode=o.holdGun?'low':'none';o.play('idle');};
  o.setPose=(pz,x,y,z,yaw)=>{ // pz: null | sit | tv | eat | cook | handsup | phone | sleep
+  if(o.sitClip&&pz!=='sit'&&pz!=='tv'&&pz!=='eat'){o.sitClip=false;o.cur=null;o.play('idle',1,.1);}
+  if(assets.ual&&(pz==='sit'||pz==='tv'||pz==='eat')){o.pose=null;o.poseT=0;holder.rotation.set(0,0,0);holder.position.set(0,0,0);o.sitClip=true;holder.position.y=.11;o.cur=null;o.play(pz==='eat'?'sitTalk':'sit',1,0);if(x!==undefined){root.position.set(x,0,z);root.rotation.y=yaw||0;}return;}
   o.pose=pz||null;o.poseT=0;holder.rotation.set(0,0,0);holder.position.set(0,0,0);
   if(pz==='sleep'){holder.rotation.x=-Math.PI/2;holder.position.set(0,y||0,def.h*.5);}
   else if(pz==='sit'||pz==='tv'||pz==='eat'||pz==='ride'){holder.position.y=(y||.5)+.1-def.h*POSE_HIP;}
@@ -4997,7 +5008,7 @@ function buildClub(s,grp,W,D,H,L2W,box){
  const hs=new THREE.Mesh(new THREE.PlaneGeometry(4,4),new THREE.MeshBasicMaterial({map:(()=>{const c=mkCanvas(256,256),g=c.getContext('2d');g.clearRect(0,0,256,256);g.font='190px system-ui';g.textAlign='center';g.textBaseline='middle';g.shadowColor='#ff2fa0';g.shadowBlur=36;g.fillText('👠',128,138);g.fillText('👠',128,138);const t=new THREE.CanvasTexture(c);t.colorSpace=SRGB;return t;})(),transparent:true,toneMapped:false,side:THREE.DoubleSide}));
  hs.position.set(-W/2+3,H+4.6,-D*.3);grp.add(hs);hs.userData.neon=1;
  // bailarines
- const dn=[];for(let k=0;k<6;k++){const p=makePerson(pick(PEOPLE_F));const q=L2W(-3.5+(k%3)*2.6+3,-7.5-Math.floor(k/3)*3.6);p.root.position.set(q.x,0,q.z);p.root.rotation.y=Math.random()*TAU;p.ph=Math.random()*6;p.play('samba',.9+Math.random()*.3);worldGroup.add(p.root);dn.push(p);}
+ const dn=[];for(let k=0;k<6;k++){const p=makePerson(pick(PEOPLE_F));const q=L2W(-3.5+(k%3)*2.6+3,-7.5-Math.floor(k/3)*3.6);p.root.position.set(q.x,0,q.z);p.root.rotation.y=Math.random()*TAU;p.ph=Math.random()*6;p.play(k%2?'dance2':'samba',.9+Math.random()*.3);worldGroup.add(p.root);dn.push(p);}
  clubDancers.push(...dn);
 }
 const clubDancers=[];
@@ -5445,7 +5456,7 @@ const peds=[],cops=[],drops=[];
 function pedGroundRect(){return{};}
 function spawnPed(x,z,state){
  const nm=pick(CIVIL_POOL),p=makePerson(nm,{tint:nm==='soldier'?pick([0x8f95a3,0xb08a68,0x6f8a6f,0x7a7aa0,0xa07a7a]):pick([0xd0d0e0,0xe0c8c8,0xc8e0c8])});
- const o={p,kind:'ped',x,z,yaw:Math.random()*TAU,hp:60,dead:false,state:state||'walk',sp:rnd(1.1,1.6),t:0,tFlee:0,nav:null,dying:0,kx:0,kz:0,wait:0,fx:0,fz:0};
+ const o={p,wk:Math.random()<.35?'walkF':'walk',kind:'ped',x,z,yaw:Math.random()*TAU,hp:60,dead:false,state:state||'walk',sp:rnd(1.1,1.6),t:0,tFlee:0,nav:null,dying:0,kx:0,kz:0,wait:0,fx:0,fz:0};
  p.root.position.set(x,0,z);p.root.rotation.y=o.yaw;scene.add(p.root);peds.push(o);return o;
 }
 function pedStartNav(o,ix,iz){
@@ -5493,7 +5504,7 @@ function updatePeds(dt){
   if(o.state==='talk'){o.wait-=dt;if(o.wait<=0){o.p.setPose(null);o.state='walk';o.nav=null;}}
   const far=dp>130;
   if(o.p.pose&&o.state==='flee')o.p.setPose(null);
-  if(o.state==='walk'&&!far&&dp<60&&Math.random()<dt*.012){o.state='talk';o.wait=rnd(5,10);o.p.play('idle');o.p.setPose('phone');}
+  if(o.state==='walk'&&!far&&dp<60&&Math.random()<dt*.012){o.state='talk';o.wait=rnd(5,10);o.p.play('idle');if(Math.random()<.5)o.p.setPose('phone');else o.p.play('talk');}
   if(o.state==='walk'){
    let n=o.nav;if(!n){const [ix,iz]=nearestNode(o.x,o.z),B=nodePos(ix,iz);n=o.nav={ix,iz,nx:ix,nz:iz,t:0,fx:o.x,fz:o.z,len:dist2(o.x,o.z,B.x,B.z)+.01,lat:0};}
    // esperar si viene un coche al cruzar
@@ -5508,7 +5519,7 @@ function updatePeds(dt){
     const px=lerp(A.x,B.x,t),pz=lerp(A.z,B.z,t),dx=B.x-A.x,dz=B.z-A.z,l=Math.hypot(dx,dz)||1;
     o.x=px-dz/l*n.lat*.0;o.z=pz+dx/l*n.lat*.0;
     const ty=Math.atan2(dx,dz);o.yaw+=angDiff(o.yaw,ty)*clamp(dt*8,0,1);
-    o.p.play('walk',o.sp/1.35);
+    o.p.play(o.wk||'walk',o.sp/1.35);
    }
   }else if(o.state==='flee'||o.state==='cop'){
    o.tFlee-=dt;
@@ -5851,7 +5862,7 @@ function gamble(n){
  if(Math.random()<.47){player.money+=2*n;sfx('coins',1);sfx('win',.6);toast('🎰 ¡Has ganado $'+n.toLocaleString('es')+'!','ok');}else{sfx('err',.6);toast('🎰 Pierdes $'+n.toLocaleString('es'),'warn');}
 }
 function healP(n){if(player.hp>=100&&n<100)return false;player.hp=Math.min(100,player.hp+n);}
-function startDance(){player.dance=7;}
+function startDance(){player.dance=7;player.danceKey=Math.random()<.5?'samba':'dance2';}
 const hasMenu=st=>!!(MENUS[st.s.menu]||TRADE[st.s.type]);
 function nearStore(){
  if(player.inside){const r=nearRes(3.4,q=>q.state!=='sleep'&&q.state!=='flee'&&q.state!=='fleeHide'&&!q.robbed&&q.state!=='waking');return r?r.st:null;}
@@ -6792,7 +6803,7 @@ const _hurt0=hurtPed;
 hurtPed=function(o,d,fx,fz,byPlayer){
  if(!o.res)return _hurt0(o,d,fx,fz,byPlayer);
  if(o.dead)return;o.hp-=d;homeHeat(.8);
- if(o.hp<=0){killPed(o,fx,fz,!byPlayer);homeHeat(1.2);return;}
+ if(o.hp<=0){const sat=o.p.sitClip;killPed(o,fx,fz,!byPlayer);homeHeat(1.2);if(sat){o.p.sitClip=false;o.p.holder.position.y=0;o.x+=Math.sin(o.yaw)*1.1;o.z+=Math.cos(o.yaw)*1.1;}return;}
  sfx('ugh',.5,1.2,o.x,o.z);
  if(o.state==='sleep')wakeRes(o);
  o.p.setPose(null);o.p.root.position.y=0;
@@ -7114,7 +7125,7 @@ function walkPlayer(dt){
  else if(sp>.4)P_.yaw+=angDiff(P_.yaw,Math.atan2(P_.vx,P_.vz))*clamp(dt*11,0,1);
  // animacion
  const pe=P_.person;
- if(P_.dance>0){pe.play('samba',1);}
+ if(P_.dance>0){pe.play(P_.danceKey||'samba',1);}
  else if(!P_.onGround)pe.play(sp>4?'run':'walk',1);
  else if(sp>5.2)pe.play('run',clamp(sp/6.8,.8,1.3));
  else if(sp>.5)pe.play('walk',clamp(sp/3.2,.7,1.4));

@@ -45,3 +45,8 @@ MUSICA Y SONIDO DE KOKE CITY (todo CC0 / dominio publico, recomprimido a mp3 mon
 - audio/s/*.mp3    Efectos sonoros CC0 (via bonesvt/GodotFall, que los recopila de OpenGameArt y Kenney):
                    rubberduck, qubodup, HaelDB, bart, BMacZero, AntumDeluge, EZduzziteh, mujtaba-io,
                    Kenney (Impact Sounds) y otros autores CC0.
+
+ANIMACIONES
+- models/net/ual.glb  Universal Animation Library de Quaternius (CC0): sentado, hablando, muerte, baile, etc.
+                      Obtenidas del release "animation-assets" de jonit-dev/threenative-asset-mcp y
+                      reasignadas a los personajes del juego.
