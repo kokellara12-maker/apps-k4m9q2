@@ -28,6 +28,8 @@ VEHICULOS Y OBJETOS
 - taxi_cv.glb    "2001 Crown Victoria Taxi Game Prop" de haoliu95, CC BY 4.0
                  https://sketchfab.com/3d-models/2429a825ff1646568e8e6e1453f9c501
                  (los cuatro, simplificados/recomprimidos para el juego; obtenidos del repo ubyjvovk/asciicity)
+- qc_*.glb       Quaternius "Realistic Car Pack" (SUV, berlina, familiar, deportivos), CC0
+                 (via el repo beep2bleep/FreeAssetsByKenneyNLandQuaternius, convertidos de FBX a GLB)
 - props/*.glb    KayKit "City Builder Bits 1.0" de Kay Lousberg (taxi, banco, hidrante,
                  contenedor, arbusto, deposito de agua...). CC0.
 
