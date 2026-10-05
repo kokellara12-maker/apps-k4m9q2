@@ -4552,19 +4552,22 @@ function loopSet(n,vol){
  L.g.gain.setTargetAtTime(muted?0:vol,AC.currentTime,.15);
 }
 const musWant={};
-const musEl=new Audio();musEl.loop=true;musEl.preload='auto';musEl.volume=0;let musCur=null;
-function musicUnlock(){try{musEl.src='audio/m_pueblo.mp3';musEl.volume=0;musCur='pueblo';const p=musEl.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
-function musicTick(dt){ // un solo reproductor (compatible con iOS): fundido al cambiar de pista
+const musEl=new Audio();musEl.loop=true;musEl.preload='auto';let musCur=null,musV=0,musGain=null;
+// en iPhone el volumen del <audio> no se puede cambiar: se controla con WebAudio (ganancia) y se pausa de verdad
+function musicUnlock(){try{if(AC&&!musGain){musGain=AC.createGain();musGain.gain.value=0;AC.createMediaElementSource(musEl).connect(musGain);musGain.connect(AC.destination);}musGain.gain.value=0;musEl.src='audio/m_g_mall.mp3';const pr=musEl.play();if(pr&&pr.then)pr.then(()=>{setTimeout(()=>{if(!musCur)musEl.pause();},120);}).catch(()=>{});}catch(e){}}
+function musicTick(dt){
  let best=null,bv=0;if(!muted)for(const k in musWant)if(musWant[k]>bv){bv=musWant[k];best=k;}
  for(const k in musWant)musWant[k]=0;
- if(!AC)return;
+ if(!AC||!musGain)return;
  if(best!==musCur){
-  musEl.volume=Math.max(0,musEl.volume-dt*1.6);
-  if(musEl.volume<=.02){
+  musV=Math.max(0,musV-dt*1.6);musGain.gain.value=musV;
+  if(musV<=.02){
+   musGain.gain.value=0;musV=0;
    if(best){musCur=best;musEl.src='audio/m_'+best+'.mp3';const p=musEl.play();if(p&&p.catch)p.catch(()=>{});}
-   else{musCur=null;musEl.pause();}
+   else{musCur=null;if(!musEl.paused)musEl.pause();}
   }
- }else if(best){musEl.volume=clamp(lerp(musEl.volume,bv,clamp(dt*1.6,0,1)),0,1);if(musEl.paused){const p=musEl.play();if(p&&p.catch)p.catch(()=>{});}}
+ }else if(best){musV=clamp(lerp(musV,bv,clamp(dt*1.6,0,1)),0,1);musGain.gain.value=musV;if(musEl.paused){const p=musEl.play();if(p&&p.catch)p.catch(()=>{});}}
+ else if(!musEl.paused&&musV<=.02)musEl.pause();
 }
 const RADIOS=[{n:'g_rock',t:'📻 Rock FM'},{n:'g_hiphop',t:'📻 Koke Hip-Hop'},{n:'funky',t:'📻 Radio Funky'},{n:'g_jazz',t:'📻 Jazz Gitano'},{n:'g_calle',t:'📻 Radio Calle'},{n:'techno',t:'📻 Radio Techno'},{n:'playa',t:'📻 Radio Playa'},{n:'alegre',t:'📻 Radio Alegre'},{n:null,t:'📻 Radio apagada'}];
 
@@ -8098,7 +8101,7 @@ $('bmClose').onclick=()=>toggleMap();$('bmX').onclick=()=>toggleMap();$('bmGo').
 $('bGuide').onclick=()=>{openGuide();};$('bGuide2').onclick=()=>{toggleMap();openGuide();};
 addEventListener('beforeunload',persist);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){persist();if(state==='play')togglePause();}});
-window.__gta={toast,toggleMap,togglePause,openGuide,decalHit,DEC,PEOPLE,LOOSE,spawnLoose,pickLoose,throwHeld,FXS,get HELD(){return HELD;},nearLoose,streetInteract,streetPrompt,useDrug,smokeCig,sitBench,nearBench,propPos,nearDumpster,searchDumpster,WX,get AC(){return AC;},sfxBuf,hurtPed:(...a)=>hurtPed(...a),killPed,set camOv(v){_camOv=v;},IN,HOUSES,enterHouse,leaveHouse,giveItem,ITEMS,openInventory,interactWorld,interactPrompt,nearHouseDoor,makePlayerPerson,getGun:()=>handGun,removeVehicle,exitVehicle,mis,STORY,startMission,placeGiver,abortMission,nearGiver,missionDef,killCop,spawnVehicle,lightState,zoneAt,step:(n,dt=.05)=>{for(let i=0;i<n;i++){stepGame(dt);fxTick(dt);tracerTick(dt);updateCamera(dt);}updateFrustum();},hurtPlayer,openShop,respawn,MENUS,spawnCop,spawnPed,castRay,player,vehicles,peds,cops,stores,get wanted(){return wanted;},setWanted,startGame,get state(){return state;},tp:(x,z)=>{player.x=x;player.z=z;},camera,scene,renderer,setTime,get camMode(){return camMode;},cycleCam,selectWeapon,playerFire,keys,save,startRob,enterVehicle,nearestVehicle,toggleVehicle,env,set camYaw(v){camYaw=v;},set camPitch(v){camPitch=v;},colliders,commitCrime,nearStore};
+window.__gta={music:()=>({paused:musEl.paused,gain:musGain?+musGain.gain.value.toFixed(2):null,cur:musCur,src:musEl.src.split('/').pop()}),toast,toggleMap,togglePause,openGuide,decalHit,DEC,PEOPLE,LOOSE,spawnLoose,pickLoose,throwHeld,FXS,get HELD(){return HELD;},nearLoose,streetInteract,streetPrompt,useDrug,smokeCig,sitBench,nearBench,propPos,nearDumpster,searchDumpster,WX,get AC(){return AC;},sfxBuf,hurtPed:(...a)=>hurtPed(...a),killPed,set camOv(v){_camOv=v;},IN,HOUSES,enterHouse,leaveHouse,giveItem,ITEMS,openInventory,interactWorld,interactPrompt,nearHouseDoor,makePlayerPerson,getGun:()=>handGun,removeVehicle,exitVehicle,mis,STORY,startMission,placeGiver,abortMission,nearGiver,missionDef,killCop,spawnVehicle,lightState,zoneAt,step:(n,dt=.05)=>{for(let i=0;i<n;i++){stepGame(dt);fxTick(dt);tracerTick(dt);updateCamera(dt);}updateFrustum();},hurtPlayer,openShop,respawn,MENUS,spawnCop,spawnPed,castRay,player,vehicles,peds,cops,stores,get wanted(){return wanted;},setWanted,startGame,get state(){return state;},tp:(x,z)=>{player.x=x;player.z=z;},camera,scene,renderer,setTime,get camMode(){return camMode;},cycleCam,selectWeapon,playerFire,keys,save,startRob,enterVehicle,nearestVehicle,toggleVehicle,env,set camYaw(v){camYaw=v;},set camPitch(v){camPitch=v;},colliders,commitCrime,nearStore};
 requestAnimationFrame(frame);
 boot();
 })();
