@@ -1,6 +1,61 @@
 {
  "apps": [
   {
+   "nombre": "Afinador y Metrónomo",
+   "desc": "Afina guitarra, ukelele, bajo o violín y marca el ritmo 🎸⏱️",
+   "href": "afinador.html",
+   "icono": "🎸",
+   "color": "#7cff3a",
+   "cat": "herramientas",
+   "sub": "musica",
+   "tags": "afinador metronomo guitarra ukelele bajo violin tuner afinar tap tempo bpm",
+   "img": "img/afinador.webp"
+  },
+  {
+   "nombre": "Vídeo a GIF",
+   "desc": "Convierte un trozo de vídeo en GIF, con velocidad y al revés 🎞️",
+   "href": "gif.html",
+   "icono": "🎞️",
+   "color": "#ffd166",
+   "cat": "herramientas",
+   "sub": "foto",
+   "tags": "gif video convertir animado meme recortar",
+   "img": "img/gif.webp"
+  },
+  {
+   "nombre": "QR",
+   "desc": "Crea códigos QR bonitos y escanea los que veas 🔳",
+   "href": "qr.html",
+   "icono": "🔳",
+   "color": "#4dd0ff",
+   "cat": "herramientas",
+   "sub": "util",
+   "tags": "qr codigo wifi crear leer escanear whatsapp lector",
+   "img": "img/qr.webp"
+  },
+  {
+   "nombre": "Quitafondos",
+   "desc": "Quita el fondo de cualquier foto con IA o a mano ✂️",
+   "href": "quitafondos.html",
+   "icono": "✂️",
+   "color": "#b48cff",
+   "cat": "herramientas",
+   "sub": "foto",
+   "tags": "quitafondos quitar fondo recortar png transparente remove bg ia sticker",
+   "img": "img/quitafondos.webp"
+  },
+  {
+   "nombre": "Escáner PDF",
+   "desc": "Foto a documento: recorta solo, mejora y crea PDF 📄",
+   "href": "escaner.html",
+   "icono": "📄",
+   "color": "#4dd0ff",
+   "cat": "herramientas",
+   "sub": "util",
+   "tags": "escaner scanner documento pdf camscanner papel factura dni foto recortar",
+   "img": "img/escaner.webp"
+  },
+  {
    "nombre": "Fábrica de Fondos",
    "desc": "Fondos de pantalla únicos para tu iPhone: aurora, atardecer, cristal 🌈",
    "href": "fondos.html",

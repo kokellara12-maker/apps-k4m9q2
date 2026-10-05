@@ -130,6 +130,19 @@
   .tile p { margin: 0; color: var(--dim); font-size: 11px; line-height: 1.3; text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
   @media (prefers-reduced-motion: reduce) { .tile { transition: none; } }
+
+  @keyframes pop { from { opacity: 0; transform: translateY(22px) scale(.72); } to { opacity: 1; transform: none; } }
+  .tile { animation: pop .55s cubic-bezier(.2,1.5,.4,1) both; animation-delay: calc(var(--i, 0) * 30ms); }
+  @keyframes drop { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
+  h1, header, .hero { animation: drop .6s ease-out both; }
+  #lz { position: fixed; inset: 0; z-index: 99; pointer-events: none; background: var(--lc, #4b3a8a); clip-path: circle(0 at var(--lx, 50%) var(--ly, 50%)); transition: clip-path .5s cubic-bezier(.5,0,.2,1); display: grid; place-items: center; }
+  #lz.go { clip-path: circle(150% at var(--lx, 50%) var(--ly, 50%)); }
+  #lz .li { width: 120px; height: 120px; border-radius: 27px; overflow: hidden; display: grid; place-items: center; font-size: 64px; box-shadow: 0 12px 40px rgba(0,0,0,.5); transform: scale(.4); opacity: 0; transition: transform .45s cubic-bezier(.2,1.6,.4,1) .12s, opacity .25s .12s; }
+  #lz.go .li { transform: scale(1); opacity: 1; }
+  #lz .li img { width: 100%; height: 100%; object-fit: cover; }
+  #lz .ln { position: absolute; top: calc(50% + 86px); font-weight: 900; font-size: 22px; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.5); opacity: 0; transition: opacity .3s .2s; }
+  #lz.go .ln { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .tile, h1, header, .hero { animation: none; } #lz { transition: none; } }
 </style>
 </head>
 <body>
@@ -177,8 +190,10 @@
   var standalone = window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
   if (!standalone) document.getElementById('tip').hidden = false;
 
+  var TI = 0;
   function tile(a) {
     var el = document.createElement('a');
+    el.style.setProperty('--i', Math.min(TI++, 22));
     el.className = 'tile';
     el.href = a.href;
     var color = a.color || '#4b3a8a';
@@ -277,7 +292,7 @@
     var b = document.createElement('button'); b.className = 'chip' + (on ? ' on' : ''); b.innerHTML = label; b.onclick = cb; parent.appendChild(b);
   }
   function draw() {
-    grid.textContent = ''; cats.textContent = ''; subs.textContent = '';
+    TI = 0; grid.textContent = ''; cats.textContent = ''; subs.textContent = '';
     var searching = st.q.trim().length > 0;
     qx.style.display = qi.value ? 'block' : 'none';
     CATS.forEach(function (c) {
@@ -368,6 +383,27 @@
 
   window.addEventListener('offline', function () { setStatus('off', 'Sin conexión · usando lo guardado'); });
 })();
+
+  // animación al abrir una app: círculo de color que se expande desde el icono
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('a.tile');
+    if (!t || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    var ic = t.querySelector('.ic'), r = (ic || t).getBoundingClientRect(), name = (t.querySelector('h2') || {}).textContent || '';
+    var z = document.getElementById('lz'); if (z) z.remove();
+    z = document.createElement('div'); z.id = 'lz';
+    z.style.setProperty('--lc', getComputedStyle(t).getPropertyValue('--c') || '#4b3a8a');
+    z.style.setProperty('--lx', (r.left + r.width / 2) + 'px'); z.style.setProperty('--ly', (r.top + r.height / 2) + 'px');
+    var li = document.createElement('div'); li.className = 'li'; li.style.background = 'rgba(0,0,0,.25)';
+    var im = t.querySelector('img'), b = t.querySelector('b');
+    if (im) { var i2 = document.createElement('img'); i2.src = im.src; li.appendChild(i2); } else if (b) li.textContent = b.textContent; else li.textContent = '✨';
+    var ln = document.createElement('div'); ln.className = 'ln'; ln.textContent = name;
+    z.appendChild(li); z.appendChild(ln); document.body.appendChild(z);
+    try { navigator.vibrate && navigator.vibrate(8); } catch (x) {}
+    requestAnimationFrame(function () { requestAnimationFrame(function () { z.classList.add('go'); }); });
+    var href = t.getAttribute('href'); setTimeout(function () { location.href = href; }, 520);
+  });
+  window.addEventListener('pageshow', function () { var z = document.getElementById('lz'); if (z) z.remove(); });
 </script>
 </body>
 </html>
