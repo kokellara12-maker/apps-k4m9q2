@@ -86,7 +86,7 @@ window.__lhPm=()=>1+pw.v*.07;
 window.__lhTap=(x,y)=>{if(g.state!=="play")return;pw.v=Math.min(12,pw.v+1);pw.t=.9;if(x!=null)g.burst(x,y,3,[u[10],u[7]],{smax:35,life:.25,size:1})};
 const tick0=window.__lhT;
 window.__lhT=o=>{tick0(o);pw.t-=o;if(pw.t<=0&&pw.v>0)pw.v=Math.max(0,pw.v-3*o)};
-window.__lhDraw=n=>{if(pw.v<.2||g.state!=="play")return;const m=1+pw.v*.12,w=Math.round(40*pw.v/12);const cx=Math.round(g.LW/2);
+window.__lhDraw=n=>{if(pw.v<.2||g.state!=="play"||(window.__lhBusy&&__lhBusy()))return;const m=1+pw.v*.12,w=Math.round(40*pw.v/12);const cx=Math.round(g.LW/2);
  g.text(n,"CLICK x"+m.toFixed(1),cx,g.top+2,pw.v>8?u[8]:u[10],1,"center","#000");
  n.fillStyle="#000";n.fillRect(cx-21,g.top+10,42,4);n.fillStyle=pw.v>8?u[8]:u[10];n.fillRect(cx-20,g.top+11,w,2)};
 const nextUp=()=>{let best=null;for(const t of V){if(t.l>=3)continue;const c=Math.round(ct[t.k].c*.75*t.l);if(C<c)continue;if(!best||t.l<best.t.l||(t.l===best.t.l&&c<best.c))best={t,c}}return best};
@@ -120,7 +120,7 @@ window.__lhDraw=n=>{if(lhDraw0)lhDraw0(n);if(g.state!=="play")return;
  /* nombres y vida de enemigos */
  for(const a of q){if(a.dead)continue;const sp=D[(a.t==="bo"?"bo":a.t)+"0"];if(!sp)continue;
   const e=Math.round(a.y-(a.t==="bo"?sp.height*2-a.r-2:sp.height-a.r+(a.t==="bat"?3:0)))-3;
-  if(a.t==="bo"||a.t==="og"||a.t==="wiz"||a.lh>0){const txt=EN[a.t]+((a.t==="bo"||a.t==="og")?" "+Math.ceil(a.hp):"");
+  if(!(window.__lhBusy&&__lhBusy())&&(a.t==="bo"||a.t==="og")){const txt=EN[a.t]+((a.t==="bo"||a.t==="og")?" "+Math.ceil(a.hp):"");
    g.text(n,txt,Math.round(a.x),e-7,a.t==="bo"?u[8]:a.t==="og"?u[9]:u[7],1,"center","#000")}}
  /* vida del castillo */
  if(!T&&!M){const c=St(4,14),w=26,x=Math.round(c[0]-w/2),y=Math.round(c[1]-D.castle.height-2);
@@ -132,18 +132,17 @@ window.__lhDraw=n=>{if(lhDraw0)lhDraw0(n);if(g.state!=="play")return;
   n.fillStyle="#000";n.fillRect(x-1,y-1,w+2,7);n.fillStyle=u[2];n.fillRect(x,y,w,5);n.fillStyle=u[8];n.fillRect(x,y,Math.max(1,Math.round(w*a.hp/a.mh)),5);
   g.text(n,"JEFE "+Math.ceil(a.hp)+"/"+Math.ceil(a.mh),Math.round(g.LW/2),y+7,u[7],1,"center","#000");break}
  /* numeros de dano */
- for(const d of dn)g.text(n,d.txt,Math.round(d.x),Math.round(d.y-d.t*18),d.col,1,"center","#000");
+ if(!(window.__lhBusy&&__lhBusy()))for(const d of dn)g.text(n,d.txt,Math.round(d.x),Math.round(d.y-d.t*18),d.col,1,"center","#000");
  /* nombre de torres en el menu de construccion */
  for(const b of K){if(0&&b.id.length>1&&b.id[0]==="b"&&ct[b.id.slice(1)]){const k=b.id.slice(1);g.text(n,name3(k),Math.round(b.x+b.w/2),b.y+14,ct[k].col,1,"center","#000")}}
  /* panel de la torre seleccionada */
  if(M&&ct[M.k]&&!(window.__lhEmp&&__lhEmp(M.k))){const c=ct[M.k],a=Wt(M),w=Math.min(g.LW-8,118),x=4,y=g.top+2;
-  n.fillStyle="#000";n.fillRect(x-1,y-1,w+2,27);n.fillStyle="#1d2b53";n.fillRect(x,y,w,25);n.fillStyle=c.col;n.fillRect(x,y,w,1);
+  n.fillStyle="#000";n.fillRect(x-1,y-1,w+2,19);n.fillStyle="#1d2b53";n.fillRect(x,y,w,17);n.fillStyle=c.col;n.fillRect(x,y,w,1);
   g.text(n,nm(M.k)+"  NIVEL "+M.l+(M.l>=3?" MAX":""),x+3,y+3,c.col,1,"left","#000");
   const dmg=M.k==="frost"?"LENTO":Math.round(a.dm*10)/10;
-  g.text(n,"DANO "+dmg+"  ALCANCE "+Math.round(a.r)+"  "+(1/a.rate).toFixed(1)+"/S",x+3,y+11,u[7],1,"left","#000");
-  g.text(n,"BAJAS "+(M.kl||0)+"  DANO TOTAL "+Math.round(M.dmg||0),x+3,y+18,u[10],1,"left","#000")}
+  g.text(n,"DANO "+dmg+"  ALCANCE "+Math.round(a.r)+"  "+(1/a.rate).toFixed(1)+"/S",x+3,y+11,u[7],1,"left","#000");}
  /* banner de oleada */
- if(banner.t>0){const cx=Math.round(g.LW/2),y=g.top+34;if(banner.t>.4||Math.floor(g.t*20)%2){
+ if(banner.t>0&&!(window.__lhBusy&&__lhBusy())){const cx=Math.round(g.LW/2),y=g.top+34;if(banner.t>.4||Math.floor(g.t*20)%2){
   const w=Math.min(g.LW-6,Math.max(banner.l2.length*4+10,banner.l1.length*4+10));
   n.fillStyle="rgba(0,0,0,.7)";n.fillRect(cx-w/2,y-3,w,18);
   g.text(n,banner.l1,cx,y,banner.l1.indexOf("JEFE")>0?u[8]:u[10],1,"center","#000");g.text(n,banner.l2,cx,y+8,u[7],1,"center","#000")}}
@@ -269,7 +268,7 @@ window.__lhDraw=n=>{if(lhDraw1)lhDraw1(n);if(g.state!=="play")return;
  // torres nivel 3: estrellita
  for(const t of V)if(t.l>=3&&Math.floor(g.t*3+t.tx)%2){n.fillStyle=u[10];n.fillRect(Math.round(t.x)+4,Math.round(t.y)-9,1,3);n.fillRect(Math.round(t.x)+3,Math.round(t.y)-8,3,1)}
  // quedan enemigos
- if(B&&!arm){g.text(n,"QUEDAN "+(rt.length+q.length),I+2,H+2,u[7],1,"left","#000")}
+ if(B&&!arm&&!(window.__lhBusy&&__lhBusy())){g.text(n,"QUEDAN "+(rt.length+q.length),I+2,H+2,u[7],1,"left","#000")}
  // boton ARMAS en el letrero
  if(!M&&!pv&&!T){const bx=I+7*f,by=H-2,bw=2*f,bh=f+4;UI.push({x:bx,y:by,w:bw,h:bh,fn:()=>openArm()});
   n.fillStyle="#000";n.fillRect(bx-1,by,bw+2,bh+2);n.fillStyle=arm?u[10]:u[11];n.fillRect(bx,by+1,bw,bh);n.fillStyle="rgba(255,255,255,.35)";n.fillRect(bx,by+1,bw,1);
@@ -281,7 +280,7 @@ window.__lhDraw=n=>{if(lhDraw1)lhDraw1(n);if(g.state!=="play")return;
   et(n,c[0],c[1],r,ok?"rgba(255,255,255,.75)":"rgba(255,80,80,.8)",1);n.fillStyle=ok?"rgba(255,255,255,.08)":"rgba(255,0,0,.08)";
   for(let a=-r;a<=r;a+=2)for(let l=-r;l<=r;l+=2)l*l+a*a<r*r&&(l+a&2)===0&&n.fillRect(Math.round(c[0]+l),Math.round(c[1]+a),1,1);
   const sp=D[pv.k];if(sp){n.globalAlpha=.75;n.drawImage(sp,Math.round(c[0]-sp.width/2),Math.round(c[1]-sp.height/2));n.globalAlpha=1}
-  const L=towerLines(pv.k),w=Math.min(g.LW-8,Math.max(...L.map(l=>l[0].length))*4+8);panelTxt(n,4,g.top+2,w,L,o.col);
+  const L=towerLines(pv.k).slice(0,3),w=Math.min(g.LW-8,Math.max(...L.map(l=>l[0].length))*4+8);if(!pv.menu)panelTxt(n,4,g.top+2,w,L,o.col);
   if(!pv.menu){const by=g.top+2+L.length*7+10,bw=Math.floor((g.LW-12)/2);
    const b1={x:4,y:by,w:bw,h:12},b2={x:8+bw,y:by,w:bw,h:12};UI.push({...b1,fn:placePv},{...b2,fn:()=>pv=null});
    nt(n,b1,C<o.c||!ok?"#3a3550":u[11],"COLOCAR "+o.c,u[0],C<o.c||!ok);nt(n,b2,u[8],"CERRAR",u[7])}}
@@ -345,7 +344,7 @@ Object.assign(TXT,{
 const EFX={house:[4,8,13],farm:[.15,.3,.5],mine:[1,1,2],workshop:[.03,.06,.09],barracks:[.03,.06,.09]};
 const EFT={house:"ORO POR OLEADA",farm:"ORO POR SEGUNDO",mine:"ORO POR BAJA",workshop:"DESCUENTO",barracks:"DANO EXTRA"};
 const isEmp=k=>EFX[k]!==undefined;
-window.__lhEmp=isEmp;
+window.__lhEmp=isEmp;window.__lhBusy=()=>!!(T||M||pv||arm||emp);
 function empFx(){const o={house:0,farm:0,mine:0,workshop:0,barracks:0};for(const t of V)if(isEmp(t.k))o[t.k]+=EFX[t.k][t.l-1];o.workshop=Math.min(.25,o.workshop);o.barracks=Math.min(.25,o.barracks);return o}
 /* sprites */
 const emSpr=()=>{
@@ -476,7 +475,7 @@ window.__lhDraw=n=>{
  if(!arm&&!emp&&!M&&!pv&&!T){const bx=I+5*f,by=H-2,bw=2*f,bh=f+4;UI.push({x:bx,y:by,w:bw,h:bh,fn:openEmp});
   n.fillStyle="#000";n.fillRect(bx-1,by,bw+2,bh+2);n.fillStyle=u[9];n.fillRect(bx,by+1,bw,bh);n.fillStyle="rgba(255,255,255,.35)";n.fillRect(bx,by+1,bw,1);g.text(n,"IMPERIO",bx+bw/2,by+Math.floor((bh-5)/2)+1,u[0],1,"center")}
  // panel de edificio seleccionado
- if(M&&isEmp(M.k)&&!arm&&!emp){const L=empLines(M.k,M.l),w=Math.min(g.LW-8,Math.max(...L.map(l=>l[0].length))*4+8);panelTxt(n,4,g.top+2,w,L.slice(0,-1).concat([["NIVEL "+M.l+"  AHORA "+(k=>{const v=EFX[M.k][M.l-1];return M.k==="workshop"||M.k==="barracks"?Math.round(v*100)+"%":M.k==="farm"?fmt(v):v})(),u[10]]]),ct[M.k].col)}
+ if(M&&isEmp(M.k)&&!arm&&!emp){const L=empLines(M.k,M.l),w=Math.min(g.LW-8,Math.max(...L.map(l=>l[0].length))*4+8);panelTxt(n,4,g.top+2,w,[[TXT[M.k].n+" NIVEL "+M.l,ct[M.k].col],[EFT[M.k]+" "+(k=>{const v=EFX[M.k][M.l-1];return M.k==="workshop"||M.k==="barracks"?Math.round(v*100)+"%":M.k==="farm"?fmt(v):v})(),u[10]]],ct[M.k].col)}
  // aviso de parcela
  if(pz!==null&&!arm&&!emp){const p=PZ[pz],ok=C>=p.c;panelTxt(n,4,g.top+2,Math.min(g.LW-8,128),[["PARCELA "+p.n,u[10]],["COSTE "+p.c+" ORO",ok?u[11]:u[8]],["ABRE TERRENO PARA CONSTRUIR",u[6]]],u[11]);
   const by=g.top+2+3*7+10,bw=Math.floor((g.LW-12)/2),b1={x:4,y:by,w:bw,h:12},b2={x:8+bw,y:by,w:bw,h:12};UI.push({...b1,fn:()=>buyZone(pz)},{...b2,fn:()=>pz=null});nt(n,b1,ok?u[11]:"#3a3550","COMPRAR "+p.c,u[0],!ok);nt(n,b2,u[8],"CERRAR",u[7])}
