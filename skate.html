@@ -4212,23 +4212,24 @@ jx=function(s){
   const at=_.at||0,up=_.vy>1,pk=_.vy>-2.5;
   let ex;
   if(at<.12&&up){ // pop: extension
-   H({fL:.28,fR:.28,kL:.55,kR:.55,abL:.3,abR:.3,tx:.05,rL:-2.1,rR:-2.1,fwL:.35,fwR:.35,elL:.2,elR:.2,hdx:-.25});
+   H({fL:.85,fR:.8,kL:1.55,kR:1.45,abL:.32,abR:.32,tx:.15,rL:-1.9,rR:-1.9,fwL:.45,fwR:.45,elL:.3,elR:.3,hdx:-.2,dy:-.03});
   }else if(pk){ // tuck
-   H({fL:1.1,fR:1.1,kL:1.95,kR:1.95,abL:.42,abR:.42,tx:.3,rL:-1.35,rR:-1.35,fwL:.95,fwR:.95,elL:.5,elR:.5,hdx:-.1});
+   H({fL:1.05,fR:1.05,kL:1.8,kR:1.8,abL:.4,abR:.4,tx:.28,rL:-1.35,rR:-1.35,fwL:.95,fwR:.95,elL:.5,elR:.5,hdx:-.1});
   }else{ // caida: preparar aterrizaje
-   H({fL:.75,fR:.75,kL:1.3,kR:1.3,abL:.36,abR:.36,tx:.25,rL:-1.2,rR:-1.2,fwL:1.05,fwR:1.05,elL:.4,elR:.4,hdx:-.2});
+   H({fL:.85,fR:.85,kL:1.5,kR:1.5,abL:.36,abR:.36,tx:.25,rL:-1.2,rR:-1.2,fwL:1.05,fwR:1.05,elL:.4,elR:.4,hdx:-.2,dy:-.05});
   }
   H({ty:ty,hdy:hdy});
   if(_.btk){const f=Wt(_.btk.t/_.btk.dur,0,1),k=Math.sin(f*Math.PI);
-   e.kR+=.6*k;e.fR-=.45*k;e.abR+=.22*k;e.fL+=.15*k;e.tz=(e.tz||0)+.08*k*Math.sign(_.btk.roll||1);
+   e.kR+=.5*k;e.fR-=.3*k;e.abR+=.2*k;e.fL+=.1*k;e.dy=(e.dy||0)-.14*k;e.tz=(e.tz||0)+.08*k*Math.sign(_.btk.roll||1);
    if(_.btk.yaw)e.ty=-.8+(_.btk.yaw>0?-.35:.35)*k;if(_.btk.pitch)e.tx+=.15*k}
   if(_.trk&&_.trk.k==="s"){e.rL=-1.0;e.rR=-1.0;e.fwL=.15;e.fwR=.15;e.elL=1.1;e.elR=1.1;e.tx=.15}
-  if(_.trk&&_.trk.k==="r"){e.fL=1.3;e.fR=1.3;e.kL=2.1;e.kR=2.1;e.rL=-1.0;e.rR=-1.0;e.fwL=.2;e.fwR=.2;e.elL=1.2;e.elR=1.2}
+  if(_.trk&&_.trk.k==="r"){e.fL=1.1;e.fR=1.1;e.kL=1.8;e.kR=1.8;e.dy=-.12;e.rL=-1.0;e.rR=-1.0;e.fwL=.2;e.fwR=.2;e.elL=1.2;e.elR=1.2}
   if(_.grab>.3){const o=_.grab;e.tx=.25+.5*o;e.fL=1;e.fR=1.1;e.kL=1.9;e.kR=1.9;e.rR=lp(-1.35,-1.2,o);e.fwR=lp(.95,1.15,o);e.elR=lp(.5,.4,o);e.hdx=.2;
    if(_.gk==="NOSEGRAB"){e.fwR=lp(.2,1.5,o);e.rR=lp(-.5,-1.4,o);e.tx=.25+.7*o;e.kL=2.1;e.kR=2.1}
    else if(_.gk==="TAILGRAB"){e.fwR=lp(.2,-.2,o);e.rR=lp(-.5,.2,o);e.tx=.25+.1*o}
    else if(_.gk==="MELON"){e.fwL=lp(.2,1.1,o);e.rL=lp(-.5,-1.2,o);e.tx=.4*o}
    else if(_.gk==="STALEFISH"){e.fwR=lp(.2,.9,o);e.rR=lp(-.5,-.9,o);e.hdx=.35;e.tx=.6*o}}
+  {const ga=(q,w)=>.77*(1-Math.cos(q))+.89*(1-Math.cos(w-q));const gr=ga(.62+.22*sp,1.2+.4*sp),gc=ga((e.fL+e.fR)/2,(e.kL+e.kR)/2);e.dy=Math.min(0,gr-gc)}
   return e}
  // --- suelo ---
  hf+=land*.4;kn+=land*.8;tx+=land*.2;
