@@ -4122,6 +4122,48 @@ T(AIR,"U,L","TRIPLE SPIN",{b:"L",y:2,pts:420,d:.7});
 T(AIR,"U,R","FS TRIPLE SPIN",{b:"R",y:-2,pts:420,d:.7});
 T(AIR,"D,L","BACKFLIP SHOVE",{b:"B",y:1,pts:380,d:.65});
 T(AIR,"D,R","FRONTFLIP SHOVE",{b:"F",y:-1,pts:380,d:.65});
+
+// --- 100+ COMBOS generados: dos movimientos de palanca encadenados (se suman giros/flips) ---
+{const PM={UL:["KICKFLIP",1,0,0,170],UR:["HEELFLIP",-1,0,0,170],L:["SHOVE-IT",0,1,0,110],R:["FS SHOVE-IT",0,-1,0,110],DL:["VARIAL FLIP",1,1,0,260],DR:["VARIAL HEEL",-1,-1,0,260],U:["IMPOSSIBLE",0,0,1,240],D:["CASPER",0,0,-1,240]};
+ const toks=Object.keys(PM);let made=0;
+ const mk=(map,start,air)=>{for(const a of toks)for(const b of toks){if(a===b&&(a==="U"||a==="D"))continue;
+   const key=(start?start+",":"")+a+","+b;if(map[key]||(!air&&key.split(",").length<3))continue;
+   const A=PM[a],B=PM[b];const r=A[1]+B[1],y=A[2]+B[2],p=A[3]+B[3];
+   if(!r&&!y&&!p)continue;
+   const nm=(start==="U"?"NOLLIE ":"")+A[0]+" > "+B[0];
+   T(map,key,nm,{r:Math.max(-3,Math.min(3,r)),y:Math.max(-3,Math.min(3,y)),p:Math.max(-1,Math.min(1,p)),pts:Math.round((A[4]+B[4])*1.3+(start==="U"?90:0)),d:Math.min(.95,.5+.12*(Math.abs(r)+Math.abs(y)+Math.abs(p)))});made++}};
+ mk(G,"D");mk(G,"U");mk(AIR,"",1);
+ window.__skCombos=made}
+
+// --- TABLA NUEVA: deck curvo con kicktails, grip, grafico, trucks y ruedas que giran ---
+{while(Lt.children.length)Lt.remove(Lt.children[0]);
+ const std=(c,m,r)=>new Mt({color:c,metalness:m||0,roughness:r==null?.6:r});
+ const N=17,LEN=1.12,W=.29,TH=.034,wood=std(0xd9a860,0,.7),grip=std(0x17171b,0,.95);
+ // grafico de la cara inferior (degradado + rayo)
+ const gfx=i=>{const u=i/(N-1);const c=[[0x12c2ff,0x7a3cff],[0xff3c78,0xff9a1f]][0];const k=Math.abs(u-.5)<.12?1:0;
+  const f=(a,b,t)=>Math.round(a+(b-a)*t);const r=f(c[0]>>16,c[1]>>16,u),g=f((c[0]>>8)&255,(c[1]>>8)&255,u),b=f(c[0]&255,c[1]&255,u);
+  return k?0xfff3a0:(r<<16|g<<8|b)};
+ for(let i=0;i<N;i++){const u=i/(N-1)*2-1,au=Math.abs(u);const kt=au>.56?Math.pow((au-.56)/.44,1.5):0;
+  const y=.17+kt*.17,seg=LEN/N*1.18;const ww=W*(au>.86?1-(au-.86)/.14*.32:1);
+  const mats=[wood,wood,grip,std(gfx(i),0,.55),wood,wood];
+  const m=new Re(new vt(seg,TH,ww),mats);m.position.set(u*LEN/2,y,0);
+  {const t=kt>0?(au-.56)/.44:0;m.rotation.z=Math.sign(u)*Math.atan(.17*1.5*Math.sqrt(t)/.44/(LEN/2))}Lt.add(m)}
+ // trucks + ruedas
+ const metal=std(0xb9bfc9,.85,.3),bush=std(0xff8a1a,0,.5),urethane=std(0xffa52e,0,.35),hub=std(0xeeeeee,.2,.4);
+ const wh=[];
+ for(const sx of[-1,1]){const x=sx*.34;
+  const base=new Re(new vt(.15,.022,.11),metal);base.position.set(x,.146,0);Lt.add(base);
+  const hang=new Re(new vt(.1,.05,.2),metal);hang.position.set(x,.115,0);Lt.add(hang);
+  const bs=new Re(new Ii(.026,.026,.05,10),bush);bs.position.set(x+sx*.04,.14,0);Lt.add(bs);
+  const ax=new Re(new Ii(.012,.012,.36,8),metal);ax.rotation.x=Math.PI/2;ax.position.set(x,.088,0);Lt.add(ax);
+  for(const sz of[-1,1]){const g=new _t;g.position.set(x,.088,sz*.162);
+   const tire=new Re(new Ii(.088,.088,.07,18),urethane);tire.rotation.x=Math.PI/2;g.add(tire);
+   const hb=new Re(new Ii(.05,.05,.074,12),hub);hb.rotation.x=Math.PI/2;g.add(hb);
+   const mk=new Re(new vt(.03,.03,.078),std(0x333333,0,.6));mk.position.set(.07,0,0);g.add(mk);
+   Lt.add(g);wh.push(g)}}
+ Lt.userData.wheels=wh;
+ let lt=performance.now();const spin=now=>{requestAnimationFrame(spin);const dt=Math.min(.05,(now-lt)/1e3);lt=now;
+  const v=_.air?(_.v||0)*.5:(_.v||0),k=v*dt/.088;for(const g of wh)g.rotation.z-=k};requestAnimationFrame(spin)}
 const getAir=k=>AIR[k]||(G[k]&&!G[k].ol?G[k]:null);
 window.__skTricks={G,AIR,get classify(){return classify}};ot("ov").querySelector("p").innerHTML="\u{1F579}\uFE0F Joystick izq.: mover \xB7 <b>\u{1F579}\uFE0F stick derecho: toca la mitad derecha y mueve</b> (como Skate 3): \u2193\u2191 OLLIE \xB7 \u2193\u2196 KICKFLIP \xB7 \u2193\u2197 HEELFLIP \xB7 \u2193\u2190 SHOVE-IT \xB7 en el aire un gesto = truco \xB7 \u270B GRAB \xB7 \u{1FA99} monedas \xB7 S-K-A-T-E (+10 s) \xB7 \u26A1 turbo<br>\u{1F4D6} <b>TRUCOS</b> = lista de +50 trucos con sus gestos";
 // --- clasificar gesto ---
@@ -4172,9 +4214,12 @@ const rs=()=>{cv.width=innerWidth*Math.min(2,devicePixelRatio||1);cv.height=inne
 const lab=document.createElement("div");lab.id="fkp";lab.style.cssText="position:fixed;z-index:6;right:calc(8% + env(safe-area-inset-right,0px));top:28%;pointer-events:none;font:900 clamp(15px,4.2vmin,26px)/1.1 -apple-system,system-ui,sans-serif;color:#fff;text-shadow:0 2px 0 #000,0 0 10px rgba(255,200,60,.9);opacity:0;text-align:right;transition:opacity .25s";document.body.appendChild(lab);
 let lt2=0;
 function flickPop(n,k,bad){const arr=k.split(",").map(x=>AR[x]).join(" ");lab.innerHTML=(bad?"<span style=color:#ff7a7a>":"")+arr+"<br>"+n+(bad?"</span>":"");lab.style.opacity=1;clearTimeout(lt2);lt2=setTimeout(()=>lab.style.opacity=0,900)}
-const SR=()=>Math.max(44,Math.min(72,Math.min(innerWidth,innerHeight)*.16));
+let PADC={x:innerWidth-110,y:innerHeight-110,R:60};
+const padC=()=>{const e=ot("rr");if(e){const r=e.getBoundingClientRect();if(r.width>20){PADC.x=r.left+r.width/2;PADC.y=r.top+r.height/2;PADC.R=Math.max(44,r.width*.5)}}return PADC};
+const SR=()=>padC().R;
+vn.head.insertAdjacentHTML("beforeend","<style>#rr{visibility:hidden!important;pointer-events:none!important}</style>");
 function drawTrail(){const c=Math.min(2,devicePixelRatio||1);cx.clearRect(0,0,cv.width,cv.height);if(!_.run||gi)return;cx.save();cx.scale(c,c);const R=SR();
- const st=window.__stk,x0=st?st.ox:innerWidth*.6,y0=st?st.oy:innerHeight*.36,al=st?1:.14;
+ const st=window.__stk,P=padC(),x0=P.x,y0=P.y,al=st?1:.85;
  cx.globalAlpha=al;cx.lineWidth=3;cx.strokeStyle="rgba(255,255,255,.55)";cx.fillStyle="rgba(10,10,30,.35)";
  cx.beginPath();cx.arc(x0,y0,R,0,6.283);cx.fill();cx.stroke();
  cx.lineWidth=1.5;cx.strokeStyle="rgba(255,255,255,.3)";cx.beginPath();cx.arc(x0,y0,R*.3,0,6.283);cx.stroke();
@@ -4184,10 +4229,11 @@ function drawTrail(){const c=Math.min(2,devicePixelRatio||1);cx.clearRect(0,0,cv
   cx.strokeStyle="rgba(255,255,255,.28)";cx.lineWidth=1.5;cx.beginPath();cx.moveTo(x0+Math.cos(a+Math.PI/8)*R*.3,y0-Math.sin(a+Math.PI/8)*R*.3);cx.lineTo(x0+Math.cos(a+Math.PI/8)*R,y0-Math.sin(a+Math.PI/8)*R);cx.stroke()}
  cx.fillStyle="rgba(255,255,255,.8)";cx.font="800 "+Math.round(R*.22)+"px sans-serif";cx.textAlign="center";cx.textBaseline="middle";
  cx.fillText("↑",x0,y0-R*.8);cx.fillText("↓",x0,y0+R*.8);cx.fillText("←",x0-R*.8,y0);cx.fillText("→",x0+R*.8,y0);
- const kx=st?st.kx:x0,ky=st?st.ky:y0;
- cx.shadowColor="rgba(255,160,0,.9)";cx.shadowBlur=st?14:0;cx.fillStyle=st&&st.cur?"#ffd23a":"#ffffff";cx.globalAlpha=st?.95:.3;
+ const kx=st?x0+(st.kx-st.ox):x0,ky=st?y0+(st.ky-st.oy):y0;
+ cx.shadowColor="rgba(255,160,0,.9)";cx.shadowBlur=st?14:0;cx.fillStyle=st&&st.cur?"#ffd23a":"#ffffff";cx.globalAlpha=st?.95:.55;
  cx.beginPath();cx.arc(kx,ky,R*.42,0,6.283);cx.fill();cx.shadowBlur=0;cx.strokeStyle="#000";cx.lineWidth=2;cx.stroke();
- if(st&&st.seq.length){cx.globalAlpha=1;cx.fillStyle="#fff";cx.strokeStyle="#000";cx.lineWidth=4;cx.font="900 "+Math.round(R*.34)+"px sans-serif";const t=st.seq.map(x=>AR[x]).join(" ");cx.strokeText(t,x0,y0+R*1.35);cx.fillText(t,x0,y0+R*1.35)}
+ if(!st){cx.globalAlpha=.9;cx.fillStyle="#222";cx.font="900 "+Math.round(R*.2)+"px sans-serif";cx.fillText("TRUCOS",x0,y0)}
+ if(st&&st.seq.length){cx.globalAlpha=1;cx.fillStyle="#fff";cx.strokeStyle="#000";cx.lineWidth=4;cx.font="900 "+Math.round(R*.34)+"px sans-serif";const t=st.seq.map(x=>AR[x]).join(" ");cx.strokeText(t,x0,y0-R*1.3);cx.fillText(t,x0,y0-R*1.3)}
  cx.restore()}
 {const lp=()=>{requestAnimationFrame(lp);if(fade>0&&!gp)fade-=.06;drawTrail()};requestAnimationFrame(lp)}
 // --- captura de gestos en la mitad derecha ---
@@ -4196,20 +4242,20 @@ const isUI=t=>t.closest&&t.closest(".fb,#bo,.ib,.ov,#menu,#mm,#fl,#mapsel,#tbk")
 const PRE=new Set();[G,AIR].forEach(m=>Object.keys(m).forEach(k=>{const p=k.split(",");for(let i=1;i<p.length;i++)PRE.add(p.slice(0,i).join(","))}));
 const adj=(a,b)=>{const d=Math.abs(A8.indexOf(a)-A8.indexOf(b));return d===1||d===7};
 function stkCommit(st){const key=st.seq.join(",");st.seq=[];if(key)fire(key)}
-addEventListener("pointerdown",e=>{if(isUI(e.target)||e.clientX<innerWidth*.45||gp!==null)return;if(!_.run||gi)return;gp=e.pointerId;const n=performance.now();window.__stk={id:e.pointerId,ox:e.clientX,oy:e.clientY,kx:e.clientX,ky:e.clientY,seq:[],cur:null,curT:n,lastCh:n,ctr:true}},{passive:!0});
+addEventListener("pointerdown",e=>{if(isUI(e.target)||e.clientX<innerWidth*.45||gp!==null)return;if(!_.run||gi)return;gp=e.pointerId;const n=performance.now();window.__stk={id:e.pointerId,ox:e.clientX,oy:e.clientY,kx:e.clientX,ky:e.clientY,seq:[],cur:null,curT:n,lastCh:n,ctr:true,t0:n,moved:false}},{passive:!0});
 addEventListener("pointermove",e=>{const st=window.__stk;if(!st||e.pointerId!==gp)return;const R=SR();let dx=e.clientX-st.ox,dy=e.clientY-st.oy;const m=Math.hypot(dx,dy);
  // el stick flotante sigue al dedo si te pasas del borde (como Roblox)
  if(m>R*1.6){const k=(m-R*1.6)/m;st.ox+=dx*k;st.oy+=dy*k;dx=e.clientX-st.ox;dy=e.clientY-st.oy}
- const mm=Math.hypot(dx,dy),cl=mm>R?R/mm:1;st.kx=st.ox+dx*cl;st.ky=st.oy+dy*cl;const f=Math.min(mm,R)/R,n=performance.now();
- if(f>.6){const d=dirOf(dx,dy);if(d!==st.cur){
+ const mm=Math.hypot(dx,dy),cl=mm>R?R/mm:1;if(mm>R*.3)st.moved=true;st.kx=st.ox+dx*cl;st.ky=st.oy+dy*cl;const f=Math.min(mm,R)/R,n=performance.now();
+ if(f>.6){let d=dirOf(dx,dy);if(st.cur&&d!==st.cur){let df=Math.abs(Math.atan2(-dy,dx)-A8.indexOf(st.cur)*Math.PI/4)%(2*Math.PI);if(df>Math.PI)df=2*Math.PI-df;if(df<Math.PI/8+.17)d=st.cur}if(d!==st.cur){
    if(st.seq.length>=2&&n-st.curT<55&&adj(st.seq[st.seq.length-1],d)&&st.cur===st.seq[st.seq.length-1])st.seq.pop();
    if(st.seq[st.seq.length-1]!==d||st.cur===null)st.seq.push(d);
    st.cur=d;st.curT=n;st.lastCh=n;st.ctr=false}}
  else if(f<.3){if(!st.ctr){st.ctr=true;st.ctrT=n}st.cur=null}},{passive:!0});
 {const lp=()=>{requestAnimationFrame(lp);const st=window.__stk;if(!st||!st.seq.length)return;const n=performance.now(),t=n-st.lastCh,key=st.seq.join(","),air=_.air&&!_.grind;
  const known=air?getAir(key):G[key];const longer=PRE.has(key);
- if(known&&t>(longer?170:70))stkCommit(st);else if(t>(air?190:320))stkCommit(st)};requestAnimationFrame(lp)}
-const fin=e=>{const st=window.__stk;if(!st||e.pointerId!==gp)return;gp=null;if(st.seq.length)stkCommit(st);window.__stk=null};
+ if(known&&t>(longer?140:70))stkCommit(st);else if(t>(air?190:320))stkCommit(st)};requestAnimationFrame(lp)}
+const fin=e=>{const st=window.__stk;if(!st||e.pointerId!==gp)return;gp=null;if(st.seq.length)stkCommit(st);else if(!st.moved&&performance.now()-st.t0<320){if(_.air&&!_.grind)fire("UL");else{flickPop("OLLIE","D,U");jp()}}window.__stk=null};
 addEventListener("pointerup",fin);addEventListener("pointercancel",fin);
 // --- libro de trucos ---
 vn.head.insertAdjacentHTML("beforeend","<style>#tbk{position:fixed;inset:0;z-index:20;background:rgba(8,6,20,.96);display:none;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px 20px;color:#fff;font-family:-apple-system,system-ui,sans-serif}#tbk h2{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}#tbk .gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px}#tbk .t{background:rgba(255,255,255,.08);border-radius:10px;padding:6px 9px;font-size:12px}#tbk .t b{display:block;font-size:13px}#tbk .t i{font-style:normal;color:#ffd23a;letter-spacing:2px;font-size:15px}#tbk button{background:#d90f14;color:#fff;border:0;border-radius:99px;padding:8px 16px;font-weight:800}#tbb{background:rgba(255,255,255,.14)!important;margin:4px 0}</style>");
