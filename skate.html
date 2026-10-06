@@ -4138,16 +4138,23 @@ T(AIR,"D,R","FRONTFLIP SHOVE",{b:"F",y:-1,pts:380,d:.65});
 // --- TABLA NUEVA: deck curvo con kicktails, grip, grafico, trucks y ruedas que giran ---
 {while(Lt.children.length)Lt.remove(Lt.children[0]);
  const std=(c,m,r)=>new Mt({color:c,metalness:m||0,roughness:r==null?.6:r});
- const N=17,LEN=1.12,W=.29,TH=.034,wood=std(0xd9a860,0,.7),grip=std(0x17171b,0,.95);
- // grafico de la cara inferior (degradado + rayo)
- const gfx=i=>{const u=i/(N-1);const c=[[0x12c2ff,0x7a3cff],[0xff3c78,0xff9a1f]][0];const k=Math.abs(u-.5)<.12?1:0;
-  const f=(a,b,t)=>Math.round(a+(b-a)*t);const r=f(c[0]>>16,c[1]>>16,u),g=f((c[0]>>8)&255,(c[1]>>8)&255,u),b=f(c[0]&255,c[1]&255,u);
-  return k?0xfff3a0:(r<<16|g<<8|b)};
- for(let i=0;i<N;i++){const u=i/(N-1)*2-1,au=Math.abs(u);const kt=au>.56?Math.pow((au-.56)/.44,1.5):0;
-  const y=.17+kt*.17,seg=LEN/N*1.18;const ww=W*(au>.86?1-(au-.86)/.14*.32:1);
-  const mats=[wood,wood,grip,std(gfx(i),0,.55),wood,wood];
-  const m=new Re(new vt(seg,TH,ww),mats);m.position.set(u*LEN/2,y,0);
-  {const t=kt>0?(au-.56)/.44:0;m.rotation.z=Math.sign(u)*Math.atan(.17*1.5*Math.sqrt(t)/.44/(LEN/2))}Lt.add(m)}
+ const N=27,LEN=1.12,W=.29,TH=.034,wood=std(0xdcae6a,0,.7);
+ // texturas: grip con granulado y grafico inferior (rayo + franjas + circulo)
+ const cvs=(w,h)=>{const c=document.createElement("canvas");c.width=w;c.height=h;return c};
+ const gc=cvs(256,128),gx=gc.getContext("2d");gx.fillStyle="#18181c";gx.fillRect(0,0,256,128);for(let i=0;i<5200;i++){gx.fillStyle=Math.random()<.5?"#2b2b31":"#0c0c0f";gx.fillRect(Math.random()*256,Math.random()*128,1.6,1.6)}
+ const gt=new Ms(gc);gt.colorSpace=Ke;const grip=new Mt({map:gt,roughness:.98});
+ const dc=cvs(1024,256),dx=dc.getContext("2d");{const gr=dx.createLinearGradient(0,0,1024,0);gr.addColorStop(0,"#7a2cff");gr.addColorStop(.5,"#16c4ff");gr.addColorStop(1,"#7a2cff");dx.fillStyle=gr;dx.fillRect(0,0,1024,256);
+  dx.fillStyle="#fff";dx.fillRect(0,18,1024,10);dx.fillRect(0,228,1024,10);dx.fillStyle="#ffe24a";dx.beginPath();dx.moveTo(430,20);dx.lineTo(600,20);dx.lineTo(540,115);dx.lineTo(630,115);dx.lineTo(400,240);dx.lineTo(470,140);dx.lineTo(385,140);dx.closePath();dx.fill();dx.lineWidth=7;dx.strokeStyle="#111";dx.stroke();
+  dx.fillStyle="#ff3c78";dx.beginPath();dx.arc(130,128,52,0,6.283);dx.fill();dx.beginPath();dx.arc(894,128,52,0,6.283);dx.fill();dx.fillStyle="#fff";dx.beginPath();dx.arc(130,128,24,0,6.283);dx.fill();dx.beginPath();dx.arc(894,128,24,0,6.283);dx.fill()}
+ const dts=[];
+ for(let i=0;i<N;i++){const u=i/(N-1)*2-1,au=Math.abs(u);const t=au>.58?(au-.58)/.42:0,kt=Math.pow(t,1.6);
+  const y=.17+kt*.13,seg=LEN/N*1.15;const e=au>.92?Math.sqrt(Math.max(0,1-Math.pow((au-.92)/.08,2)*.9)):1;const ww=W*e;
+  const tx=new Ms(dc);tx.colorSpace=Ke;tx.repeat.set(1/N,1);tx.offset.set(i/N,0);
+  const bm=new Mt({map:tx,roughness:.5});
+  const m=new Re(new vt(seg,TH,ww),[wood,wood,grip,bm,wood,wood]);m.position.set(u*LEN/2,y,0);
+  m.rotation.z=Math.sign(u)*Math.atan(.13*1.6*Math.pow(t,.6)/.42/(LEN/2));Lt.add(m)}
+ // tornillos
+ for(const sx of[-1,1])for(const dxp of[-.07,.07])for(const dz of[-.065,.065]){const bo=new Re(new Ii(.012,.012,.012,8),std(0xc9ced6,.9,.3));bo.position.set(sx*.34+dxp,.2,dz);Lt.add(bo)}
  // trucks + ruedas
  const metal=std(0xb9bfc9,.85,.3),bush=std(0xff8a1a,0,.5),urethane=std(0xffa52e,0,.35),hub=std(0xeeeeee,.2,.4);
  const wh=[];
