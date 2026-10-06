@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
+<script src="mute.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -8105,7 +8106,7 @@ $('bResume').onclick=()=>togglePause();
 $('bAbort').onclick=()=>{abortMission();togglePause();};
 $('bQuit').onclick=()=>{persist();location.href='index.html';};
 function setMuted(v){
- muted=!!v;try{localStorage.setItem('kc_mute',muted?'1':'0');}catch(e){}
+ muted=!!v;try{localStorage.setItem('mis_mute',muted?'1':'0');}catch(e){}
  const t=muted?'🔇 Sonido: NO':'🔊 Sonido: SÍ';$('bMute').textContent=t;$('bMuteMenu').textContent=t;
  try{
   if(muted){musV=0;if(musGain)musGain.gain.value=0;musCur=null;musEl.pause();musEl.muted=true;if(eng.g)eng.g.gain.value=0;for(const k in LOOPS)LOOPS[k].g.gain.value=0;if(AC&&AC.state==='running')AC.suspend();}
@@ -8113,13 +8114,13 @@ function setMuted(v){
  }catch(e){}
 }
 $('bMute').onclick=()=>setMuted(!muted);$('bMuteMenu').onclick=()=>setMuted(!muted);
-try{if(localStorage.getItem('kc_mute')==='1')setMuted(true);}catch(e){}
+try{if(localStorage.getItem('mis_mute')==='1')setMuted(true);}catch(e){}
 $('shopClose').onclick=closeShop;
 $('bmClose').onclick=()=>toggleMap();$('bmX').onclick=()=>toggleMap();$('bmGo').onclick=()=>teleportTo(mapSel);$('bm').addEventListener('pointerdown',mapClick);
 $('bGuide').onclick=()=>{openGuide();};
 $('bMusic').onclick=()=>{musicEnabled=!musicEnabled;try{localStorage.setItem('kc_music',musicEnabled?'1':'0');}catch(e){}$('bMusic').textContent='🎵 Música de persecución: '+(musicEnabled?'SÍ':'NO');if(!musicEnabled){musEl.pause();musV=0;if(musGain)musGain.gain.value=0;musCur=null;}};
 try{if(localStorage.getItem('kc_music')==='0'){musicEnabled=false;$('bMusic').textContent='🎵 Música de persecución: NO';}}catch(e){}
-$('bVer').textContent='Koke City · versión 123';$('bGuide2').onclick=()=>{toggleMap();openGuide();};
+$('bVer').textContent='Koke City · versión 124';$('bGuide2').onclick=()=>{toggleMap();openGuide();};
 addEventListener('beforeunload',persist);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){persist();if(state==='play')togglePause();}});
 window.__gta={music:()=>({paused:musEl.paused,gain:musGain?+musGain.gain.value.toFixed(2):null,cur:musCur,src:musEl.src.split('/').pop()}),toast,toggleMap,togglePause,openGuide,decalHit,DEC,PEOPLE,LOOSE,spawnLoose,pickLoose,throwHeld,FXS,get HELD(){return HELD;},nearLoose,streetInteract,streetPrompt,useDrug,smokeCig,sitBench,nearBench,propPos,nearDumpster,searchDumpster,WX,get AC(){return AC;},sfxBuf,hurtPed:(...a)=>hurtPed(...a),killPed,set camOv(v){_camOv=v;},IN,HOUSES,enterHouse,leaveHouse,giveItem,ITEMS,openInventory,interactWorld,interactPrompt,nearHouseDoor,makePlayerPerson,getGun:()=>handGun,removeVehicle,exitVehicle,mis,STORY,startMission,placeGiver,abortMission,nearGiver,missionDef,killCop,spawnVehicle,lightState,zoneAt,step:(n,dt=.05)=>{for(let i=0;i<n;i++){stepGame(dt);fxTick(dt);tracerTick(dt);updateCamera(dt);}updateFrustum();},hurtPlayer,openShop,respawn,MENUS,spawnCop,spawnPed,castRay,player,vehicles,peds,cops,stores,get wanted(){return wanted;},setWanted,startGame,get state(){return state;},tp:(x,z)=>{player.x=x;player.z=z;},camera,scene,renderer,setTime,get camMode(){return camMode;},cycleCam,selectWeapon,playerFire,keys,save,startRob,enterVehicle,nearestVehicle,toggleVehicle,env,set camYaw(v){camYaw=v;},set camPitch(v){camPitch=v;},colliders,commitCrime,nearStore};

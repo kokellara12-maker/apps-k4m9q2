@@ -69,6 +69,8 @@
   #status[data-s="ok"] i { background: var(--ok); box-shadow: 0 0 10px var(--ok); }
   #status[data-s="off"] i { background: var(--mag); }
 
+  #snd { margin-top: 8px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: #fff; font: 700 13px/1 inherit; cursor: pointer; }
+  #snd.off { color: var(--mag); border-color: var(--mag); }
   #tip {
     margin: 0;
     padding: 12px 14px;
@@ -168,6 +170,7 @@ setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.re
   <header>
     <h1>MIS<br><span>APPS</span></h1>
     <div id="status" data-s="work"><i></i><span id="statusText">Comprobando…</span></div>
+    <button id="snd" type="button" aria-label="Sonido de todos los juegos">🔊 Sonido: SÍ</button>
   </header>
 
   <p id="tip" hidden>Para tenerlas como app: toca <b>Compartir</b> en Safari y luego <b>Añadir a pantalla de inicio</b>. Ábrela una vez con internet y después funciona sin conexión.</p>
@@ -422,5 +425,6 @@ setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.re
   });
   window.addEventListener('pageshow', function () { var z = document.getElementById('lz'); if (z) z.remove(); });
 </script>
+<script>(function(){var b=document.getElementById('snd');if(!b)return;function g(){try{return localStorage.getItem('mis_mute')==='1';}catch(e){return false;}}function r(){var m=g();b.textContent=m?'🔇 Sonido: NO (todos los juegos)':'🔊 Sonido: SÍ';b.className=m?'off':'';}b.onclick=function(){try{localStorage.setItem('mis_mute',g()?'0':'1');}catch(e){}r();};r();})();</script>
 </body>
 </html>
