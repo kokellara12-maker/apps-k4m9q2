@@ -4167,7 +4167,10 @@ T(AIR,"D,R","FRONTFLIP SHOVE",{b:"F",y:-1,pts:380,d:.65});
 const getAir=k=>AIR[k]||(G[k]&&!G[k].ol?G[k]:null);
 window.__skTricks={G,AIR,get classify(){return classify}};ot("ov").querySelector("p").innerHTML="\u{1F579}\uFE0F Joystick izq.: mover \xB7 <b>\u{1F579}\uFE0F stick derecho: toca la mitad derecha y mueve</b> (como Skate 3): \u2193\u2191 OLLIE \xB7 \u2193\u2196 KICKFLIP \xB7 \u2193\u2197 HEELFLIP \xB7 \u2193\u2190 SHOVE-IT \xB7 en el aire un gesto = truco \xB7 \u270B GRAB \xB7 \u{1FA99} monedas \xB7 S-K-A-T-E (+10 s) \xB7 \u26A1 turbo<br>\u{1F4D6} <b>TRUCOS</b> = lista de +50 trucos con sus gestos";
 // --- clasificar gesto ---
-function dirOf(dx,dy){const a=Math.atan2(-dy,dx);return A8[((Math.round(a/(Math.PI/4))%8)+8)%8]}
+function dirOf(dx,dy){let d=Math.atan2(-dy,dx)*180/Math.PI;d=((d%360)+360)%360;
+ // cardinales anchos (+-27 grados): ollie facil; diagonales mas estrechos (+-18)
+ for(let i=0;i<8;i+=2){let df=Math.abs(d-i*45);if(df>180)df=360-df;if(df<=30)return A8[i]}
+ return A8[Math.round(d/45)%8]}
 function classify(P){
  if(P.length<3)return null;
  // remuestreo cada 12px
@@ -4217,7 +4220,7 @@ function flickPop(n,k,bad){const arr=k.split(",").map(x=>AR[x]).join(" ");lab.in
 let PADC={x:innerWidth-110,y:innerHeight-110,R:60};
 const padC=()=>{const e=ot("rr");if(e){const r=e.getBoundingClientRect();if(r.width>20){PADC.x=r.left+r.width/2;PADC.y=r.top+r.height/2;PADC.R=Math.max(44,r.width*.5)}}return PADC};
 const SR=()=>padC().R;
-vn.head.insertAdjacentHTML("beforeend","<style>#rr{visibility:hidden!important;pointer-events:none!important}</style>");
+vn.head.insertAdjacentHTML("beforeend","<style>#rr{visibility:hidden!important;pointer-events:none!important}html,body{touch-action:none!important;overscroll-behavior:none}</style>");
 function drawTrail(){const c=Math.min(2,devicePixelRatio||1);cx.clearRect(0,0,cv.width,cv.height);if(!_.run||gi)return;cx.save();cx.scale(c,c);const R=SR();
  const st=window.__stk,P=padC(),x0=P.x,y0=P.y,al=st?1:.85;
  cx.globalAlpha=al;cx.lineWidth=3;cx.strokeStyle="rgba(255,255,255,.55)";cx.fillStyle="rgba(10,10,30,.35)";
@@ -4246,12 +4249,12 @@ addEventListener("pointerdown",e=>{if(isUI(e.target)||e.clientX<innerWidth*.45||
 addEventListener("pointermove",e=>{const st=window.__stk;if(!st||e.pointerId!==gp)return;const R=SR();let dx=e.clientX-st.ox,dy=e.clientY-st.oy;const m=Math.hypot(dx,dy);
  // el stick flotante sigue al dedo si te pasas del borde (como Roblox)
  if(m>R*1.6){const k=(m-R*1.6)/m;st.ox+=dx*k;st.oy+=dy*k;dx=e.clientX-st.ox;dy=e.clientY-st.oy}
- const mm=Math.hypot(dx,dy),cl=mm>R?R/mm:1;if(mm>R*.3)st.moved=true;st.kx=st.ox+dx*cl;st.ky=st.oy+dy*cl;const f=Math.min(mm,R)/R,n=performance.now();
- if(f>.6){let d=dirOf(dx,dy);if(st.cur&&d!==st.cur){let df=Math.abs(Math.atan2(-dy,dx)-A8.indexOf(st.cur)*Math.PI/4)%(2*Math.PI);if(df>Math.PI)df=2*Math.PI-df;if(df<Math.PI/8+.17)d=st.cur}if(d!==st.cur){
+ const mm=Math.hypot(dx,dy),cl=mm>R?R/mm:1;if(mm>R*.25)st.moved=true;st.kx=st.ox+dx*cl;st.ky=st.oy+dy*cl;const f=Math.min(mm,R)/R,n=performance.now();
+ if(f>.5){let d=dirOf(dx,dy);if(st.cur&&d!==st.cur){let df=Math.abs(Math.atan2(-dy,dx)-A8.indexOf(st.cur)*Math.PI/4)%(2*Math.PI);if(df>Math.PI)df=2*Math.PI-df;if(df<Math.PI/8+.17)d=st.cur}if(d!==st.cur){
    if(st.seq.length>=2&&n-st.curT<55&&adj(st.seq[st.seq.length-1],d)&&st.cur===st.seq[st.seq.length-1])st.seq.pop();
    if(st.seq[st.seq.length-1]!==d||st.cur===null)st.seq.push(d);
    st.cur=d;st.curT=n;st.lastCh=n;st.ctr=false}}
- else if(f<.3){if(!st.ctr){st.ctr=true;st.ctrT=n}st.cur=null}},{passive:!0});
+ else if(f<.25){if(!st.ctr){st.ctr=true;st.ctrT=n}st.cur=null}},{passive:!0});
 const PL={fL:1.0,fR:1.0,kL:1.9,kR:1.9,abL:.3,abR:.3,tx:.5,hdy:-.6};
 {const lp=()=>{requestAnimationFrame(lp);const st=window.__stk,n=performance.now(),gnd=_.run&&!_.air&&!_.grind&&_.bail<=0;
  // agacharse (preparar el pop) mientras la palanca esta abajo
