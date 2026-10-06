@@ -1,6 +1,6 @@
 // Mis Apps: modo offline.
 // Cambia el número de versión si quieres forzar una recarga completa.
-const CORE = 'mis-juegos-core-v153';
+const CORE = 'mis-juegos-core-v154';
 const RUN = 'mis-juegos-run-v3';
 const HEAVY_CACHE = 'mis-juegos-heavy-v1';
 const PRECACHE = [
