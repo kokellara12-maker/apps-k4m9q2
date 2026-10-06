@@ -117,6 +117,14 @@
     text-decoration: none;
     transition: transform 0.12s;
   }
+  .tile { position: relative; }
+  .tile .fv { position: absolute; top: -6px; right: 4px; font-style: normal; font-size: 17px; filter: drop-shadow(0 1px 2px #000); pointer-events: none; z-index: 2; }
+  #qs { display: flex; flex-direction: column; gap: 6px; }
+  #qs .q { display: flex; align-items: center; gap: 8px; background: #0a0614; border: 1px solid var(--line); border-radius: 12px; padding: 7px 10px; font-size: 12.5px; }
+  #qs .q.ok { border-color: var(--ok); }
+  #qs .q .t { flex: 1; min-width: 0; } #qs .q .t i { display: block; height: 4px; border-radius: 9px; background: var(--line); margin-top: 5px; overflow: hidden; } #qs .q .t i b { display: block; height: 100%; background: var(--cyan); }
+  #qs .q button { padding: 6px 10px; font-size: 12px; border-radius: 99px; border: 0; background: var(--ok); color: #04210f; font-weight: 800; }
+  #qs .q span { color: var(--dim); font-size: 11.5px; white-space: nowrap; }
   .tile:active { transform: scale(0.95); }
   .tile:focus-visible { outline: 2px solid var(--c); outline-offset: 4px; border-radius: 24px; }
   .ic {
@@ -205,7 +213,8 @@ setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.re
 
   <section id="prof" aria-label="Tu progreso"><div class="top"><div class="lv" id="pLv">1</div><div class="xp"><b id="pTit">Nivel 1</b><small id="pXp"></small><div class="bar"><i id="pBar"></i></div></div></div>
     <div class="st"><div><b id="pT">0</b>jugado</div><div><b id="pG">0</b>juegos</div><div><b id="pS">0</b>racha</div><div><b id="pA">0</b>logros</div></div>
-    <div class="bt"><button id="pAch" type="button">🏆 Logros</button><button id="pBk" type="button">💾 Copia</button><button id="pRs" type="button">📥 Restaurar</button><input id="pFile" type="file" accept="application/json,.json" hidden></div></section>
+    <div id="qs"></div>
+    <div class="bt"><button id="pAch" type="button">🏆 Logros</button><button id="pBk" type="button">💾 Copia</button><button id="pRs" type="button">📥 Restaurar</button><button id="pRnd" type="button">🎲 Sorpréndeme</button><input id="pFile" type="file" accept="application/json,.json" hidden></div></section>
   <section id="cont" hidden><h3>▶️ Seguir jugando</h3><div class="r" id="contR"></div></section>
   <div id="bar">
     <div id="q"><i>🔎</i><input id="qi" type="search" placeholder="Busca: fnaf, minecraft, dibujar…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><button id="qx" aria-label="Borrar">✕</button></div>
@@ -274,6 +283,7 @@ setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.re
     el.appendChild(ic);
     el.appendChild(h);
     el.appendChild(p);
+    if (window.KokeProg && KokeProg.isFav(a.href)) { var st_ = document.createElement('i'); st_.className = 'fv'; st_.textContent = '⭐'; el.appendChild(st_); }
     var bd = badge(a.href); if (bd) { var pg = document.createElement('div'); pg.className = 'pg'; pg.textContent = bd; el.appendChild(pg); }
     return el;
   }
@@ -344,6 +354,7 @@ setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.re
   function chip(parent, key, label, on, cb) {
     var b = document.createElement('button'); b.className = 'chip' + (on ? ' on' : ''); b.innerHTML = label; b.onclick = cb; parent.appendChild(b);
   }
+  window.__redraw = function () { draw(); };
   function draw() {
     TI = 0; grid.textContent = ''; cats.textContent = ''; subs.textContent = '';
     var searching = st.q.trim().length > 0;
@@ -370,6 +381,7 @@ setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.re
       subs.className = 'row s';
     } else subs.style.display = 'none';
     if (st.cat === 'all') {
+      var fv = ALL.filter(function (a) { return window.KokeProg && KokeProg.isFav(a.href); }); if (fv.length) section('⭐ Favoritos', fv);
       CATS.slice(1).forEach(function (c) { var it = list.filter(function (a) { return a.cat === c[0]; }); if (it.length) section(c[1] + ' ' + c[2], it); });
     } else if (st.sub !== 'all') {
       var x = (sl || []).filter(function (y) { return y[0] === st.sub; })[0];
@@ -478,7 +490,25 @@ setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.re
       l.appendChild(ic);l.appendChild(document.createTextNode(a.nombre));box.appendChild(l);});
     $('cont').hidden=!shown;
   }
+  function games(){return (window.__ALL||[]).filter(function(a){return a.cat==='juegos'});}
+  function paintQ(){var box=$('qs');if(!box)return;var L=games();if(!L.length){box.textContent='';return;}box.textContent='';
+    P.quests(L).forEach(function(q){var d=document.createElement('div');d.className='q'+(q.done?' ok':'');
+      var t=document.createElement('div');t.className='t';t.innerHTML='<b>'+q.txt+'</b><i><b style="width:'+Math.round(100*q.cur/q.max)+'%"></b></i>';d.appendChild(t);
+      if(q.href&&!q.done){var go=document.createElement('a');go.href=q.href;go.textContent='▶';go.style.cssText='color:#fff;text-decoration:none;font-size:16px;padding:0 4px';d.appendChild(go);}
+      if(q.claimed){var s=document.createElement('span');s.textContent='✅';d.appendChild(s);}
+      else if(q.done){var b=document.createElement('button');b.textContent='+'+q.xp+' XP';b.onclick=function(){if(P.claim(q.id,L)){paint();}};d.appendChild(b);}
+      else{var s2=document.createElement('span');s2.textContent=q.cur+'/'+q.max+' · +'+q.xp;d.appendChild(s2);}
+      box.appendChild(d);});}
+  var _paint=paint;paint=function(){_paint();paintQ();};
   window.__paintProg=paint;paint();setTimeout(paint,1200);
+  $('pRnd').onclick=function(){var L=games(),un=L.filter(function(a){var g=P.game(gid(a.href));return !g||!(g.n>0)}),pool=un.length?un:L;if(!pool.length)return;var a=pool[Math.floor(Math.random()*pool.length)];P.toast('🎲 '+a.nombre);setTimeout(function(){location.href=a.href},700);};
+  (function(){var tm=null,sx=0,sy=0;
+    document.addEventListener('pointerdown',function(e){var t=e.target.closest&&e.target.closest('a.tile');if(!t)return;sx=e.clientX;sy=e.clientY;clearTimeout(tm);tm=setTimeout(function(){var h=t.getAttribute('href');var on=P.toggleFav(h);window.__lp=Date.now();P.toast((on?'⭐ Favorito: ':'Quitado: ')+((t.querySelector('h2')||{}).textContent||''));if(window.__redraw)window.__redraw();},550);},true);
+    ['pointerup','pointercancel'].forEach(function(n){document.addEventListener(n,function(){clearTimeout(tm)},true)});
+    document.addEventListener('pointermove',function(e){if(Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10)clearTimeout(tm)},true);
+    document.addEventListener('click',function(e){if(window.__lp&&Date.now()-window.__lp<900){e.preventDefault();e.stopImmediatePropagation();}},true);
+    document.addEventListener('contextmenu',function(e){if(e.target.closest&&e.target.closest('a.tile'))e.preventDefault()});
+  })();
   $('pAch').onclick=function(){var s=P.stats(),L=$('achL');L.textContent='';s.ach.forEach(function(a){var d=document.createElement('div');d.className='a'+(a.on?'':' off');d.innerHTML='<span>'+a.ico+'</span><div><b>'+a.name+'</b><small>'+a.desc+(a.on?' · ✅':'')+'</small></div>';L.appendChild(d);});$('achm').style.display='block';};
   $('achx').onclick=function(){$('achm').style.display='none';};
   $('pBk').onclick=function(){try{var b=new Blob([P.backup()],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='mis-apps-copia-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(u)},1500);}catch(e){alert('No se pudo crear la copia');}};

@@ -61,7 +61,7 @@
   function stats() {
     var d = load(), T = totals(d), n = 0, list = [];
     ACH.forEach(function (a) { var on = !!d.ach[a[0]]; if (on) n++; list.push({ id: a[0], ico: a[1], name: a[2], desc: a[3], on: on, at: d.ach[a[0]] || 0 }); });
-    var xp = Math.floor(T.sec / 6) + T.games * 50 + n * 100;
+    var xp = Math.floor(T.sec / 6) + T.games * 50 + n * 100 + (d.bonus || 0);
     var lvl = Math.floor(Math.sqrt(xp / 120)) + 1, base = 120 * (lvl - 1) * (lvl - 1), next = 120 * lvl * lvl;
     return { T: T, xp: xp, lvl: lvl, pct: Math.max(0, Math.min(1, (xp - base) / (next - base))), toNext: next - xp, ach: list, achOn: n, data: d };
   }
@@ -76,7 +76,7 @@
     }
     return fresh;
   }
-  function stats0(d, T) { var n = 0; for (var k in d.ach) n++; var xp = Math.floor(T.sec / 6) + T.games * 50 + n * 100; return Math.floor(Math.sqrt(xp / 120)) + 1; }
+  function stats0(d, T) { var n = 0; for (var k in d.ach) n++; var xp = Math.floor(T.sec / 6) + T.games * 50 + n * 100 + (d.bonus || 0); return Math.floor(Math.sqrt(xp / 120)) + 1; }
 
   var tEl, tQ = [], tBusy = 0;
   function toast(msg) {
@@ -96,6 +96,26 @@
 
   var api = { stats: stats, record: function (gid) { var d = load(); return recordOf(d.g[gid]); }, game: function (gid) { return load().g[gid] || null; }, ACH: ACH, load: load, save: save, toast: toast };
   window.KokeProg = api;
+  function gidOf(h) { return String(h).split('/').pop().replace(/\.html$/, ''); }
+  function today(d) { var y = ymd(); if (!d.dd || d.dd.y !== y) d.dd = { y: y, s: 0, g: {}, c: {} }; return d.dd; }
+  api.daily = function (list) { if (!list || !list.length) return null; var h = ((ymd() * 2654435761) >>> 0) % list.length; return list[h]; };
+  api.quests = function (list) {
+    var d = load(), dd = (d.dd && d.dd.y === ymd()) ? d.dd : { s: 0, g: {}, c: {} }, n = 0, k;
+    for (k in dd.g) if (dd.g[k] >= 20) n++;
+    var dg = api.daily(list), gid = dg ? gidOf(dg.href) : null;
+    return [
+      { id: 'q1', txt: 'Prueba 3 juegos distintos', cur: Math.min(3, n), max: 3, xp: 60 },
+      { id: 'q2', txt: 'Juega 15 minutos hoy', cur: Math.min(15, Math.floor(dd.s / 60)), max: 15, xp: 80 },
+      { id: 'q3', txt: '\u{1F3AF} Juego del día: ' + (dg ? dg.nombre : '…') + ' (5 min)', cur: gid ? Math.min(5, Math.floor((dd.g[gid] || 0) / 60)) : 0, max: 5, xp: 100, href: dg ? dg.href : null }
+    ].map(function (q) { q.done = q.cur >= q.max; q.claimed = !!(dd.c && dd.c[q.id]); return q; });
+  };
+  api.claim = function (id, list) {
+    var d = load(), q = api.quests(list).filter(function (x) { return x.id === id; })[0];
+    if (!q || !q.done || q.claimed) return false;
+    today(d).c[id] = 1; d.bonus = (d.bonus || 0) + q.xp; check(d); save(d); toast('\u{1F381} +' + q.xp + ' XP'); return true;
+  };
+  api.isFav = function (h) { var d = load(); return !!(d.fav && d.fav[gidOf(h)]); };
+  api.toggleFav = function (h) { var d = load(); d.fav = d.fav || {}; var k = gidOf(h); if (d.fav[k]) delete d.fav[k]; else d.fav[k] = 1; save(d); return !!d.fav[k]; };
 
   // copias de seguridad de todo lo guardado (partidas, récords, ajustes)
   api.backup = function () {
@@ -118,6 +138,7 @@
   g.l = now; g.k = g.k || {};
   var td = ymd(); if (d0.days.indexOf(td) < 0) { d0.days.push(td); if (d0.days.length > 400) d0.days.shift(); }
   var hr = new Date().getHours(); if (hr < 5) d0.night = 1;
+  today(d0).g[id] = today(d0).g[id] || 0;
   check(d0); save(d0);
 
   var snap = {};
@@ -140,7 +161,7 @@
     var t = Date.now(), dt = (t - last) / 1000; last = t;
     var vis = document.visibilityState === 'visible';
     var d = load(), gg = d.g[id] || (d.g[id] = { n: 1, s: 0, f: t, k: {} });
-    if (vis && dt > 0 && dt < 15) { gg.s = (gg.s || 0) + dt; sess += dt; if (sess > (d.ms || 0)) d.ms = sess; }
+    if (vis && dt > 0 && dt < 15) { gg.s = (gg.s || 0) + dt; sess += dt; if (sess > (d.ms || 0)) d.ms = sess; var dd = today(d); dd.s += dt; dd.g[id] = (dd.g[id] || 0) + dt; }
     gg.l = t; gg.k = gg.k || {};
     try {
       for (var i = 0; i < localStorage.length; i++) {
