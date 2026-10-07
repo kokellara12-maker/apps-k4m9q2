@@ -1,0 +1,23 @@
+<!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="siniestro"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0a0c1c"><title>Tren Fantasma</title></head><body><script src="gk.js"></script><script>
+(function(){
+var wag,gh,t,sp,hp,spawn,dist;
+GK.start({title:'Tren Fantasma',icon:'🚂',color:'#9fb0ff',bg:'#0a0c1c',help:'Los fantasmas atacan los vagones. <b>Tócalos</b> antes de que lo destrocen. Si pierdes todos los vagones se acaba 🚂👻',
+reset:function(){wag=[];for(var i=0;i<5;i++)wag.push(100);gh=[];t=0;sp=1;spawn=1.5;dist=0;GK.setScore(0)},
+down:function(x,y){var best=null,bd=1e9;for(var g of gh){var d=GK.dist(x,y,g.x,g.y);if(d<46&&d<bd){bd=d;best=g}}if(best){best.dead=1;GK.add(2);GK.beep(700+Math.random()*300,.08,'triangle',.07,300);GK.burst(best.x,best.y,8,'#bdf',180,.5)}},
+update:function(dt){var W=GK.W(),H=GK.H();t+=dt;dist+=dt*80;sp=1+t*.012;spawn-=dt;
+ var n=wag.length,ww=Math.min(66,(W-30)/Math.max(5,n)),x0=W/2-n*(ww+4)/2;
+ if(spawn<=0){spawn=Math.max(.35,1.4/sp);var alive=[];for(var i=0;i<n;i++)if(wag[i]>0)alive.push(i);if(alive.length){var i=GK.pick(alive),side=Math.random()<.5;gh.push({w:i,x:Math.random()*W,y:side?-30:H+30,tx:x0+i*(ww+4)+ww/2,ty:H*.55,v:70+t*1.2,p:Math.random()*6})}}
+ for(var g of gh){var dx=g.tx-g.x,dy=g.ty-g.y,d=Math.hypot(dx,dy);if(d<30){g.dead=1;wag[g.w]-=22;GK.shake(8);GK.beep(130,.15,'sawtooth',.08,-60);if(wag[g.w]<=0)wag[g.w]=0}else{g.x+=dx/d*g.v*dt+Math.sin(t*4+g.p)*20*dt;g.y+=dy/d*g.v*dt}}
+ gh=gh.filter(function(g){return !g.dead});
+ if(wag.every(function(v){return v<=0}))GK.over('¡Tren destruido!');
+ if(t>0&&Math.floor(t)%10===0&&!this.l){this.l=1;var j=wag.findIndex(function(v){return v<=0});if(j>=0){wag[j]=100;GK.float(W/2,H*.4,'¡Vagón reparado!','#9f9',24)}}if(Math.floor(t)%10!==0)this.l=0},
+draw:function(c,W,H){c.fillStyle='#0a0c1c';c.fillRect(0,0,W,H);if(!wag)return;for(var i=0;i<40;i++){c.fillStyle='rgba(255,255,255,.6)';c.fillRect((i*83)%W,(i*47+t*10)%H,2,2)}
+ c.fillStyle='#161a33';c.fillRect(0,H*.55+30,W,H);c.fillStyle='#3a3f66';c.fillRect(0,H*.55+40,W,6);for(var x=-((dist*3)%40);x<W;x+=40)c.fillRect(x,H*.55+50,18,5);
+ var n=wag.length,ww=Math.min(66,(W-30)/Math.max(5,n)),x0=W/2-n*(ww+4)/2;
+ for(var i=0;i<n;i++){var x=x0+i*(ww+4),y=H*.55-20,h=wag[i]/100;c.fillStyle=h>0?'#4a5599':'#222';c.fillRect(x,y,ww,50);c.fillStyle=h>0?'#7a88dd':'#333';c.fillRect(x,y,ww,8);c.fillStyle='#ffd86a';c.fillRect(x+8,y+18,ww-16,14);if(i===0){c.fillStyle='#2a3166';c.fillRect(x-8,y-12,16,20)}
+  c.fillStyle='#000';c.fillRect(x+4,y+50,10,10);c.fillRect(x+ww-14,y+50,10,10);c.fillStyle='#000';c.fillRect(x,y-8,ww,5);c.fillStyle=h>.5?'#6c6':h>.25?'#fc3':'#f55';c.fillRect(x,y-8,ww*h,5)}
+ for(var g of gh){c.font='40px serif';c.textAlign='center';c.textBaseline='middle';c.fillText('👻',g.x,g.y+Math.sin(t*5+g.p)*4)}
+ GK.text('Vagones: '+wag.filter(function(v){return v>0}).length+'/'+n,W/2,H-40,18,'#9fb0ff')}});
+})();
+
+</script></body></html>

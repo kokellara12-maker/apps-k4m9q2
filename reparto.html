@@ -1,0 +1,33 @@
+<!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="carretera"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#102a3a"><title>Reparto en Patinete</title></head><body><script src="gk.js"></script><script>
+(function(){
+var lane,tl,obs,pk,doors,speed,dist,t,vy,y,air,carry,ph=0;
+var LN=3;
+function lx(l){return GK.W()/2+(l-1)*Math.min(90,GK.W()/4.2)}
+GK.start({title:'Reparto en Patinete',icon:'🛴',color:'#4de0a0',bg:'#102a3a',help:'Desliza ← → para cambiar de carril y toca para saltar. Recoge 📦 y entrégalos en las casas del lateral (mantén tu carril lateral) 🛴',
+reset:function(){lane=1;tl=1;obs=[];pk=[];doors=[];speed=300;dist=0;t=0;y=0;vy=0;air=false;carry=0;GK.setScore(0);this.sx=null},
+down:function(x,y2){this.sx=x;this.sy=y2;this.st=performance.now()},
+up:function(x,y2){var dx=x-this.sx;if(Math.abs(dx)>30){tl=GK.clamp(tl+(dx>0?1:-1),0,LN-1)}else if(!air){vy=520;air=true;GK.beep(500,.1,'square',.06,300)}},
+key:function(k){if(k==='ArrowLeft')tl=Math.max(0,tl-1);if(k==='ArrowRight')tl=Math.min(LN-1,tl+1);if(k==='Space'||k==='ArrowUp'){if(!air){vy=520;air=true}}},
+update:function(dt){t+=dt;speed=Math.min(620,300+dist*.01);dist+=speed*dt;lane+=(tl-lane)*Math.min(1,dt*14);
+ if(air){y+=vy*dt;vy-=1500*dt;if(y<=0){y=0;air=false}}
+ for(var o of obs)o.y+=speed*dt*(o.v||1);for(var p of pk)p.y+=speed*dt;for(var d of doors)d.y+=speed*dt;
+ if(Math.random()<dt*(1.1+speed/500)){var l=GK.ri(0,LN-1);if(!obs.some(function(o){return o.y<80}))obs.push({l:l,y:-60,k:Math.random()<.35?'curb':'car',v:Math.random()<.4?.6:1,c:GK.pick(['#e33','#39f','#fc3','#4c7'])})}
+ if(Math.random()<dt*.8)pk.push({l:GK.ri(0,LN-1),y:-40,g:0});
+ if(carry>0&&Math.random()<dt*.5)doors.push({s:Math.random()<.5?-1:1,y:-60,g:0});
+ var H=GK.H(),py=H*.78;
+ for(var o of obs){if(Math.abs(o.l-lane)<.5&&Math.abs(o.y-py)<34&&(o.k==='car'||y<26)){GK.shake(12);GK.over('¡Choque!')}}
+ for(var p of pk)if(!p.g&&Math.abs(p.l-lane)<.5&&Math.abs(p.y-py)<30){p.g=1;carry++;GK.add(5);GK.float(lx(lane),py-30,'📦','#fff');GK.beep(800,.07,'triangle',.07,300)}
+ for(var d of doors){if(!d.g&&carry>0&&((d.s<0&&tl===0)||(d.s>0&&tl===LN-1))&&Math.abs(d.y-py)<50){d.g=1;carry--;var tip=GK.ri(10,30);GK.add(tip);GK.float(lx(lane),py-40,'+'+tip+'💰','#ffd23a',24);GK.beep(1000,.12,'triangle',.08,500)}}
+ obs=obs.filter(function(o){return o.y<H+80});pk=pk.filter(function(p){return !p.g&&p.y<H+60});doors=doors.filter(function(d){return d.y<H+80})},
+draw:function(c,W,H){c.fillStyle='#2c3e50';c.fillRect(0,0,W,H);if(!obs)return;var rw=Math.min(90,W/4.2)*3+30,x0=W/2-rw/2;
+ c.fillStyle='#4d5a68';c.fillRect(x0,0,rw,H);c.fillStyle='#788';c.fillRect(0,0,x0,H);c.fillRect(x0+rw,0,W,H);c.fillStyle='#d6d9a6';var off=(dist%60);for(var i=-1;i<H/60+1;i++){c.fillRect(W/2-Math.min(90,W/4.2)/2-2,i*60+off,4,30);c.fillRect(W/2+Math.min(90,W/4.2)/2-2,i*60+off,4,30)}
+ for(var d of doors){var hx=d.s<0?x0-50:x0+rw+10;c.fillStyle='#c4784a';c.fillRect(hx,d.y-30,40,60);c.fillStyle='#7a2f1a';c.fillRect(hx+(d.s<0?30:0),d.y-8,10,16);if(carry>0&&!d.g){c.fillStyle='#ffd23a';c.font='20px serif';c.textAlign='center';c.fillText('📍',hx+20,d.y-40)}}
+ for(var p of pk){c.font='30px serif';c.textAlign='center';c.textBaseline='middle';c.fillText('📦',lx(p.l),p.y)}
+ for(var o of obs){var x=lx(o.l);if(o.k==='curb'){c.fillStyle='#ddd';c.fillRect(x-34,o.y-8,68,16);c.fillStyle='#e33';c.fillRect(x-34,o.y-8,18,16);c.fillRect(x,o.y-8,18,16)}else{c.fillStyle=o.c;c.fillRect(x-26,o.y-40,52,80);c.fillStyle='#bde';c.fillRect(x-20,o.y-26,40,22);c.fillStyle='#000';c.fillRect(x-30,o.y-30,6,18);c.fillRect(x+24,o.y-30,6,18);c.fillRect(x-30,o.y+14,6,18);c.fillRect(x+24,o.y+14,6,18)}}
+ var px=lx(lane),py=H*.78-y;c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(px,H*.78+18,16,6,0,0,7);c.fill();
+ c.fillStyle='#222';c.fillRect(px-5,py-4,10,36);c.fillStyle='#4de0a0';c.fillRect(px-6,py+28,12,6);c.fillStyle='#ff6a3a';c.fillRect(px-10,py-34,20,28);c.fillStyle='#ffcfa0';c.beginPath();c.arc(px,py-42,9,0,7);c.fill();c.fillStyle='#fc3';c.fillRect(px-9,py-52,18,6);
+ if(carry>0){c.font='20px serif';c.textAlign='center';c.fillText('📦'.repeat(Math.min(4,carry)),px,py-66)}
+ GK.text('📦 x'+(carry||0),W-50,H-24,18,'#fff')}});
+})();
+
+</script></body></html>

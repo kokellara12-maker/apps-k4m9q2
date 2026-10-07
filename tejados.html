@@ -1,0 +1,40 @@
+<!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="ninja"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#150a2e"><title>Gato Ninja Tejados</title></head><body><script src="gk.js"></script><script>
+(function(){
+var cat,roofs,birds,fish,speed,dist,hold,t,fc;
+function nr(p,first){var W=GK.W(),H=GK.H();var gap=first?0:GK.rnd(80,130+speed*.14),w=first?W*.9:GK.rnd(170,330),y=first?H*.68:GK.clamp(p.y+GK.rnd(-60,60),H*.5,H*.82),x=p.x+p.w+gap,r={x:x,w:w,y:y,ch:[]};
+ if(!first&&w>230&&Math.random()<.55)r.ch.push({x:x+w*GK.rnd(.45,.75),w:24,h:36});
+ if(Math.random()<.55)fish.push({x:x+w/2,y:y-70-GK.rnd(0,50),g:0});
+ if(!first&&Math.random()<.4)birds.push({x:x+w/2,y:y-GK.rnd(80,150),p:GK.rnd(0,6)});return r}
+GK.start({title:'Gato Ninja Tejados',icon:'🐱',color:'#ffb347',bg:'#150a2e',help:'Toca para saltar. Mantén pulsado en el aire para <b>planear</b>. Esquiva chimeneas y palomas, recoge pescados 🐟',
+reset:function(){fc=0;speed=260;dist=0;roofs=[];birds=[];fish=[];hold=false;t=0;var p={x:-50,w:0,y:GK.H()*.68};var r=nr({x:-50,w:0,y:GK.H()*.68},true);r.x=-50;roofs.push(r);for(var i=0;i<6;i++)roofs.push(nr(roofs[roofs.length-1]));cat={x:GK.W()*.25,y:r.y,vy:0,on:true,co:0,tail:0}},
+down:function(){hold=true;if(cat.on||cat.co>0){cat.vy=-640;cat.on=false;cat.co=0;GK.beep(500,.12,'square',.07,300)}},
+up:function(){hold=false},
+update:function(dt){t+=dt;speed=Math.min(560,260+dist*.012);var dx=speed*dt;dist+=dx;
+ for(var r of roofs)r.x-=dx;for(var f of fish)f.x-=dx;for(var b of birds){b.x-=dx*1.25;b.y+=Math.sin(t*3+b.p)*30*dt}
+ while(roofs[0].x+roofs[0].w<-50)roofs.shift();while(roofs[roofs.length-1].x<GK.W()+400)roofs.push(nr(roofs[roofs.length-1]));
+ fish=fish.filter(function(f){return f.x>-30&&!f.g});birds=birds.filter(function(b){return b.x>-40});
+ var g=1800;if(hold&&cat.vy<0)g=900;if(hold&&cat.vy>0){g=500;cat.vy=Math.min(cat.vy,150)}
+ cat.vy+=g*dt;var oy=cat.y;cat.y+=cat.vy*dt;var on=false;
+ for(var r of roofs){if(cat.x>r.x+6&&cat.x<r.x+r.w-6&&oy<=r.y+4&&cat.y>=r.y){cat.y=r.y;cat.vy=0;on=true}}
+ if(on){if(!cat.on)GK.burst(cat.x,cat.y,5,'#ddd',90,.3)}else if(cat.on){cat.co=.1}cat.on=on;if(cat.co>0)cat.co-=dt;
+ cat.tail+=dt*8;
+ var cx0=cat.x-12,cx1=cat.x+12,cy0=cat.y-30,cy1=cat.y;
+ for(var r of roofs)for(var c of r.ch){if(cx1>c.x&&cx0<c.x+c.w&&cy1>r.y-c.h&&cy0<r.y){GK.shake(10);GK.over('¡Chimenea!')}}
+ for(var b of birds)if(GK.dist(cat.x,cat.y-15,b.x,b.y)<24){GK.shake(10);GK.over('¡Paloma!')}
+ for(var f of fish)if(!f.g&&GK.dist(cat.x,cat.y-15,f.x,f.y)<26){f.g=1;fc++;GK.float(f.x,f.y,'+5','#7df');GK.beep(900,.08,'triangle',.08,400)}
+ if(cat.y>GK.H()+60)GK.over('¡Te caíste!');GK.setScore(Math.floor(dist/40)+fc*5);},
+draw:function(c,W,H){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#150a2e');g.addColorStop(1,'#4a2358');c.fillStyle=g;c.fillRect(0,0,W,H);
+ c.fillStyle='#fff3c0';c.beginPath();c.arc(W*.8,H*.18,34,0,7);c.fill();c.fillStyle='rgba(255,255,255,.7)';for(var i=0;i<30;i++)c.fillRect((i*97)%W,(i*53)%(H*.5),2,2);
+ var sx=(dist||0)*.25;for(var i=0;i<14;i++){var bx=i*90-(sx%90)-20,bh=60+((i*37+Math.floor(sx/90)*17)%80);c.fillStyle='#2a1a4a';c.fillRect(bx,H*.78-bh+((i*13)%20),70,H);}
+ if(!roofs)return;
+ for(var r of roofs){c.fillStyle='#241338';c.fillRect(r.x,r.y,r.w,H-r.y);c.fillStyle='#5a3a7a';c.fillRect(r.x,r.y,r.w,8);c.fillStyle='#ffd86a';for(var wx=r.x+14;wx<r.x+r.w-20;wx+=34)for(var wy=r.y+26;wy<H;wy+=40)if(((wx*7+wy*3)|0)%5>1)c.fillRect(wx,wy,14,18);
+  for(var ch of r.ch){c.fillStyle='#6a4a52';c.fillRect(ch.x,r.y-ch.h,ch.w,ch.h);c.fillStyle='#3a2a30';c.fillRect(ch.x-3,r.y-ch.h,ch.w+6,6)}}
+ for(var f of fish){c.fillStyle='#7df';c.beginPath();c.ellipse(f.x,f.y,11,6,0,0,7);c.fill();c.beginPath();c.moveTo(f.x+9,f.y);c.lineTo(f.x+18,f.y-6);c.lineTo(f.x+18,f.y+6);c.fill()}
+ for(var b of birds){c.fillStyle='#ddd';c.beginPath();c.ellipse(b.x,b.y,13,8,0,0,7);c.fill();var w=Math.sin(t*14)*10;c.beginPath();c.moveTo(b.x-4,b.y);c.lineTo(b.x+4,b.y-12-w);c.lineTo(b.x+10,b.y);c.fill();c.fillStyle='#f90';c.fillRect(b.x-18,b.y-2,6,4)}
+ if(cat){var x=cat.x,y=cat.y;c.save();c.translate(x,y);c.fillStyle='#ff9d2e';c.strokeStyle='#ff9d2e';c.lineWidth=5;c.lineCap='round';c.beginPath();c.moveTo(-10,-14);c.quadraticCurveTo(-26,-20+Math.sin(cat.tail)*8,-24,-34);c.stroke();
+  c.beginPath();c.ellipse(0,-14,14,11,0,0,7);c.fill();c.beginPath();c.arc(8,-28,10,0,7);c.fill();c.beginPath();c.moveTo(2,-34);c.lineTo(4,-44);c.lineTo(9,-36);c.fill();c.beginPath();c.moveTo(11,-36);c.lineTo(16,-44);c.lineTo(17,-33);c.fill();
+  c.fillStyle='#222';c.fillRect(11,-30,3,4);c.fillStyle='#e33';c.fillRect(-5,-24,16,3);var l=cat.on?Math.sin(t*18)*6:5;c.fillStyle='#d97a15';c.fillRect(-8+l,-6,5,6);c.fillRect(3-l,-6,5,6);
+  if(hold&&!cat.on&&cat.vy>0){c.fillStyle='rgba(255,255,255,.5)';c.beginPath();c.ellipse(0,-50,22,6,0,0,7);c.fill()}c.restore()}}});
+})();
+
+</script></body></html>

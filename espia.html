@@ -1,0 +1,41 @@
+<!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="misterio"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0a1018"><title>Espía de Noche</title></head><body><script src="gk.js"></script><script>
+(function(){
+var N=9,M=11,wall,pl,doc,ex,gu,cam,tu,has,lvl,per,T,sx,sy,hist;
+var DV=[[0,-1],[1,0],[0,1],[-1,0]];
+function gcd(a,b){return b?gcd(b,a%b):a}
+function lcm(a,b){return a*b/gcd(a,b)}
+function gpos(g,t){var cyc=2*(g.len-1),m=t%cyc,idx=m<g.len?m:cyc-m;return[g.x+g.d[0]*idx,g.y+g.d[1]*idx,m<g.len-1?1:-1]}
+function vis(t){var v={};function add(x,y){v[x+','+y]=1}
+ for(var g of gu){var p=gpos(g,t),fx=g.d[0]*p[2],fy=g.d[1]*p[2];add(p[0],p[1]);for(var i=1;i<=3;i++){var x=p[0]+fx*i,y=p[1]+fy*i;if(x<0||y<0||x>=N||y>=M||wall[y][x])break;add(x,y)}}
+ for(var c of cam){var d=DV[(c.o+t)%4];add(c.x,c.y);for(var i=1;i<=4;i++){var x=c.x+d[0]*i,y=c.y+d[1]*i;if(x<0||y<0||x>=N||y>=M||wall[y][x])break;add(x,y)}}return v}
+function solvable(){var seen={},q=[[pl.x,pl.y,0,0,0]];seen[pl.x+','+pl.y+',0,0']=1;var vc=[];for(var t=0;t<per;t++)vc.push(vis(t));var qi=0;while(qi<q.length){var s=q[qi++];if(s[0]===ex.x&&s[1]===ex.y&&s[2])return s[4];if(s[4]>60)continue;var t2=(s[3]+1)%per;for(var d=0;d<5;d++){var dx=d<4?DV[d][0]:0,dy=d<4?DV[d][1]:0,x=s[0]+dx,y=s[1]+dy;if(x<0||y<0||x>=N||y>=M||wall[y][x])continue;if(vc[t2][x+','+y])continue;var h=s[2]||(x===doc.x&&y===doc.y?1:0);var k=x+','+y+','+h+','+t2;if(seen[k])continue;seen[k]=1;q.push([x,y,h,t2,s[4]+1])}}return -1}
+function gen(){for(var tr=0;tr<300;tr++){wall=[];for(var y=0;y<M;y++){wall.push([]);for(var x=0;x<N;x++)wall[y].push(Math.random()<.16?1:0)}pl={x:0,y:M-1};ex={x:0,y:M-1};wall[M-1][0]=0;wall[M-2][0]=0;wall[M-1][1]=0;
+  doc={x:GK.ri(3,N-1),y:GK.ri(0,3)};wall[doc.y][doc.x]=0;gu=[];cam=[];var ng=Math.min(4,1+Math.floor(lvl/2)),nc=Math.min(3,Math.floor(lvl/3));
+  for(var i=0;i<ng;i++){var hor=Math.random()<.5,len=GK.ri(3,5);var g={x:GK.ri(1,N-2),y:GK.ri(1,M-4),len:len,d:hor?[1,0]:[0,1]};var ok=true;for(var k=0;k<len;k++){var x=g.x+g.d[0]*k,y=g.y+g.d[1]*k;if(x>=N||y>=M||wall[y][x]){ok=false;break}}if(ok&&!(g.x<2&&g.y>M-4))gu.push(g)}
+  for(var i=0;i<nc;i++){var x=GK.ri(1,N-1),y=GK.ri(0,M-3);if(!wall[y][x]&&!(x===doc.x&&y===doc.y))cam.push({x:x,y:y,o:GK.ri(0,3)})}
+  per=4;for(var g of gu)per=lcm(per,2*(g.len-1));if(per>120)continue;
+  var s=solvable();if(s>=8&&s<=50)return}
+ wall=wall.map(function(r){return r.map(function(){return 0})});gu=[];cam=[]}
+function step(dx,dy){var x=pl.x+dx,y=pl.y+dy;if(x<0||y<0||x>=N||y>=M||wall[y][x]){if(dx||dy)return}else{pl.x=x;pl.y=y}
+ hist=hist||[];T++;GK.beep(300,.04,'square',.04);if(pl.x===doc.x&&pl.y===doc.y&&!has){has=1;GK.beep(900,.15,'triangle',.08,400);GK.float(GK.W()/2,GK.H()*.2,'¡Documento!','#ffd23a',24)}
+ if(vis(T)[pl.x+','+pl.y]){GK.shake(14);GK.over('¡Te vieron!');return}
+ if(has&&pl.x===ex.x&&pl.y===ex.y){GK.add(10*(lvl+1));GK.beep(900,.25,'triangle',.1,500);GK.float(GK.W()/2,GK.H()*.3,'¡Misión cumplida!','#6fe0ff',28);lvl++;start()}}
+function start(){gen();T=0;has=0;pl.x=0;pl.y=M-1}
+GK.start({title:'Espía de Noche',icon:'🕵️',color:'#6fe0ff',bg:'#0a1018',help:'Es por turnos: cada vez que te mueves, guardias y cámaras se mueven también. Roba el 📄 y vuelve a la 🚪. Las casillas rojas son su visión: ¡no pises ninguna! Toca tu espía para esperar',
+reset:function(){lvl=0;start()},
+down:function(x,y){sx=x;sy=y;var W=GK.W(),H=GK.H();var cs=Math.min((W-20)/N,(H-200)/M),x0=W/2-cs*N/2,y0=100;var cx=Math.floor((x-x0)/cs),cy=Math.floor((y-y0)/cs);this.tp=[cx,cy]},
+up:function(x,y){var dx=x-sx,dy=y-sy;if(Math.hypot(dx,dy)>26){if(Math.abs(dx)>Math.abs(dy))step(dx>0?1:-1,0);else step(0,dy>0?1:-1)}else{var t=this.tp;if(!t)return;var ddx=t[0]-pl.x,ddy=t[1]-pl.y;if(ddx===0&&ddy===0)step(0,0);else if(Math.abs(ddx)+Math.abs(ddy)===1)step(ddx,ddy);else if(Math.abs(ddx)>Math.abs(ddy))step(Math.sign(ddx),0);else step(0,Math.sign(ddy))}},
+key:function(k){if(k==='ArrowUp')step(0,-1);if(k==='ArrowDown')step(0,1);if(k==='ArrowLeft')step(-1,0);if(k==='ArrowRight')step(1,0);if(k==='Space')step(0,0)},
+update:function(){},
+draw:function(c,W,H){c.fillStyle='#0a1018';c.fillRect(0,0,W,H);if(!wall)return;var cs=Math.min((W-20)/N,(H-200)/M),x0=W/2-cs*N/2,y0=100;var v=vis(T),vn=vis(T+1);
+ for(var y=0;y<M;y++)for(var x=0;x<N;x++){var px=x0+x*cs,py=y0+y*cs;c.fillStyle=(x+y)%2?'#16202c':'#131c27';c.fillRect(px,py,cs,cs);if(wall[y][x]){c.fillStyle='#3a4a5c';c.fillRect(px+2,py+2,cs-4,cs-4);c.fillStyle='#4a5c70';c.fillRect(px+2,py+2,cs-4,6)}
+  if(vn[x+','+y]&&!wall[y][x]){c.fillStyle='rgba(255,60,60,.28)';c.fillRect(px,py,cs,cs)}}
+ c.font=cs*.62+'px serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';
+ c.fillText('🚪',x0+ex.x*cs+cs/2,y0+ex.y*cs+cs/2+1);if(!has)c.fillText('📄',x0+doc.x*cs+cs/2,y0+doc.y*cs+cs/2+1);
+ for(var g of gu){var p=gpos(g,T);c.fillText('💂',x0+p[0]*cs+cs/2,y0+p[1]*cs+cs/2+1)}
+ for(var cm of cam)c.fillText('📷',x0+cm.x*cs+cs/2,y0+cm.y*cs+cs/2+1);
+ c.fillText('🕵️',x0+pl.x*cs+cs/2,y0+pl.y*cs+cs/2+1);
+ GK.text('Misión '+(lvl+1)+(has?'  ·  ¡Corre a la salida!':'  ·  Busca el documento'),W/2,y0-30,16,'#6fe0ff');GK.text('Turno '+T,W/2,y0+cs*M+30,16,'#9ab');GK.text('Rojo = zona vigilada en el próximo turno',W/2,y0+cs*M+54,12,'#f99')}});
+})();
+
+</script></body></html>

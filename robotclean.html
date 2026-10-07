@@ -1,0 +1,29 @@
+<!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="alegre"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#20263a"><title>Robot Limpiador</title></head><body><script src="gk.js"></script><script>
+(function(){
+var rb,dust,bin,cap,bat,dog,furn,dock,tx,ty,t,stun,del,spawnT;
+function rectHit(x,y,r){for(var f of furn)if(x+r>f.x&&x-r<f.x+f.w&&y+r>f.y&&y-r<f.y+f.h)return f;return null}
+function setup(){var W=GK.W(),H=GK.H();dock={x:34,y:H-60};furn=[{x:W*.3,y:H*.28,w:W*.4,h:46},{x:20,y:H*.45,w:60,h:120},{x:W-110,y:H*.5,w:90,h:70},{x:W*.35,y:H*.62,w:W*.28,h:40}];dust=[];for(var i=0;i<45;i++)add()}
+function add(){var W=GK.W(),H=GK.H();for(var k=0;k<20;k++){var x=GK.rnd(24,W-24),y=GK.rnd(110,H-40);if(!rectHit(x,y,6)&&GK.dist(x,y,dock.x,dock.y)>60){dust.push({x:x,y:y});return}}}
+GK.start({title:'Robot Limpiador',icon:'🤖',color:'#5ae6c8',bg:'#20263a',help:'Arrastra: tu robot va hacia tu dedo y aspira el polvo. Cuando la bolsa se llena, vuelve a la <b>base</b> 🔌 a vaciar y cargar. ¡Cuidado con el perro! 🐕',
+reset:function(){var W=GK.W(),H=GK.H();setup();rb={x:dock.x+30,y:dock.y};bin=0;cap=20;bat=100;dog={x:W-60,y:H*.3,vx:0,vy:0,m:0};tx=rb.x;ty=rb.y;t=0;stun=0;del=0;spawnT=1},
+down:function(x,y){tx=x;ty=y},move:function(x,y){if(GK.ptr.down){tx=x;ty=y}},
+update:function(dt){var W=GK.W(),H=GK.H();t+=dt;stun-=dt;
+ if(stun<=0){var dx=tx-rb.x,dy=ty-rb.y,d=Math.hypot(dx,dy);if(d>6){var sp=170*Math.min(1,d/40);var nx=rb.x+dx/d*sp*dt,ny=rb.y+dy/d*sp*dt;if(!rectHit(nx,rb.y,13))rb.x=nx;if(!rectHit(rb.x,ny,13))rb.y=ny;bat-=dt*(3.4+Math.min(2,del*.1))}else bat-=dt*.8}
+ rb.x=GK.clamp(rb.x,14,W-14);rb.y=GK.clamp(rb.y,100,H-14);
+ for(var q of dust)if(bin<cap&&GK.dist(rb.x,rb.y,q.x,q.y)<22){q.g=1;bin++;GK.beep(1200,.02,'square',.025)}dust=dust.filter(function(q){return !q.g});
+ spawnT-=dt;if(spawnT<=0){spawnT=.7;if(dust.length<60)add()}
+ if(GK.dist(rb.x,rb.y,dock.x,dock.y)<34){if(bin>0){var s=bin*2;GK.add(s);GK.float(dock.x+30,dock.y-30,'+'+s,'#5ae6c8',24);GK.beep(700,.15,'triangle',.08,300);del++;if(del%2===0)cap=Math.min(50,cap+3);bin=0}bat=Math.min(100,bat+dt*60)}
+ var ddx=rb.x-dog.x,ddy=rb.y-dog.y,dd=Math.hypot(ddx,ddy),chase=dd<170&&GK.dist(rb.x,rb.y,dock.x,dock.y)>60;dog.m-=dt;if(dog.m<=0){dog.m=GK.rnd(.6,1.5);dog.tx=GK.rnd(30,W-30);dog.ty=GK.rnd(120,H-40)}
+ var gx=chase?rb.x:dog.tx,gy=chase?rb.y:dog.ty,gl=Math.hypot(gx-dog.x,gy-dog.y)||1,ds=chase?120+t*.3:60;var nx=dog.x+(gx-dog.x)/gl*ds*dt,ny=dog.y+(gy-dog.y)/gl*ds*dt;if(!rectHit(nx,dog.y,12))dog.x=nx;if(!rectHit(dog.x,ny,12))dog.y=ny;
+ if(dd<28&&stun<=0){stun=1.2;GK.shake(8);GK.beep(200,.2,'sawtooth',.08,-80);var lost=Math.floor(bin*.5);bin-=lost;rb.x-=ddx/dd*30;rb.y-=ddy/dd*30;GK.float(rb.x,rb.y-20,'¡Guau!','#f99',22)}
+ if(bat<=0)GK.over('¡Sin batería!')},
+draw:function(c,W,H){c.fillStyle='#c9a778';c.fillRect(0,0,W,H);c.strokeStyle='rgba(0,0,0,.12)';c.lineWidth=2;for(var x=0;x<W;x+=50){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke()}if(!dust)return;
+ for(var f of furn){GK.rr(f.x+4,f.y+6,f.w,f.h,10,'rgba(0,0,0,.25)');GK.rr(f.x,f.y,f.w,f.h,10,'#7a5a3a','#4a3320',3)}
+ c.fillStyle='#6a5a4a';for(var q of dust)c.fillRect(q.x-2,q.y-2,4,4);
+ c.fillStyle='#2a8a6a';c.beginPath();c.arc(dock.x,dock.y,26,0,7);c.fill();c.font='22px serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';c.fillText('🔌',dock.x,dock.y);
+ c.save();c.translate(dog.x,dog.y);c.font='30px serif';c.textAlign='center';c.textBaseline='middle';c.fillText('🐕',0,0);c.restore();
+ c.fillStyle='rgba(0,0,0,.2)';c.beginPath();c.arc(rb.x+3,rb.y+4,14,0,7);c.fill();c.fillStyle=stun>0?'#f77':'#e8eef2';c.beginPath();c.arc(rb.x,rb.y,14,0,7);c.fill();c.strokeStyle='#5ae6c8';c.lineWidth=3;c.stroke();c.fillStyle='#223';c.beginPath();c.arc(rb.x,rb.y,5,0,7);c.fill();
+ GK.rr(20,H-30,W-40,12,6,'#222');GK.rr(20,H-30,(W-40)*Math.max(0,bat/100),12,6,bat<25?'#f55':'#5ae6c8');GK.text('🔋',12,H-24,14,'#fff');GK.text('Bolsa '+bin+'/'+cap,W/2,100,16,bin>=cap?'#ff7a7a':'#fff')}});
+})();
+
+</script></body></html>

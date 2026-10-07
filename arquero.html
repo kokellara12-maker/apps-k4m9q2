@@ -1,0 +1,26 @@
+<!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="batalla"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#1a1226"><title>Arquero Sombra</title></head><body><script src="gk.js"></script><script>
+(function(){
+var ar,arrows,en,wave,ph,aim,t,gx,gy,kills;
+function mk(){var W=GK.W(),H=GK.H();en=[];var n=2+Math.min(5,wave);for(var i=0;i<n;i++)en.push({x:W*.5+GK.rnd(30,W*.42),y:H*.72,hp:1,v:GK.rnd(-18,0)-wave*2,h:0,p:Math.random()*6,k:Math.random()<.18?'big':'n'});ar=5+n+Math.floor(wave/2)}
+GK.start({title:'Arquero Sombra',icon:'🏹',color:'#ff8a3d',bg:'#1a1226',help:'Pon el dedo, <b>arrastra hacia atrás</b> para tensar el arco y suelta. La cabeza vale doble. Flechas limitadas por oleada 🏹',
+reset:function(){wave=1;arrows=[];kills=0;ph=0;mk();aim=null;t=0;gx=60;gy=GK.H()*.72},
+down:function(x,y){aim={x:x,y:y,dx:0,dy:0}},move:function(x,y){if(aim){aim.dx=aim.x-x;aim.dy=aim.y-y;var l=Math.hypot(aim.dx,aim.dy);if(l>140){aim.dx*=140/l;aim.dy*=140/l}}},
+up:function(){if(aim&&ar>0&&Math.hypot(aim.dx,aim.dy)>20){var p=Math.hypot(aim.dx,aim.dy);arrows.push({x:gx,y:gy-30,vx:aim.dx*5.2,vy:aim.dy*5.2,hit:0});ar--;GK.beep(400,.12,'triangle',.06,-200)}aim=null},
+update:function(dt){var W=GK.W(),H=GK.H();t+=dt;gy=H*.72;
+ for(var a of arrows){a.vy+=700*dt;a.x+=a.vx*dt;a.y+=a.vy*dt;a.ang=Math.atan2(a.vy,a.vx);if(a.hit)continue;
+  for(var e of en){if(e.dead)continue;var hx=e.x,hy=e.y-(e.k==='big'?58:44);if(GK.dist(a.x,a.y,hx,hy)<(e.k==='big'?16:12)){e.hp-=2;a.hit=1;GK.add(30);GK.float(a.x,a.y-10,'¡CABEZA! +30','#ffd23a',20);GK.beep(900,.1,'square',.08,300);if(e.hp<=0)e.dead=1;GK.burst(a.x,a.y,8,'#f66',160,.4)}
+   else if(Math.abs(a.x-e.x)<(e.k==='big'?22:14)&&a.y>e.y-(e.k==='big'?50:36)&&a.y<e.y){e.hp-=1;a.hit=1;GK.add(10);GK.float(a.x,a.y,'+10','#fff');GK.beep(500,.08,'square',.06,100);if(e.hp<=0)e.dead=1}}
+  if(a.y>H*.72+10){a.hit=1}}
+ arrows=arrows.filter(function(a){return !a.hit&&a.x<W+50&&a.x>-50});
+ for(var e of en){if(e.dead)continue;e.x+=e.v*dt;if(e.x<gx+30){GK.over('¡Te alcanzaron!');return}e.hp=Math.max(e.hp,0);if(e.k==='big'&&e.hp===1)e.hp=3}
+ if(en.every(function(e){return e.dead})){wave++;GK.add(50);GK.float(W/2,H*.3,'¡Oleada '+wave+'!','#ff8a3d',30);mk();arrows=[]}
+ else if(ar<=0&&arrows.length===0&&en.some(function(e){return !e.dead}))GK.over('¡Sin flechas!')},
+draw:function(c,W,H){var g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1a1226');g.addColorStop(1,'#5a2a3a');c.fillStyle=g;c.fillRect(0,0,W,H);c.fillStyle='#ffd8a0';c.beginPath();c.arc(W*.75,H*.2,40,0,7);c.fill();c.fillStyle='#20142a';c.fillRect(0,H*.72,W,H);c.fillStyle='#2a1a38';c.beginPath();c.moveTo(0,H*.72);for(var x=0;x<=W;x+=40)c.lineTo(x,H*.72-20-((x*7)%30));c.lineTo(W,H*.72);c.fill();
+ if(!en)return;for(var e of en){if(e.dead)continue;var big=e.k==='big',s=big?1.4:1,y=e.y;c.fillStyle='#000';c.fillRect(e.x-10*s,y-34*s,20*s,34*s);c.beginPath();c.arc(e.x,y-44*s+0,10*s,0,7);c.fill();c.fillStyle='#f33';c.fillRect(e.x-4*s,y-46*s,3,3);c.fillRect(e.x+2*s,y-46*s,3,3);var l=Math.sin(t*8+e.p)*5;c.fillStyle='#000';c.fillRect(e.x-8*s+l,y,6,10);c.fillRect(e.x+2*s-l,y,6,10);if(big){c.fillStyle='#a33';c.fillRect(e.x-12,y-70,24,5)}}
+ c.fillStyle='#000';c.fillRect(gx-8,gy-34,16,34);c.beginPath();c.arc(gx,gy-42,9,0,7);c.fill();c.strokeStyle='#fb8';c.lineWidth=3;c.beginPath();c.arc(gx+12,gy-28,24,-1.2,1.2);c.stroke();
+ if(aim&&(Math.abs(aim.dx)+Math.abs(aim.dy)>5)){var vx=aim.dx*5.2,vy=aim.dy*5.2,px=gx,py=gy-30;c.fillStyle='rgba(255,255,255,.7)';for(var i=1;i<18;i++){var tt=i*.05;c.fillRect(px+vx*tt,py+vy*tt+350*tt*tt,3,3)}}
+ for(var a of arrows){c.save();c.translate(a.x,a.y);c.rotate(a.ang||0);c.fillStyle='#fc8';c.fillRect(-14,-1.5,22,3);c.fillStyle='#ddd';c.fillRect(8,-3,6,6);c.restore()}
+ GK.text('🏹 '+ar,60,H*.72+40,22,'#fb8');GK.text('Oleada '+wave,W/2,H*.9,18,'#ccb')}});
+})();
+
+</script></body></html>

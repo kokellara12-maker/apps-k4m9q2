@@ -1,0 +1,23 @@
+<!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="travieso"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#2b2410"><title>Pandilla de Ratas</title></head><body><script src="gk.js"></script><script>
+(function(){
+var rats,cheese,feet,tr,t,tx,ty,cx,cy;
+function ratsN(){return rats.length}
+GK.start({title:'Pandilla de Ratas',icon:'🐀',color:'#ffd23a',bg:'#2b2410',help:'Arrastra el dedo: tu enjambre te sigue. Come queso 🧀 para crecer y huye de las sombras de los pies que van a pisar 👣',
+reset:function(){var W=GK.W(),H=GK.H();cx=W/2;cy=H*.6;tx=cx;ty=cy;rats=[];for(var i=0;i<6;i++)rats.push({x:cx+GK.rnd(-20,20),y:cy+GK.rnd(-20,20),a:Math.random()*6});cheese=[];feet=[];tr=[];t=0;for(var i=0;i<4;i++)cheese.push({x:GK.rnd(40,W-40),y:GK.rnd(120,H-60)});GK.setScore(6)},
+down:function(x,y){tx=x;ty=y},move:function(x,y){if(GK.ptr.down){tx=x;ty=y}},
+update:function(dt){var W=GK.W(),H=GK.H();t+=dt;cx+=(tx-cx)*Math.min(1,dt*5);cy+=(ty-cy)*Math.min(1,dt*5);
+ for(var r of rats){var d=GK.dist(r.x,r.y,cx,cy),sp=(60+d*3.2);var a=Math.atan2(cy-r.y,cx-r.x)+Math.sin(t*4+r.a)*.5;r.x+=Math.cos(a)*sp*dt*(d>14?1:.2);r.y+=Math.sin(a)*sp*dt*(d>14?1:.2);r.rot=a}
+ for(var c of cheese){for(var r of rats)if(!c.g&&GK.dist(r.x,r.y,c.x,c.y)<16){c.g=1;for(var k=0;k<3;k++)rats.push({x:c.x,y:c.y,a:Math.random()*6});GK.beep(900,.1,'triangle',.07,300);GK.float(c.x,c.y,'+3','#ffd23a');break}}
+ cheese=cheese.filter(function(c){return !c.g});while(cheese.length<4+Math.floor(ratsN()/25))cheese.push({x:GK.rnd(40,W-40),y:GK.rnd(120,H-60)});
+ if(Math.random()<dt*(.6+t*.02)){var tgt=rats[GK.ri(0,rats.length-1)];feet.push({x:tgt.x+GK.rnd(-30,30),y:tgt.y+GK.rnd(-30,30),t:1.1,r:46+Math.min(40,ratsN()*.5)})}
+ for(var f of feet){f.t-=dt;if(f.t<=0&&!f.s){f.s=1;f.st=.35;GK.shake(10);GK.beep(100,.2,'sawtooth',.1,-50);var before=rats.length;rats=rats.filter(function(r){return GK.dist(r.x,r.y,f.x,f.y)>f.r});for(var q=0;q<before-rats.length;q++)GK.burst(f.x,f.y,1,'#a33',120,.4)}if(f.s)f.st-=dt}
+ feet=feet.filter(function(f){return !f.s||f.st>0});
+ GK.setScore(ratsN()+Math.floor(t));if(rats.length===0)GK.over('¡Pisoteadas!')},
+draw:function(c,W,H){c.fillStyle='#3a3014';c.fillRect(0,0,W,H);if(!rats)return;c.strokeStyle='rgba(0,0,0,.18)';c.lineWidth=2;for(var x=0;x<W;x+=60){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke()}for(var y=0;y<H;y+=60){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke()}
+ for(var q of cheese){c.font='28px serif';c.textAlign='center';c.textBaseline='middle';c.fillText('🧀',q.x,q.y)}
+ for(var f of feet){if(!f.s){var a=1-f.t/1.1;c.fillStyle='rgba(0,0,0,'+(.15+a*.35)+')';c.beginPath();c.ellipse(f.x,f.y,f.r*(.6+a*.4),f.r*(.8+a*.2)*.7,0,0,7);c.fill();c.strokeStyle='rgba(255,60,60,'+a+')';c.lineWidth=3;c.stroke()}else{c.font=f.r*1.6+'px serif';c.textAlign='center';c.textBaseline='middle';c.globalAlpha=Math.max(0,f.st/.35);c.fillText('👣',f.x,f.y);c.globalAlpha=1}}
+ for(var r of rats){c.save();c.translate(r.x,r.y);c.rotate(r.rot||0);c.fillStyle='#9a8a7a';c.beginPath();c.ellipse(0,0,8,5,0,0,7);c.fill();c.fillStyle='#d99';c.fillRect(7,-2,3,4);c.strokeStyle='#d99';c.lineWidth=1.5;c.beginPath();c.moveTo(-8,0);c.quadraticCurveTo(-14,Math.sin(t*14+r.a)*4,-18,0);c.stroke();c.fillStyle='#000';c.fillRect(5,-3,2,2);c.restore()}
+ c.strokeStyle='rgba(255,255,255,.5)';c.beginPath();c.arc(cx,cy,9,0,7);c.stroke()}});
+})();
+
+</script></body></html>

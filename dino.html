@@ -1,0 +1,24 @@
+<!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="jardin"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0f2a14"><title>Dino Crianza</title></head><body><script src="gk.js"></script><script>
+(function(){
+var ph,eggTaps,hungry,fun,energy,care,t,sp,dino,obs,dist,y,vy,kind,ct,flash;
+var KINDS=['🦖','🦕','🐊','🐲','🦎'];
+GK.start({title:'Dino Crianza',icon:'🦖',color:'#7dff7a',bg:'#0f2a14',help:'1) Toca el huevo para calentarlo. 2) Cuida a tu dino 30 s: 🍖 comer, 🎾 jugar, 💤 dormir. 3) ¡Carrera! Cuanto mejor lo cuides, más rápido y más salta 🦖',
+reset:function(){ph='egg';eggTaps=0;hungry=60;fun=60;energy=60;care=0;t=0;kind=GK.pick(KINDS);ct=30;flash=0},
+down:function(x,y2){var W=GK.W(),H=GK.H();if(ph==='egg'){eggTaps++;flash=.15;GK.beep(300+eggTaps*20,.05,'square',.05);GK.burst(W/2,H*.4,3,'#ffe',100,.3);if(eggTaps>=18){ph='care';GK.beep(900,.3,'triangle',.1,500);GK.burst(W/2,H*.4,20,'#ff9',220)}}
+ else if(ph==='care'){for(var i=0;i<3;i++)if(GK.hit(x,y2,6+i*(W/3)+6,H-110,W/3-12,80)){[function(){hungry=Math.min(100,hungry+22)},function(){fun=Math.min(100,fun+22)},function(){energy=Math.min(100,energy+22)}][i]();GK.beep(600+i*100,.08,'triangle',.06,200);GK.burst(W/2,H*.4,5,['#fa6','#6af','#aaf'][i],120,.4)}}
+ else if(ph==='race'){if(y<=0){vy=560*(1+dino.j*.2);y=.01;GK.beep(500,.08,'square',.05,200)}}},
+update:function(dt){var W=GK.W(),H=GK.H();t+=dt;flash-=dt;
+ if(ph==='care'){ct-=dt;hungry-=dt*3.2;fun-=dt*2.6;energy-=dt*2.2;care+=Math.max(0,Math.min(hungry,fun,energy))*dt/30;if(ct<=0){var q=(hungry+fun+energy)/300;dino={q:q,s:1+q*.8,j:q*1.2};ph='race';obs=[];dist=0;y=0;vy=0;sp=260*dino.s;GK.beep(500,.3,'triangle',.1,400);return}GK.setScore(Math.floor(care))}
+ else if(ph==='race'){sp=Math.min(560,(260+dist*.04)*dino.s);dist+=sp*dt;vy-=1500*dt;y+=vy*dt;if(y<0){y=0;vy=0}
+  for(var o of obs)o.x-=sp*dt;if(!obs.length||obs[obs.length-1].x<W-GK.rnd(260,420)/dino.s*(1+.5/dino.s))obs.push({x:W+30,h:GK.rnd(30,56),w:GK.rnd(18,30)});obs=obs.filter(function(o){return o.x>-50});
+  for(var o of obs)if(o.x<W*.2+14&&o.x+o.w>W*.2-14&&y<o.h-6){GK.shake(10);GK.over('¡Tropezón!')}GK.setScore(Math.floor(care)+Math.floor(dist/20))}},
+draw:function(c,W,H){c.fillStyle=ph==='race'?'#8fd8ff':'#16381c';c.fillRect(0,0,W,H);if(!ph)return;
+ if(ph==='egg'){c.fillStyle='#16381c';c.fillRect(0,0,W,H);var s=1+flash*3;c.save();c.translate(W/2,H*.4);c.rotate(Math.sin(t*20)*.05*flash*6);c.scale(s,s);c.fillStyle='#f4eed8';c.beginPath();c.ellipse(0,0,56,72,0,0,7);c.fill();c.fillStyle='#7dbf6a';for(var i=0;i<6;i++){c.beginPath();c.arc(Math.cos(i*1.1)*30,Math.sin(i*1.9)*40,8,0,7);c.fill()}if(eggTaps>8){c.strokeStyle='#333';c.lineWidth=3;c.beginPath();c.moveTo(-30,-20);c.lineTo(-10,-5);c.lineTo(-24,10);c.stroke()}c.restore();GK.text('¡Toca el huevo! '+eggTaps+'/18',W/2,H*.68,22,'#fff')}
+ else if(ph==='care'){c.font='110px serif';c.textAlign='center';c.textBaseline='middle';c.fillText(kind,W/2,H*.4+Math.sin(t*3)*6);GK.text('Cuidando… '+Math.ceil(ct)+'s',W/2,110,20,'#bfa');var bars=[['🍖',hungry,'#fa6'],['🎾',fun,'#6af'],['💤',energy,'#aaf']];bars.forEach(function(b,i){var by=H*.58+i*30;GK.text(b[0],30,by,20,'#fff');GK.rr(54,by-8,W-90,16,8,'#222');GK.rr(54,by-8,(W-90)*Math.max(0,b[1]/100),16,8,b[1]<25?'#f55':b[2])});
+  var lab=['🍖 Comer','🎾 Jugar','💤 Dormir'];for(var i=0;i<3;i++)GK.btn(6+i*(W/3)+6,H-110,W/3-12,80,lab[i],['#ffb06a','#6ab4ff','#b0a8ff'][i],true,16)}
+ else{c.fillStyle='#6fbf4f';c.fillRect(0,H*.7,W,H);c.fillStyle='#4a9a36';for(var x=-(dist%60);x<W;x+=60)c.fillRect(x,H*.7,30,8);
+  for(var o of obs){c.fillStyle='#2a8a3a';c.fillRect(o.x,H*.7-o.h,o.w,o.h);c.fillRect(o.x-8,H*.7-o.h*.6,10,6);c.fillRect(o.x+o.w-2,H*.7-o.h*.75,10,6)}
+  c.font=(54*dino.s)+'px serif';c.textAlign='center';c.textBaseline='bottom';c.save();c.translate(W*.2,H*.7-y);c.scale(-1,1);c.fillText(kind,0,10);c.restore();GK.text('Calidad '+Math.round(dino.q*100)+'%',W/2,100,16,'#fff')}}});
+})();
+
+</script></body></html>

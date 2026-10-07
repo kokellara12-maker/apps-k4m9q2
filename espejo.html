@@ -1,0 +1,26 @@
+<!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="lab"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#101530"><title>Laberinto Espejo</title></head><body><script src="gk.js"></script><script>
+(function(){
+var N,g,A,B,xa,xb,lvl,moves,lim,t,sx,sy;
+var D=[[0,-1],[1,0],[0,1],[-1,0]];
+function gen(n){var w=n,h=n,cells=[];for(var i=0;i<w*h;i++)cells.push([1,1,1,1]);var vis=new Array(w*h).fill(0),st=[0];vis[0]=1;while(st.length){var c=st[st.length-1],cx=c%w,cy=Math.floor(c/w),nb=[];for(var d=0;d<4;d++){var nx=cx+D[d][0],ny=cy+D[d][1];if(nx>=0&&ny>=0&&nx<w&&ny<h&&!vis[ny*w+nx])nb.push(d)}if(!nb.length){st.pop();continue}var d=GK.pick(nb),nx=cx+D[d][0],ny=cy+D[d][1],n2=ny*w+nx;cells[c][d]=0;cells[n2][(d+2)%4]=0;vis[n2]=1;st.push(n2)}
+ for(var k=0;k<n*2;k++){var c=GK.ri(0,w*h-1),d=GK.ri(0,3),cx=c%w,cy=Math.floor(c/w),nx=cx+D[d][0],ny=cy+D[d][1];if(nx>=0&&ny>=0&&nx<w&&ny<h){cells[c][d]=0;cells[ny*w+nx][(d+2)%4]=0}}return cells}
+function can(cells,n,p,d){var x=p%n,y=Math.floor(p/n);if(cells[p][d])return -1;var nx=x+D[d][0],ny=y+D[d][1];if(nx<0||ny<0||nx>=n||ny>=n)return -1;return ny*n+nx}
+function solve(cells,n,a0,b0,ea,eb){var key=function(a,b){return a*n*n+b},seen=new Map(),q=[[a0,b0,0]];seen.set(key(a0,b0),1);var qi=0;while(qi<q.length){var s=q[qi++];if(s[0]===ea&&s[1]===eb)return s[2];for(var d=0;d<4;d++){var md=d%2===1?(d+2)%4:d;var na=can(cells,n,s[0],d);if(na<0)na=s[0];var nb=can(cells,n,s[1],md);if(nb<0)nb=s[1];var k=key(na,nb);if(!seen.has(k)){seen.set(k,1);q.push([na,nb,s[2]+1])}}}return -1}
+function level(){N=Math.min(11,4+Math.floor(lvl/2));var tries=0;while(true){tries++;g=gen(N);A=0*N+0;B=N-1;xa=N*N-1;xb=(N-1)*N;var s=solve(g,N,A,B,xa,xb);if(s>=N&&s>0||tries>80){lim=Math.round(s*1.6)+6;moves=0;return}}}
+function mv(d){var md=d%2===1?(d+2)%4:d;var na=can(g,N,A,d);if(na>=0)A=na;var nb=can(g,N,B,md);if(nb>=0)B=nb;moves++;GK.beep(400,.04,'square',.04);
+ if(A===xa&&B===xb){GK.add(10+N);GK.float(GK.W()/2,GK.H()*.2,'¡Nivel superado!','#7be7ff',28);GK.beep(900,.2,'triangle',.1,400);lvl++;level()}else if(moves>=lim)GK.over('¡Sin movimientos!')}
+GK.start({title:'Laberinto Espejo',icon:'🪞',color:'#7be7ff',bg:'#101530',help:'Desliza para mover los dos personajes a la vez: el azul va normal y el rosa va <b>en espejo</b> (izquierda/derecha invertidas). Que cada uno llegue a su salida ⭐',
+reset:function(){lvl=0;level();t=0},
+down:function(x,y){sx=x;sy=y},up:function(x,y){var dx=x-sx,dy=y-sy;if(Math.hypot(dx,dy)<22)return;if(Math.abs(dx)>Math.abs(dy))mv(dx>0?1:3);else mv(dy>0?2:0)},
+key:function(k){if(k==='ArrowUp')mv(0);if(k==='ArrowRight')mv(1);if(k==='ArrowDown')mv(2);if(k==='ArrowLeft')mv(3)},
+update:function(dt){t+=dt},
+draw:function(c,W,H){c.fillStyle='#101530';c.fillRect(0,0,W,H);if(!g)return;var cs=Math.min((W-30)/N,(H-220)/N),x0=W/2-cs*N/2,y0=110;
+ GK.rr(x0-6,y0-6,cs*N+12,cs*N+12,10,'#1b2250');c.lineCap='round';
+ function tile(p,col,txt){var x=p%N,y=Math.floor(p/N);GK.rr(x0+x*cs+3,y0+y*cs+3,cs-6,cs-6,6,col);if(txt){c.font=cs*.55+'px serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';c.fillText(txt,x0+x*cs+cs/2,y0+y*cs+cs/2+1)}}
+ tile(xa,'rgba(80,160,255,.35)','⭐');tile(xb,'rgba(255,100,180,.35)','⭐');
+ c.strokeStyle='#8fa0ff';c.lineWidth=3;for(var p=0;p<N*N;p++){var x=p%N,y=Math.floor(p/N),w=g[p];if(w[0]){c.beginPath();c.moveTo(x0+x*cs,y0+y*cs);c.lineTo(x0+x*cs+cs,y0+y*cs);c.stroke()}if(w[3]){c.beginPath();c.moveTo(x0+x*cs,y0+y*cs);c.lineTo(x0+x*cs,y0+y*cs+cs);c.stroke()}if(y===N-1&&w[2]){c.beginPath();c.moveTo(x0+x*cs,y0+y*cs+cs);c.lineTo(x0+x*cs+cs,y0+y*cs+cs);c.stroke()}if(x===N-1&&w[1]){c.beginPath();c.moveTo(x0+x*cs+cs,y0+y*cs);c.lineTo(x0+x*cs+cs,y0+y*cs+cs);c.stroke()}}
+ tile(A,'#3a8cff','😎');tile(B,'#ff5ab4','😈');
+ GK.text('Nivel '+(lvl+1),W/2,y0-40,20,'#fff');GK.text('Movimientos: '+(lim-moves),W/2,y0+cs*N+40,20,lim-moves<5?'#ff7a7a':'#7be7ff')}});
+})();
+
+</script></body></html>
