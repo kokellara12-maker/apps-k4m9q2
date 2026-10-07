@@ -39,13 +39,14 @@
     var st = el('style', null, CSS); document.head.appendChild(st);
     document.title = g.title; document.documentElement.style.setProperty('--acc', g.color || '#ffd23a');
     document.body.style.background = g.bg || '#0d0a1f';
-    cv = el('canvas'); document.body.appendChild(cv); mc = cv.getContext('2d'); cb = document.createElement('canvas'); c = cb.getContext('2d'); hookText();
+    if (g.three) { g.real = true; g.dither = false; var c3 = el('canvas'); c3.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;display:block'; document.body.appendChild(c3); var T = window.THREE; GK.T = T; GK.rd = new T.WebGLRenderer({ canvas: c3, antialias: true, powerPreference: 'high-performance' }); GK.rd.shadowMap.enabled = true; GK.rd.shadowMap.type = T.PCFSoftShadowMap; GK.rd.toneMapping = T.ACESFilmicToneMapping; GK.rd.toneMappingExposure = g.exposure || 1.05; GK.rd.outputColorSpace = T.SRGBColorSpace; GK.scene = new T.Scene(); GK.cam = new T.PerspectiveCamera(g.fov || 50, 1, .1, 400); GK.proj = function (v) { var p = v.clone().project(GK.cam); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; }; g.init && g.init(T, GK.scene, GK.cam, GK.rd); }
+    cv = el('canvas'); cv.style.background = 'transparent'; document.body.appendChild(cv); mc = cv.getContext('2d'); cb = document.createElement('canvas'); c = cb.getContext('2d'); hookText();
     var top = el('div', 'top'); var back = el('a', 'pill', '‹ Menú'); back.href = 'index.html';
     ui.sc = el('div', 'pill sc', '0'); ui.bs = el('div', 'pill', '🏆 ' + GK.best);
     top.appendChild(back); top.appendChild(el('div', 'sp')); if (!g.noScore) { top.appendChild(ui.sc); top.appendChild(ui.bs); }
     document.body.appendChild(top);
     function resize() { dpr = Math.min(2.5, window.devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + 'px'; cv.style.height = H + 'px'; PX = g.real ? 1 / dpr : (g.px || GK.PX); GK.pxs = PX; cb.width = Math.ceil(W / PX); cb.height = Math.ceil(H / PX); vigC = document.createElement('canvas'); vigC.width = 160; vigC.height = Math.max(2, Math.round(160 * H / W)); var vx = vigC.getContext('2d'), vg = vx.createRadialGradient(80, vigC.height / 2, 30, 80, vigC.height / 2, Math.max(80, vigC.height * .85)); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.42)'); vx.fillStyle = vg; vx.fillRect(0, 0, 160, vigC.height); if (G.resize) G.resize(W, H); }
-    window.addEventListener('resize', resize); resize();
+    window.addEventListener('resize', resize); resize(); if (g.three) { GK.rd.setPixelRatio(Math.min(dpr, 2)); GK.rd.setSize(W, H, false); GK.cam.aspect = W / H; GK.cam.updateProjectionMatrix(); window.addEventListener('resize', function () { GK.rd.setPixelRatio(Math.min(dpr, 2)); GK.rd.setSize(W, H, false); GK.cam.aspect = W / H; GK.cam.updateProjectionMatrix(); }); }
     function pt(e) { var r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
     window.addEventListener('pointerdown', function (e) { if (state !== 'play' || e.target.closest && e.target.closest('.top,.ov')) return; var p = pt(e); GK.ptr.x = p[0]; GK.ptr.y = p[1]; GK.ptr.down = true; G.down && G.down(p[0], p[1], e); e.preventDefault(); }, { passive: false });
     window.addEventListener('pointermove', function (e) { var p = pt(e); GK.ptr.x = p[0]; GK.ptr.y = p[1]; if (state === 'play') G.move && G.move(p[0], p[1], e); }, { passive: true });
@@ -192,6 +193,7 @@
     c.setTransform(1 / PX, 0, 0, 1 / PX, 0, 0); c.imageSmoothingEnabled = false; c.clearRect(0, 0, W, H);
     c.save(); if (shk > .2) { c.translate((Math.random() - .5) * shk, (Math.random() - .5) * shk); shk *= .86; } else shk = 0;
     if (state === 'play') G.update && G.update(dt);
+    if (G.three) { G.frame && G.frame(dt); GK.rd.render(GK.scene, GK.cam); }
     G.draw && G.draw(c, W, H);
     c.globalCompositeOperation = 'lighter';
     for (var i = parts.length - 1; i >= 0; i--) { var p = parts[i]; p.t -= dt; if (p.t <= 0) { parts.splice(i, 1); continue; } p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 260 * dt; p.vx *= .99; var k = p.t / p.m; c.globalAlpha = Math.max(0, k) * .9; c.fillStyle = p.c; c.beginPath(); c.arc(p.x, p.y, Math.max(.6, p.r * (.4 + k * .8)), 0, 6.283); c.fill(); c.globalAlpha = Math.max(0, k) * .18; c.beginPath(); c.arc(p.x, p.y, p.r * 2.6 * (.4 + k), 0, 6.283); c.fill(); }
@@ -200,7 +202,7 @@
     for (i = floats.length - 1; i >= 0; i--) { var f = floats[i]; f.t -= dt * 1.1; if (f.t <= 0) { floats.splice(i, 1); continue; } c.globalAlpha = Math.min(1, f.t * 2); GK.text(f.txt, f.x, f.y - (1 - f.t) * 40, f.s, f.c); }
     c.globalAlpha = 1; c.restore();
     if (!(G && (G.dither === false || G.real))) dither();
-    mc.setTransform(1, 0, 0, 1, 0, 0); mc.imageSmoothingEnabled = !!G.real; mc.drawImage(cb, 0, 0, cb.width, cb.height, 0, 0, cb.width * PX * dpr, cb.height * PX * dpr);
+    mc.setTransform(1, 0, 0, 1, 0, 0); mc.clearRect(0, 0, cv.width, cv.height); mc.imageSmoothingEnabled = !!G.real; mc.drawImage(cb, 0, 0, cb.width, cb.height, 0, 0, cb.width * PX * dpr, cb.height * PX * dpr);
     mc.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (G.vig !== false && vigC) mc.drawImage(vigC, 0, 0, W, H);
     flushText();
