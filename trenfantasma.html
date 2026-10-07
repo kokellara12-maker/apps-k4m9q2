@@ -11,12 +11,13 @@ update:function(dt){var W=GK.W(),H=GK.H();t+=dt;dist+=dt*80;sp=1+t*.012;spawn-=d
  gh=gh.filter(function(g){return !g.dead});
  if(wag.every(function(v){return v<=0}))GK.over('¡Tren destruido!');
  if(t>0&&Math.floor(t)%10===0&&!this.l){this.l=1;var j=wag.findIndex(function(v){return v<=0});if(j>=0){wag[j]=100;GK.float(W/2,H*.4,'¡Vagón reparado!','#9f9',24)}}if(Math.floor(t)%10!==0)this.l=0},
-draw:function(c,W,H){c.fillStyle='#0a0c1c';c.fillRect(0,0,W,H);if(!wag)return;for(var i=0;i<40;i++){c.fillStyle='rgba(255,255,255,.6)';c.fillRect((i*83)%W,(i*47+t*10)%H,2,2)}
+draw:function(c,W,H){var tq=t||0,dq=dist||0;GK.sky(c,W,H,['#04050e','#101838','#2a2a5a'],0,H*.7);GK.stars(c,W,H,tq,60,H*.45);GK.glow(c,W*.8,H*.14,120,'#cfd8ff',.4);c.fillStyle='#eef2ff';c.beginPath();c.arc(W*.8,H*.14,24,0,7);c.fill();
+ GK.hills(c,W,H*.42,26,'#171c40',dq*.3);GK.hills(c,W,H*.5,18,'#0e1230',dq*.6,30);for(var i=0;i<3;i++){c.fillStyle='rgba(160,170,255,.07)';c.fillRect(((tq*18*(i+1))%(W*2))-W,H*.46+i*38,W*1.5,26)}if(!wag)return;
  c.fillStyle='#161a33';c.fillRect(0,H*.55+30,W,H);c.fillStyle='#3a3f66';c.fillRect(0,H*.55+40,W,6);for(var x=-((dist*3)%40);x<W;x+=40)c.fillRect(x,H*.55+50,18,5);
  var n=wag.length,ww=Math.min(66,(W-30)/Math.max(5,n)),x0=W/2-n*(ww+4)/2;
- for(var i=0;i<n;i++){var x=x0+i*(ww+4),y=H*.55-20,h=wag[i]/100;c.fillStyle=h>0?'#4a5599':'#222';c.fillRect(x,y,ww,50);c.fillStyle=h>0?'#7a88dd':'#333';c.fillRect(x,y,ww,8);c.fillStyle='#ffd86a';c.fillRect(x+8,y+18,ww-16,14);if(i===0){c.fillStyle='#2a3166';c.fillRect(x-8,y-12,16,20)}
+ for(var i=0;i<n;i++){var x=x0+i*(ww+4),y=H*.55-20,h=wag[i]/100;c.fillStyle=h>0?'#4a5599':'#222';c.fillRect(x,y,ww,50);c.fillStyle=h>0?'#7a88dd':'#333';c.fillRect(x,y,ww,8);GK.glow(c,x+ww/2,y+26,ww*.8,'#ffcf5a',.35);c.fillStyle='#ffd86a';c.fillRect(x+8,y+18,ww-16,14);if(i===0){c.fillStyle='#2a3166';c.fillRect(x-8,y-12,16,20)}
   c.fillStyle='#000';c.fillRect(x+4,y+50,10,10);c.fillRect(x+ww-14,y+50,10,10);c.fillStyle='#000';c.fillRect(x,y-8,ww,5);c.fillStyle=h>.5?'#6c6':h>.25?'#fc3':'#f55';c.fillRect(x,y-8,ww*h,5)}
- for(var g of gh){c.font='40px serif';c.textAlign='center';c.textBaseline='middle';c.fillText('👻',g.x,g.y+Math.sin(t*5+g.p)*4)}
+ for(var g of gh){GK.glow(c,g.x,g.y,54,'#9fb0ff',.45);c.globalAlpha=.88;GK.emoji(c,'👻',g.x,g.y+Math.sin(t*5+g.p)*4,44);c.globalAlpha=1}
  GK.text('Vagones: '+wag.filter(function(v){return v>0}).length+'/'+n,W/2,H-40,18,'#9fb0ff')}});
 })();
 
