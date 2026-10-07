@@ -1,5 +1,10 @@
 <!doctype html><html lang="es"><head><script src="mute.js"></script><script src="progress.js"></script><script>try{var A=navigator.audioSession;if(A){A.type="ambient";Object.defineProperty(A,"type",{get:function(){return"ambient"},set:function(v){},configurable:true})}}catch(e){}</script><script src="bgm.js" data-track="castillo"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#1c0f2e"><title>Taller de Pociones</title></head><body><script src="gk.js"></script><script>
 (function(){
+var S={};(function(){var P=GK.px,K='#16101f';
+S.pot=GK.mkd(56,44,function(x){P.r(x,6,34,6,10,'#2a2230');P.r(x,44,34,6,10,'#2a2230');P.r(x,26,38,6,6,'#2a2230');P.e(x,28,24,26,19,'#3a3446');P.e(x,28,26,22,15,'#4a445a');P.e(x,16,18,6,8,'#6a647a');P.r(x,4,8,48,8,'#2a2535');P.r(x,4,8,48,2,'#6a647a');P.e(x,28,10,24,5,'#2a2535');P.r(x,2,16,6,3,'#2a2535');P.r(x,48,16,6,3,'#2a2535')},{});
+S.liq=GK.mkd(48,10,function(x){P.e(x,24,5,23,5,'#7a3ad8');P.e(x,24,5,19,3.4,'#a870ff');P.e(x,16,4,6,1.6,'#d8b8ff')},{out:false});
+S.candle=GK.mkd(10,24,function(x){P.r(x,2,8,6,16,'#f0e4c8');P.r(x,2,8,2,16,'#fff8e0');P.r(x,6,8,2,16,'#c8b898');P.r(x,2,6,6,2,'#d8c8a8');P.r(x,4,3,2,3,'#ff8a20');P.r(x,4,1,2,2,'#ffe060')},{});
+})();
 var ING=[['🍄','Seta'],['🌿','Hierba'],['🔥','Brasa'],['💧','Gota'],['🕷','Araña'],['💎','Cristal']];
 var REC={},names=['Pócima de Fuerza','Elixir de Vuelo','Tónico Verde','Bebida Fría','Veneno Débil','Luz Líquida','Poción Dorada','Mezcla Salvaje','Néctar Raro','Brebaje Oscuro','Esencia Pura','Filtro Mágico','Sopa Burbujeante','Agua Brillante','Relámpago','Sueño Profundo','Fuego Líquido','Gotas del Alba','Savia Antigua','Niebla Azul','Rocío Mágico','Jugo del Bosque','Escarcha','Ámbar'];
 var cau,disc,cust,gold,t,msg,mt,book;
@@ -16,13 +21,13 @@ down:function(x,y){var W=GK.W(),H=GK.H();if(book){book=false;return}var bw=(W-40
  if(GK.hit(x,y,W-70,70,56,40)){book=true}},
 update:function(dt){var W=GK.W();t+=dt;if(cau.length&&Math.random()<dt*7)GK.burst(W/2+GK.rnd(-30,30),GK.H()*.46-40,1,'#d8a8ff',30,.8);mt-=dt;for(var c of cust)c.t-=dt;var bad=cust.filter(function(c){return c.t<=0});if(bad.length){cust=cust.filter(function(c){return c.t>0});GK.shake(8);GK.beep(160,.3,'sawtooth',.08,-80);this.fails=(this.fails||0)+bad.length;if(this.fails>=4)GK.over('¡Demasiados clientes enfadados!')}
  if(cust.length<3&&Math.random()<dt*.18)cust.push(newCust())},
-draw:function(c,W,H){var tq=t||0,fl=.5+.5*Math.sin(tq*9)*Math.sin(tq*5.3);GK.sky(c,W,H,['#120824','#2a1a44'],0,H);c.strokeStyle='rgba(255,255,255,.04)';c.lineWidth=2;for(var j=0;j<H;j+=36){c.beginPath();c.moveTo(0,j);c.lineTo(W,j);c.stroke();for(var i=((j/36)%2)*40;i<W;i+=80){c.beginPath();c.moveTo(i,j);c.lineTo(i,j+36);c.stroke()}}
- GK.planks(c,0,H-270,W,270,34,'#3a2358');GK.sky(c,W,H,['rgba(255,170,90,.18)','rgba(0,0,0,.4)'],H-270,H);for(var s of[30,W-30]){c.fillStyle='#e8d8b8';c.fillRect(s-6,H*.4,12,34);GK.glow(c,s,H*.4-6,70,'#ffb040',.45+fl*.2);c.fillStyle='#ffd070';c.beginPath();c.ellipse(s,H*.4-8,4,7+fl*3,0,0,7);c.fill()}
+draw:function(c,W,H){var tq=t||0,fl=.5+.5*Math.sin(tq*9)*Math.sin(tq*5.3);GK.tileFill(c,GK.tex('stone','#4a3a68'),0,0,W,H,2);GK.sky(c,W,H,['rgba(10,4,24,.65)','rgba(30,16,50,.35)'],0,H);
+ GK.tileFill(c,GK.tex('wood','#4a2c6a'),0,H-270,W,270,2);GK.sky(c,W,H,['rgba(255,170,90,.18)','rgba(0,0,0,.4)'],H-270,H);for(var s of[30,W-30]){GK.glow(c,s,H*.4-6,70,'#ffb040',.45+fl*.2);GK.spr(c,S.candle,s,H*.4+34,{s:1.5})}
  GK.glow(c,W/2,H*.46+24,130,'#ff7a2a',.4+fl*.2);if(!cust)return;
  for(var i=0;i<cust.length;i++){var cu=cust[i],x=14+i*(W-28)/3,w=(W-28)/3-6,r=REC[cu.k],f=cu.t/cu.m;GK.rr(x,70,w,120,12,'#f6eeff');c.font='34px serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#000';c.fillText(cu.e,x+w/2,96);GK.text(disc[cu.k]?r.n:'❓ Poción nueva',x+w/2,138,11,'#333','center',false);
   c.font='14px serif';var sym=cu.k.split('').map(function(q){return disc[cu.k]?ING[q][0]:'?'}).join(' ');GK.rr(x+6,172,w-12,8,4,'#ccc');GK.rr(x+6,172,(w-12)*f,8,4,f>.5?'#6c6':f>.25?'#fc3':'#f55')}
  GK.text('💰 '+gold,60,40,20,'#ffd23a',null);GK.btn(W-70,70-0,56,40,'📖','#c37bff');
- c.fillStyle='#4a2a6a';c.beginPath();c.ellipse(W/2,H*.46,70,22,0,0,7);c.fill();c.fillStyle='#7a4aa8';c.beginPath();c.ellipse(W/2,H*.46-14,60,50,0,0,7);c.fill();c.fillStyle=cau.length?'#a8f':'#5a3a8a';c.beginPath();c.ellipse(W/2,H*.46-26,52,14,0,0,7);c.fill();
+ GK.shadow(c,W/2,H*.46+28,64,12,.35);GK.spr(c,S.pot,W/2,H*.46+28,{s:1.9});GK.spr(c,S.liq,W/2,H*.46-34,{oy:.5,s:1.9*(cau.length?1:.001)});for(var bi=0;bi<4;bi++){var bt=(tq*.9+bi*.27)%1;c.fillStyle='rgba(220,190,255,'+(1-bt)+')';c.fillRect(Math.round(W/2-30+bi*20+Math.sin(bi*3+tq*2)*4),Math.round(H*.46-34-bt*26),6,6)}
  c.font='28px serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';for(var i=0;i<cau.length;i++)c.fillText(ING[cau[i]][0],W/2-(cau.length-1)*22+i*44,H*.46-70);
  if(mt>0)GK.text(msg,W/2,H*.46+50,15,'#fff');
  var bw=(W-40)/3;for(var i=0;i<6;i++){var bx=14+(i%3)*(bw+6),by=H-250+Math.floor(i/3)*72;GK.rr(bx,by+4,bw,66,14,'rgba(0,0,0,.4)');GK.rr(bx,by,bw,66,14,'#4a2c70','#a77ae0',2);GK.shine(c,bx,by,bw,66,14);c.font='30px serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';c.fillText(ING[i][0],bx+bw/2,by+26);GK.text(ING[i][1],bx+bw/2,by+52,13,'#d8c0ff',null,false)}
