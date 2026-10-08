@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Astral Affinity",
+   "desc": "Mundo abierto 3D astral y psicodélico: camino brillante con antorchas de estrella, castillo del Sol Furioso, mar de ojos, pirámide rúnica, torre del ojo, esqueletos y jefe final.",
+   "href": "astral.html",
+   "icono": "🌌",
+   "color": "#ffa020",
+   "cat": "juegos",
+   "img": "img/astral.webp",
+   "sub": "aventura",
+   "tags": "astral affinity malakor mundo abierto 3d psicodelico sol ojos esqueleto mago"
+  },
+  {
    "nombre": "Koke Guys",
    "desc": "Carrera de obstáculos 3D contra 11 bots estilo Fall Guys: barras giratorias, puertas, plataformas móviles, discos y pivotes.",
    "href": "guys.html",
