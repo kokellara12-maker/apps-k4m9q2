@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Koke Guys",
+   "desc": "Carrera de obstáculos 3D contra 11 bots estilo Fall Guys: barras giratorias, puertas, plataformas móviles, discos y pivotes.",
+   "href": "guys.html",
+   "icono": "🫘",
+   "color": "#ff5aa8",
+   "cat": "juegos",
+   "img": "img/guys.webp",
+   "sub": "arcade",
+   "tags": "fall guys stumble guys carrera obstaculos bots 3d"
+  },
+  {
    "nombre": "Koke Birds",
    "desc": "Estilo Angry Birds con física real: honda, pájaros rojo, amarillo, azul y negro, bloques de madera, piedra y cristal, cerdos con casco.",
    "href": "birds.html",
