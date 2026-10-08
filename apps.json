@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Koke League",
+   "desc": "Fútbol con coches 3D estilo Rocket League: 2 contra 2, turbo, saltos con voltereta, conducir por las paredes y demoliciones.",
+   "href": "league.html",
+   "icono": "⚽",
+   "color": "#2a8aff",
+   "cat": "juegos",
+   "img": "img/league.webp",
+   "sub": "deportes",
+   "tags": "rocket league coches futbol goles turbo 3d"
+  },
+  {
    "nombre": "Koke Kart",
    "desc": "Carreras de karts 3D estilo Mario Kart: 3 circuitos (campeonato), derrapes con turbo, cajas de objetos, caparazones, bananas y 7 rivales.",
    "href": "kart.html",
