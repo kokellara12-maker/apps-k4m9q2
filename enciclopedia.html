@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a2a1e">
+<title>Enciclopedia Animal 3D</title>
+<style>
+.cats{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 58px);display:flex;gap:6px;justify-content:center;z-index:6;padding:0 10px}
+.cats button{font:700 12px system-ui;color:#fff;background:rgba(10,18,14,.6);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:6px 12px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.cats button.on{background:#6aa84f;color:#071107;border-color:transparent}
+</style>
+</head>
+<body>
+<script src="three.min.js"></script><script src="v3d.js"></script>
+<script>
+V3.css();V3.init({fov:36,far:600,exposure:1.05,pr:2,shadows:true});V3.back();
+var T=THREE,scene=V3.scene,cam=V3.cam;
+function R(a,b){return a+Math.random()*(b-a)}function clamp(x,a,b){return x<a?a:x>b?b:x}
+function px(w,h,fn,rep){var c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d'),im=x.createImageData(w,h),d=im.data;for(var j=0;j<h;j++)for(var i=0;i<w;i++){var q=fn(i,j),o=(j*w+i)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=q.length>3?q[3]:255}x.putImageData(im,0,0);var t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;if(rep)t.wrapS=t.wrapT=T.RepeatWrapping;return t}
+var title=document.createElement('div');title.className='v-title';title.textContent='Enciclopedia animal';document.body.appendChild(title);
+var catsEl=document.createElement('div');catsEl.className='cats';document.body.appendChild(catsEl);
+var bar=document.createElement('div');bar.className='v-bar';document.body.appendChild(bar);
+var side=document.createElement('div');side.className='v-side';side.style.top='calc(env(safe-area-inset-top,0px) + 100px)';document.body.appendChild(side);
+var card=document.createElement('div');card.className='v-card v-glass';card.style.top='calc(env(safe-area-inset-top,0px) + 100px)';document.body.appendChild(card);
+/* ---------- entorno ---------- */
+scene.background=new T.Color(0x9ac0d8);scene.fog=new T.Fog(0x9ac0d8,40,260);
+var hemi=new T.HemisphereLight(0xdfeeff,0x4a5a3a,.9);scene.add(hemi);
+var sun=new T.DirectionalLight(0xfff2dc,2.0);sun.position.set(6,10,5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);scene.add(sun.target);
+var fillL=new T.DirectionalLight(0x9ab8ff,.5);fillL.position.set(-6,3,-4);scene.add(fillL);
+var ground=new T.Mesh(new T.CircleGeometry(400,48),new T.MeshStandardMaterial({color:0x6a8a50,roughness:1,map:px(128,128,function(x,y){var n=V3.noise(x*.25,y*.25)*40+V3.noise(x*.8,y*.8)*20;return[80+n,115+n,60+n*.6]},true)}));ground.material.map.repeat.set(60,60);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+var disc=new T.Mesh(new T.CircleGeometry(1,64),new T.MeshStandardMaterial({color:0xb09a70,roughness:1,transparent:true,opacity:.5}));disc.rotation.x=-Math.PI/2;disc.position.y=.01;disc.receiveShadow=true;scene.add(disc);
+/* ---------- constructores de modelos ---------- */
+function V(x,y,z){return new T.Vector3(x,y,z)}
+var UPV=V(0,1,0);
+function E(geo,col,x,y,z,rx,ry,rz,sx,sy,sz){return V3.I(geo,col,x,y,z,rx,ry,rz,sx,sy,sz)}
+function ell(items,col,x,y,z,a,b,c,rx,ry,rz){items.push(E(V3.sph(1,14,10),col,x,y,z,rx||0,ry||0,rz||0,a,b,c))}
+function seg(items,a,b,r1,r2,col){var d=b.clone().sub(a),L=d.length();if(L<1e-4)return;var m=a.clone().add(b).multiplyScalar(.5),q=new T.Quaternion().setFromUnitVectors(UPV,d.clone().normalize()),e=new T.Euler().setFromQuaternion(q);
+ items.push(E(V3.cyl(r2,r1,L,12),col,m.x,m.y,m.z,e.x,e.y,e.z));items.push(E(V3.sph(r1,12,9),col,a.x,a.y,a.z));items.push(E(V3.sph(r2,12,9),col,b.x,b.y,b.z))}
+function fin(items,col,x,y,z,lx,ly,lz,rx,ry,rz){items.push(E(V3.cone(1,1,4),col,x,y,z,rx||0,ry||0,rz||0,lx,ly,lz))}
+/* post-proceso: ruido de color + vientre claro */
+function finish(g,pat,belly,seed){var p=g.attributes.position,n=g.attributes.normal,c=g.attributes.color,col=new T.Color();for(var i=0;i<p.count;i++){var x=p.getX(i),y=p.getY(i),z=p.getZ(i);var k=.82+V3.noise(x*14+seed,z*14+y*9)*.36;var r=c.getX(i)*k,gg=c.getY(i)*k,b=c.getZ(i)*k;
+  if(belly&&n.getY(i)<-.25){var t=clamp(-n.getY(i)*1.3,0,1)*belly;r+=(1.0-r)*t*.55;gg+=(.95-gg)*t*.55;b+=(.85-b)*t*.55}
+  if(pat){var q=pat(x,y,z,n.getX(i),n.getY(i),n.getZ(i));if(q){r=r*(1-q[3])+q[0]*q[3];gg=gg*(1-q[3])+q[1]*q[3];b=b*(1-q[3])+q[2]*q[3]}}
+  c.setXYZ(i,r,gg,b)}c.needsUpdate=true;return g}
+var MAT=new T.MeshStandardMaterial({vertexColors:true,roughness:.78,metalness:0,flatShading:false});
+var MATS=new T.MeshStandardMaterial({vertexColors:true,roughness:.4,metalness:.05});
+function mesh(items,pat,belly,seed,mat){var m=new T.Mesh(finish(V3.merge(items),pat,belly,seed||0),mat||MAT);m.castShadow=true;m.receiveShadow=false;return m}
+function pivot(m,x,y,z){var g=new T.Group();g.position.set(x,y,z);g.add(m);return g}
+/* ===== CUADRÚPEDO / DINO ===== */
+function quad(p){
+ var root=new T.Group(),parts={head:null,tail:null,legs:[],body:null};
+ var C=p.col,L=p.L,H=p.H,W=p.W,lh=p.legH,by=lh+H,hl=p.hindLegH||lh,fl=p.frontLegH||lh;
+ var yy=by;
+ if(p.biped){yy=hl*.92+H*.7}
+ var it=[];
+ ell(it,C,0,yy,0,W,H,L*.5);ell(it,C,0,yy+H*.1,L*.26,W*(p.chest||1.05),H*(p.chestH||1.06),L*.3);ell(it,C,0,yy,-L*.3,W*.98,H*(p.hipH||1.0),L*.28);
+ if(p.hump)ell(it,C,0,yy+H*.8,L*.2,W*.5,H*.5,L*.2);
+ var pt=p.pat,b=mesh(it,pt,p.belly==null?.9:p.belly,p.seed||1);if(p.biped)b.rotation.x=-.18;root.add(b);parts.body=b;
+ /* extras sobre el cuerpo (placas, púas, armadura) */
+ if(p.back){var bi=[];p.back(bi,yy,H,L,W);var bm=mesh(bi,null,0,3);bm.rotation.x=p.biped?-.18:0;root.add(bm)}
+ /* patas */
+ function leg(x,z,len,r,hindy,isHind){var li=[],hipY=yy-H*.35,ky=hipY-len*.5,fx=0;var back=isHind?-.35:.1;
+  var hip=V(0,0,0),knee=V(0,-len*.52,(isHind?-1:1)*len*.12*(p.knee||1)),ank=V(0,-len*.9,(isHind?1:-1)*len*.02),foot=V(0,-len,0);
+  seg(li,hip,knee,r*1.15,r*.92,C);seg(li,knee,ank,r*.92,r*.62,C);
+  if(p.hoof)li.push(E(V3.cyl(r*.7,r*.8,r*.5,10),p.hoof,0,-len+r*.1,.0));
+  else if(p.paw){ell(li,C,0,-len+r*.35,r*.6,r*1.1,r*.45,r*1.7)}
+  else if(p.round){li.push(E(V3.cyl(r*.95,r*1.05,r*.8,12),p.foot||C,0,-len+r*.25,0))}
+  else{ell(li,C,0,-len+r*.3,r*1.1,r*.85,r*.4,r*2.1);for(var k=-1;k<=1;k++){li.push(E(V3.cone(r*.28,r*1.0,6),p.claw||0xe9e2cc,k*r*.5,-len+r*.25,r*3.2,Math.PI/2,0,0))}}
+  var m=mesh(li,pt,0,5);var g=pivot(m,x,hipY,z);root.add(g);g.userData.base=0;parts.legs.push(g);return g}
+ if(p.biped){leg(W*.72,-L*.08,hl,p.legR*1.5,0,true);leg(-W*.72,-L*.08,hl,p.legR*1.5,0,true);
+  /* brazos pequeños */
+  [-1,1].forEach(function(s){var ai=[];seg(ai,V(0,0,0),V(s*.02,-p.armL*.55,p.armL*.4),p.legR*.32,p.legR*.24,C);seg(ai,V(s*.02,-p.armL*.55,p.armL*.4),V(0,-p.armL*.7,p.armL*.8),p.legR*.24,p.legR*.18,C);for(var k=-1;k<=1;k+=2)ai.push(E(V3.cone(p.legR*.1,p.legR*.5,5),p.claw||0xe9e2cc,k*p.legR*.1,-p.armL*.72,p.armL*.95,Math.PI/1.6,0,0));var g=pivot(mesh(ai,pt,0,6),s*W*.6,yy-H*.1,L*.32);root.add(g)})}
+ else{leg(W*.78,L*.3,fl,p.legR,0,false);leg(-W*.78,L*.3,fl,p.legR,0,false);leg(W*.78,-L*.3,hl,p.legR*1.05,0,true);leg(-W*.78,-L*.3,hl,p.legR*1.05,0,true)}
+ /* cuello + cabeza */
+ var nb=V(0,yy+H*.55,L*.44),ang=p.neckA==null?.5:p.neckA,nl=p.neckL;var ne=nb.clone().add(V(0,Math.sin(ang)*nl,Math.cos(ang)*nl));
+ if(p.biped){nb=V(0,yy+H*.55,L*.46);ne=nb.clone().add(V(0,nl*.6,nl*.8))}
+ var ni=[];seg(ni,nb.clone().sub(nb),ne.clone().sub(nb),p.neckR0||H*.55,p.neckR1||H*.35,C);var nm=mesh(ni,pt,.5,7);var ng=pivot(nm,nb.x,nb.y,nb.z);root.add(ng);
+ var hi=[],hL=p.headL,hR=p.headR;
+ ell(hi,C,0,0,hL*.28,hR,hR*.92,hL*.45);                                     // cráneo
+ ell(hi,p.snoutC||C,0,-hR*.18,hL*.7,hR*(p.snW||.58),hR*(p.snH||.5),hL*(p.snL||.42));      // hocico
+ if(p.jaw)ell(hi,p.jawC||C,0,-hR*.5,hL*.55,hR*.55,hR*.3,hL*.38);
+ [-1,1].forEach(function(s){hi.push(E(V3.sph(hR*.15,10,8),0xf2ead0,s*hR*.74,hR*.3,hL*.42));hi.push(E(V3.sph(hR*.09,8,6),0x0a0806,s*hR*.8,hR*.3,hL*.46));if(p.ears)p.ears(hi,s,hR,hL);if(p.horn)p.horn(hi,s,hR,hL);if(p.tusk)p.tusk(hi,s,hR,hL)});
+ if(p.teeth){for(var k=0;k<9;k++){[-1,1].forEach(function(s){hi.push(E(V3.cone(hR*.04,hR*(.16+Math.random()*.1),5),0xf6f0dc,s*hR*.3,-hR*.38,hL*(.45+k*.055),Math.PI,0,0))})}}
+ if(p.nose)hi.push(E(V3.sph(hR*.14,8,6),p.nose,0,hR*.05,hL*(.7+(p.snL||.42)*.5)));
+ if(p.headX)p.headX(hi,hR,hL);
+ var hm=mesh(hi,pt,.5,8);var hg=pivot(hm,ne.x,ne.y,ne.z);hg.rotation.x=p.headTilt==null?(p.biped?.3:-.15):p.headTilt;root.add(hg);parts.head=hg;
+ if(p.trunk){var tr=[],pts=[V(0,hR*.2,hL*.6),V(0,-hR*.5,hL*.95),V(0,-hR*1.5,hL*1.0),V(0,-hR*2.3,hL*.9),V(0,-hR*2.5,hL*.75)];for(var q=0;q<pts.length-1;q++)seg(tr,pts[q],pts[q+1],hR*(.32-q*.05),hR*(.32-(q+1)*.05),C);var tm=mesh(tr,pt,0,9);hg.add(tm);parts.trunk=tm}
+ /* cola */
+ var tl=[],tb=V(0,yy+(p.tailY||0)*H,-L*.46),n=6,tp=tb.clone().sub(tb);var tr0=p.tailR||H*.3;
+ var dirY=p.tailUp||0;var cur=V(0,0,0);for(var q=0;q<n;q++){var t=q/n;var nx=cur.clone().add(V(0,dirY*(1-t)*p.tailL/n+(p.tailDrop||0)*t*p.tailL/n*.3,-p.tailL/n));seg(tl,cur,nx,tr0*(1-t*.9),tr0*(1-(t+1/n)*.9),C);cur=nx}
+ if(p.tailX)p.tailX(tl,cur,tr0,p.tailL);
+ var tm2=mesh(tl,pt,.4,10);var tg=pivot(tm2,tb.x,tb.y,tb.z);if(p.biped)tg.rotation.x=.1;root.add(tg);parts.tail=tg;
+ root.userData.parts=parts;root.userData.yy=yy;return root}
+/* ===== AVE ===== */
+function bird(p){var root=new T.Group(),parts={};var C=p.col;var it=[];
+ var by=p.stand?p.h*.5:0;
+ ell(it,C,0,by,0,p.w,p.hh,p.L*.5,p.stand?-.15:0);ell(it,p.belly||C,0,by-p.hh*.25,p.L*.1,p.w*.9,p.hh*.85,p.L*.35);
+ var b=mesh(it,p.pat,.3,2,MAT);root.add(b);parts.body=b;
+ /* cabeza */
+ var hi=[],hr=p.hr;ell(hi,p.headC||C,0,0,0,hr,hr,hr*1.15);
+ hi.push(E(V3.cone(hr*.45,hr*(p.beakL||1.2),8),p.beak||0xe8a020,0,-hr*.1,hr*1.2+hr*(p.beakL||1.2)*.4,Math.PI/2,0,0,1,1,p.hookB?1.2:1));
+ [-1,1].forEach(function(s){hi.push(E(V3.sph(hr*.22,8,6),p.eye||0xf4d040,s*hr*.62,hr*.2,hr*.55));hi.push(E(V3.sph(hr*.12,8,6),0x050505,s*hr*.7,hr*.2,hr*.62))});
+ var hm=mesh(hi,p.pat2,0,3,MAT);var hg=pivot(hm,0,by+p.hh*(p.stand?1.1:.2),p.L*(p.stand?.18:.42));if(!p.stand)hg.position.y=by+p.hh*.4;root.add(hg);parts.head=hg;
+ if(p.stand){var ni=[];seg(ni,V(0,0,0),V(0,by*.5+p.hh*.5,p.L*.18),p.w*.6,p.hr*.9,p.headC||C);}
+ /* alas */
+ [-1,1].forEach(function(s){var wi=[];
+  if(p.flap){var span=p.span/2;for(var k=0;k<9;k++){var t=k/8,len=p.chord*(1.1-t*.4)*1.3;wi.push(E(V3.box(span/8*1.25,.012,len),k>5?p.wingTip||C:C,s*(t*span+span*.05),0,-len*.35+(k>5?-.05:.0),0,s*t*.2,0))}
+   ell(wi,C,s*span*.15,0,0,span*.22,.025,p.chord*.8);
+   var wg=pivot(mesh(wi,null,0,4,MAT),s*p.w*.7,by+p.hh*.3,p.L*.12);root.add(wg);(parts.wings=parts.wings||[]).push(wg)}
+  else{ell(wi,p.wingC||C,0,-p.h*.2,0,.04,p.h*.28,p.L*.28,0,0,0);var wg=pivot(mesh(wi,null,0,4,MAT),s*p.w*.98,by+p.hh*.2,-p.L*.02);wg.rotation.z=s*.12;root.add(wg);(parts.wings=parts.wings||[]).push(wg)}});
+ /* cola y patas */
+ var ti=[];for(var k=-2;k<=2;k++)ti.push(E(V3.box(.02*p.L,.012,p.L*.5),p.tailC||C,k*p.L*.04,0,-p.L*.25,0,k*.13,0));var tg=pivot(mesh(ti,null,0,5,MAT),0,by,-p.L*.4);root.add(tg);parts.tail=tg;
+ var li=[];[-1,1].forEach(function(s){li.push(E(V3.cyl(p.L*.025,p.L*.02,by,6),p.legC||0xd09a30,s*p.w*.35,by*.5*(p.stand?.9:1),p.stand?0:p.L*.1));li.push(E(V3.box(p.L*.12,.012,p.L*.15),p.legC||0xd09a30,s*p.w*.35,.01,(p.stand?.05:.1)*p.L))});
+ if(!p.flap||p.perch){var lm=mesh(li,null,0,6,MAT);root.add(lm)}
+ root.userData.parts=parts;root.userData.yy=by;return root}
+/* ===== MARINO ===== */
+function marine(p){var root=new T.Group(),parts={};var g=new T.SphereGeometry(1,40,24),pp=g.attributes.position,cc=[],col=new T.Color();
+ for(var i=0;i<pp.count;i++){var x=pp.getX(i),y=pp.getY(i),z=pp.getZ(i);var t=(z+1)/2;var prof=Math.pow(Math.sin(Math.PI*clamp(t,0,1)*(.88+.1*(1-t))+.0),p.fat||.62);if(t>.82)prof*=1-(t-.82)*.8*0+0;prof=Math.max(prof,.0);var r=prof*(1-Math.max(0,(.28-t))*.6*(p.slim||0)*2);
+  var wx=x*p.W*r,wy=y*p.H*r*(y<0?(p.bellyF||.9):1),wz=(z)*p.L*.5;if(t<.18&&p.beak){wy*=1}p.beak&&t>.9&&(wy*=.6);
+  pp.setXYZ(i,wx,wy,wz);var n=g.attributes.normal;var up=clamp(y*.5+.5,0,1);var sh=p.shade?p.shade(x,y,z,t):[0,0,0];col.setRGB(p.top[0],p.top[1],p.top[2]).lerp(new T.Color(p.bot[0],p.bot[1],p.bot[2]),clamp(1-up*p.split,0,1));cc.push(col.r+sh[0],col.g+sh[1],col.b+sh[2])}
+ g.setAttribute('color',new T.Float32BufferAttribute(cc,3));g.computeVertexNormals();var body=new T.Mesh(g,MATS);body.castShadow=true;body.position.y=p.y||0;root.add(body);parts.body=body;
+ var it=[];p.fins(it);var fm=mesh(it,null,0,2,MATS);fm.position.y=p.y||0;root.add(fm);
+ /* cola */
+ var ti=[];p.tail(ti);var tg=pivot(mesh(ti,null,0,3,MATS),0,p.y||0,-p.L*.48);root.add(tg);parts.tail=tg;
+ var ei=[];[-1,1].forEach(function(s){ei.push(E(V3.sph(p.H*.07,8,6),0x0a0a0a,s*p.W*p.eyeX,p.H*.18,p.L*p.eyeZ))});var em=mesh(ei,null,0,1,MATS);em.position.y=p.y||0;root.add(em);
+ if(p.mouth){var mi=[];p.mouth(mi);var mm=mesh(mi,null,0,1,MATS);mm.position.y=p.y||0;root.add(mm)}
+ root.userData.parts=parts;root.userData.yy=p.y||0;return root}
+/* ===== PTERODÁCTILO ===== */
+function ptero(){var root=new T.Group(),parts={};var C=0x9a7a58,it=[];ell(it,C,0,.0,0,.28,.22,.75);var b=mesh(it,null,.5,1,MAT);root.add(b);
+ var hi=[];ell(hi,C,0,0,.15,.14,.12,.4);hi.push(E(V3.cone(.07,1.7,6),0xc8a070,0,-.01,1.0,Math.PI/2,0,0));hi.push(E(V3.cone(.06,1.2,4),0xd24a30,0,.12,-.65,-Math.PI/2+.25,0,0,1,1,1));hi.push(E(V3.cone(.025,.4,4),0xc8a070,0,-.07,1.7,Math.PI/2,0,0));[-1,1].forEach(function(s){hi.push(E(V3.sph(.03,8,6),0xf0c840,s*.09,.05,.22));hi.push(E(V3.sph(.016,8,6),0x050505,s*.1,.05,.235))});
+ var hg=pivot(mesh(hi,null,0,2,MAT),0,.12,.65);hg.rotation.x=-.2;root.add(hg);parts.head=hg;
+ [-1,1].forEach(function(s){var geo=new T.BufferGeometry(),P=[],Cc=[];var sh=V(0,0,.1),el=V(s*1.2,.15,0),wr=V(s*2.2,.3,-.1),tip=V(s*3.0,.15,-.6),tr=V(s*.4,0,-1.0),tl=V(s*1.4,0,-.9);
+  var tri=function(a,b,c,col){[a,b,c].forEach(function(v){P.push(v.x,v.y,v.z);Cc.push(col[0],col[1],col[2])})};
+  tri(sh,el,tr,[.55,.38,.28]);tri(el,tl,tr,[.5,.34,.25]);tri(el,wr,tl,[.5,.33,.24]);tri(wr,tip,tl,[.45,.3,.22]);
+  geo.setAttribute('position',new T.Float32BufferAttribute(P,3));geo.setAttribute('color',new T.Float32BufferAttribute(Cc,3));geo.computeVertexNormals();
+  var m=new T.Mesh(geo,new T.MeshStandardMaterial({vertexColors:true,side:T.DoubleSide,roughness:.8}));m.castShadow=true;var bi=[];seg(bi,sh,el,.04,.03,C);seg(bi,el,wr,.03,.025,C);seg(bi,wr,tip,.022,.01,C);var bm=mesh(bi,null,0,3,MAT);var wg=new T.Group();wg.add(m);wg.add(bm);wg.position.set(s*.2,.1,.2);root.add(wg);(parts.wings=parts.wings||[]).push(wg);wg.userData.s=s});
+ root.userData.parts=parts;root.userData.yy=0;return root}
+/* ---------- patrones ---------- */
+var P_STRIPE=function(c1,f,w){return function(x,y,z){var s=Math.sin(z*f*6.283+Math.sin(y*9+x*4)*1.2+x*3);return s>w?[c1[0],c1[1],c1[2],.92]:null}};
+var P_SPOT=function(c1,sc,th,a){return function(x,y,z){var n=V3.noise(x*sc+3,z*sc+y*sc);return n>th?[c1[0],c1[1],c1[2],a||.85]:null}};
+function ear(items,s,hR,hL,r,col,dx,dy){items.push(E(V3.sph(r,10,8),col||0x5a4030,s*hR*(dx||.5),hR*(dy||.88),hL*.12,0,0,0,.5,1,.4))}
+/* ---------- CATÁLOGO ---------- */
+var CAT={mamiferos:'Mamíferos',aves:'Aves',marinos:'Marinos',dinos:'Dinosaurios'};
+var SP=[];
+function add(c,id,n,sci,rows,txt,sound,build,len){SP.push({c:c,id:id,n:n,sci:sci,rows:rows,txt:txt,snd:sound,build:build,len:len})}
+/* mamíferos */
+add('mamiferos','leon','León','Panthera leo',[['Altura','1,2 m a la cruz'],['Peso','190 kg (macho)'],['Velocidad','80 km/h'],['Dieta','Carnívoro'],['Vida','10–14 años'],['Hábitat','Sabana africana']],'Es el único felino que vive en grupos, las manadas. Su rugido se oye a 8 km de distancia. Las leonas cazan más que los machos.',{f:[95,55],d:2.4,n:.55,t:'saw',lp:700,vib:7},
+ function(){return quad({L:1.25,H:.3,W:.26,legH:.5,legR:.075,paw:1,col:0xc79a52,belly:.9,neckL:.3,neckA:.55,neckR0:.2,neckR1:.18,headL:.38,headR:.15,snW:.7,snH:.5,snL:.4,nose:0x3a2020,tailL:.9,tailR:.04,tailUp:.1,tailX:function(t,c,r){ell(t,0x2a1810,c.x,c.y,c.z-.06,.07,.07,.14)},
+  headX:function(h,hR,hL){for(var k=0;k<26;k++){var a=k/26*6.283;h.push(E(V3.sph(hR*(.55+Math.random()*.3),8,6),new T.Color().setHSL(.08,.5,.15+Math.random()*.12),Math.cos(a)*hR*1.15,Math.sin(a)*hR*1.15,hL*.02,0,0,0,1,1,.8))}},ears:function(h,s,hR,hL){ear(h,s,hR,hL,hR*.22,0xb88a48,.62,.85)},hump:0,pat:null,seed:2})},2.8);
+add('mamiferos','elefante','Elefante africano','Loxodonta africana',[['Altura','3,2 m'],['Peso','6.000 kg'],['Trompa','tiene 40.000 músculos'],['Dieta','Herbívoro (150 kg al día)'],['Vida','60–70 años'],['Hábitat','Sabana y bosque africano']],'Es el animal terrestre más grande. Su trompa sirve para beber, oler, agarrar y comunicarse. Nunca olvidan: recuerdan rutas y caras durante décadas.',{f:[380,820],d:1.6,n:.2,t:'sawtooth',lp:1800,vib:11,fm:true},
+ function(){return quad({L:2.5,H:.9,W:.8,legH:1.15,legR:.24,round:1,foot:0x8a8a84,col:0x8a8782,belly:.2,neckL:.4,neckA:.2,neckR0:.55,neckR1:.5,headL:.95,headR:.5,snW:.4,snH:.5,snL:.2,trunk:1,tailL:1.0,tailR:.05,tailUp:.0,tailX:function(t,c){ell(t,0x1e1c1a,c.x,c.y,c.z-.05,.05,.05,.12)},ears:function(h,s,hR,hL){h.push(E(V3.sph(hR*1.0,16,12),0x7a7772,s*hR*1.15,hR*.25,hL*.2,0,s*.4,0,.12,1,.95))},tusk:function(h,s,hR,hL){var q=[];seg(q,V(s*hR*.45,-hR*.35,hL*.7),V(s*hR*.55,-hR*.8,hL*1.15),hR*.14,hR*.1,0xf4efdc);seg(q,V(s*hR*.55,-hR*.8,hL*1.15),V(s*hR*.45,-hR*.7,hL*1.6),hR*.1,hR*.04,0xf4efdc);q.forEach(function(i){h.push(i)})},pat:function(x,y,z){var n=V3.noise(x*30,y*30+z*30);return n>.55?[.45,.45,.43,.5]:null},seed:4})},6.5);
+add('mamiferos','jirafa','Jirafa','Giraffa camelopardalis',[['Altura','5 m'],['Peso','1.200 kg'],['Cuello','2 m, solo 7 vértebras'],['Lengua','45 cm, de color morado'],['Dieta','Herbívoro (hojas de acacia)'],['Hábitat','Sabana africana']],'Es el animal más alto. Tiene el mismo número de vértebras en el cuello que tú: siete, pero cada una mide 25 cm. Su corazón pesa 11 kg para bombear sangre hasta la cabeza.',{f:[130,95],d:.9,n:.15,t:'sine',lp:400,vib:6},
+ function(){return quad({L:1.5,H:.45,W:.3,legH:2.0,frontLegH:2.1,hindLegH:1.9,legR:.085,hoof:0x2a2018,col:0xd9a448,belly:.8,neckL:2.4,neckA:1.15,neckR0:.28,neckR1:.14,headL:.5,headR:.13,snW:.7,snH:.6,snL:.45,nose:0x4a3030,headTilt:-.55,tailL:.9,tailR:.025,tailDrop:.8,tailX:function(t,c){ell(t,0x2a1c10,c.x,c.y,c.z-.04,.04,.04,.12)},horn:function(h,s,hR,hL){h.push(E(V3.cyl(hR*.1,hR*.12,hR*.9,6),0xc79a52,s*hR*.3,hR*.9,hL*.15));h.push(E(V3.sph(hR*.17,8,6),0x2a1c10,s*hR*.3,hR*1.36,hL*.15))},ears:function(h,s,hR,hL){ear(h,s,hR,hL,hR*.3,0xc79a52,.85,.7)},pat:P_SPOT([.35,.17,.07],5,.54,.92),seed:6})},5.4);
+add('mamiferos','oso','Oso pardo','Ursus arctos',[['Altura','1 m a cuatro patas, 2,5 m de pie'],['Peso','300 kg'],['Velocidad','56 km/h'],['Dieta','Omnívoro'],['Vida','25 años'],['Hábitat','Bosques y montañas del hemisferio norte']],'Hiberna durante meses sin comer, beber ni ir al baño. Su olfato es 7 veces mejor que el de un perro: huele comida a 30 km.',{f:[75,50],d:2,n:.6,t:'sawtooth',lp:500,vib:5},
+ function(){return quad({L:1.6,H:.5,W:.45,legH:.4,legR:.14,paw:1,col:0x5b3d24,belly:.2,hump:1,neckL:.25,neckA:.3,neckR0:.38,neckR1:.3,headL:.5,headR:.24,snW:.55,snH:.45,snL:.36,nose:0x120a08,tailL:.12,tailR:.06,headTilt:-.2,ears:function(h,s,hR,hL){ear(h,s,hR,hL,hR*.28,0x4a301c,.68,.8)},pat:function(x,y,z){var n=V3.noise(x*12,z*12+y*12);return n>.6?[.8,.55,.3,.35]:null},seed:7})},2.2);
+add('mamiferos','lobo','Lobo gris','Canis lupus',[['Altura','80 cm a la cruz'],['Peso','45 kg'],['Velocidad','60 km/h'],['Dieta','Carnívoro'],['Vida','10–15 años'],['Hábitat','Bosques y tundra']],'Viven en manadas con un fuerte vínculo. Aúllan para comunicarse y marcar territorio. Pueden recorrer 50 km en un día.',{f:[420,600,420],d:3.2,n:.04,t:'sine',lp:2400,vib:5,vd:.04},
+ function(){return quad({L:1.0,H:.2,W:.17,legH:.5,legR:.045,paw:1,col:0x7d7a76,belly:.8,neckL:.2,neckA:.55,neckR0:.14,neckR1:.12,headL:.3,headR:.1,snW:.52,snH:.45,snL:.55,nose:0x0a0808,tailL:.55,tailR:.07,tailUp:-.1,tailDrop:.6,ears:function(h,s,hR,hL){h.push(E(V3.cone(hR*.28,hR*.8,4),0x6a6662,s*hR*.55,hR*.95,hL*.12))},pat:function(x,y,z){return y>0&&y<1?[.2,.18,.17,Math.max(0,V3.noise(x*10,z*10)-.4)*1.2]:null},seed:8})},1.6);
+add('mamiferos','cebra','Cebra común','Equus quagga',[['Altura','1,4 m'],['Peso','350 kg'],['Velocidad','65 km/h'],['Dieta','Herbívoro (hierba)'],['Vida','25 años'],['Hábitat','Sabanas del este de África']],'Cada cebra tiene un patrón de rayas único, como una huella dactilar. Las rayas confunden a los insectos y a los depredadores.',{f:[500,900,350],d:1.2,n:.1,t:'square',lp:2400,vib:9},
+ function(){return quad({L:1.5,H:.38,W:.28,legH:.82,legR:.055,hoof:0x201810,col:0xefece4,belly:.9,neckL:.55,neckA:.85,neckR0:.18,neckR1:.12,headL:.55,headR:.12,snW:.65,snH:.55,snL:.55,nose:0x2a2020,headTilt:-.75,tailL:.7,tailR:.03,tailDrop:.8,tailX:function(t,c){ell(t,0x1a1a1a,c.x,c.y,c.z-.04,.045,.045,.12)},ears:function(h,s,hR,hL){h.push(E(V3.cone(hR*.22,hR*.7,5),0xe0dcd0,s*hR*.4,hR*1.05,hL*.1))},pat:P_STRIPE([.07,.07,.08],2.3,.1),seed:9})},2.5);
+/* aves */
+add('aves','aguila','Águila real','Aquila chrysaetos',[['Envergadura','2,1 m'],['Peso','4–6 kg'],['Velocidad','240 km/h en picado'],['Dieta','Carnívora'],['Vida','30 años'],['Hábitat','Montañas y llanuras']],'Su vista es 4 veces más aguda que la humana: ve un conejo a 3 km. Construye nidos de 2 m de ancho y los reutiliza durante décadas.',{f:[2300,1700],d:1.1,n:.8,t:'sawtooth',lp:5200,vib:30,hi:true},
+ function(){return bird({flap:1,L:.85,w:.14,hh:.12,h:.25,hr:.075,span:2.1,chord:.33,col:0x5a3e24,belly:0x7a5a38,headC:0x9a7440,beak:0x2a2a2a,hookB:1,beakL:1.1,eye:0xe8b830,tailC:0x4a3320,wingTip:0x2a1a10,legC:0xe0b030,perch:1,pat:function(x,y,z){return V3.noise(x*30,z*20)>.55?[.8,.65,.4,.3]:null}})},2.1);
+add('aves','pinguino','Pingüino emperador','Aptenodytes forsteri',[['Altura','1,1 m'],['Peso','35 kg'],['Buceo','hasta 550 m de profundidad'],['Dieta','Peces y calamares'],['Vida','20 años'],['Hábitat','Antártida']],'Es el pingüino más grande. Los machos incuban un solo huevo sobre los pies durante 2 meses a −40 °C, sin comer.',{f:[600,520],d:.5,n:.2,t:'sawtooth',lp:2000,vib:14,rep:3},
+ function(){return bird({stand:1,L:.5,w:.2,hh:.3,h:1.05,hr:.07,col:0x16181c,belly:0xf4f2ec,headC:0x16181c,beak:0xe88830,beakL:1.9,eye:0x201810,tailC:0x16181c,legC:0x1a1a1a,wingC:0x16181c,pat:function(x,y,z,nx,ny,nz){return nz>.15&&z>-.1?[.97,.96,.92,Math.min(1,nz*2.2)]:y>.0&&z>.0&&y<.9?[.97,.94,.85,.0]:null},pat2:function(x,y,z){return y<-.01&&z>0?[.96,.82,.35,.7]:null}})},1.1);
+/* marinos */
+add('marinos','delfin','Delfín mular','Tursiops truncatus',[['Longitud','2,5–3,5 m'],['Peso','300 kg'],['Velocidad','35 km/h'],['Dieta','Peces y calamares'],['Vida','40–50 años'],['Hábitat','Océanos templados y tropicales']],'Se comunican con silbidos y clics. Cada delfín tiene un silbido propio, como un nombre. Duermen con medio cerebro a la vez.',{f:[2400,4200,3000],d:1.2,n:0,t:'sine',lp:9000,vib:0,chirp:true},
+ function(){return marine({L:2.8,W:.38,H:.4,fat:.55,top:[.32,.38,.46],bot:[.88,.9,.92],split:1.7,eyeX:.84,eyeZ:.32,y:.5,beak:1,slim:.4,eyeX:1.0,
+  fins:function(i){i.push(E(V3.cone(1,1,4),0x4a5560,0,.5,-.1,0,0,0,.025,.32,.34));[-1,1].forEach(function(s){i.push(E(V3.cone(1,1,4),0x56626c,s*.28,-.2,.35,.8,0,s*-1.2,.04,.4,.2))});i.push(E(V3.cone(.14,.4,10),0x7a8590,0,-.08,1.3,Math.PI/2,0,0))},
+  tail:function(i){i.push(E(V3.cone(1,1,4),0x4a5560,.2,0,-.12,Math.PI/2,0,.2,.04,.4,.14));i.push(E(V3.cone(1,1,4),0x4a5560,-.2,0,-.12,Math.PI/2,0,-.2,.04,.4,.14))},mouth:function(i){i.push(E(V3.box(.012,.012,.25),0x2a2a30,0,-.08,1.15))}})},3);
+add('marinos','tiburon','Tiburón blanco','Carcharodon carcharias',[['Longitud','4,5–6 m'],['Peso','2.000 kg'],['Dientes','300, de 3 hileras'],['Velocidad','56 km/h'],['Vida','70 años'],['Hábitat','Mares templados']],'Detecta una gota de sangre en 100 litros de agua y la electricidad de los latidos de sus presas. Reemplaza sus dientes sin parar: pierde unos 30.000 en su vida.',{f:[110,110],d:.1,n:.1,t:'sine',lp:200,vib:0,mute:true},
+ function(){return marine({L:4.8,W:.7,H:.8,fat:.55,top:[.38,.43,.5],bot:[.96,.97,.97],split:3.2,eyeX:.82,eyeZ:.33,y:.9,slim:.5,
+  fins:function(i){i.push(E(V3.cone(1,1,4),0x4e5963,0,.78,.2,0,0,0,.04,.9,.75));[-1,1].forEach(function(s){i.push(E(V3.cone(1,1,4),0x56626c,s*.55,-.3,.7,.8,0,s*-1.3,.05,.9,.35));i.push(E(V3.cone(1,1,4),0x56626c,s*.3,-.35,-1.1,.8,0,s*-1.2,.04,.45,.2))});i.push(E(V3.cone(.18,.55,12),0x7a8590,0,-.15,2.3,Math.PI/2,0,0))},
+  tail:function(i){i.push(E(V3.cone(1,1,4),0x4a5560,0,.6,-.45,Math.PI/2-.4,0,0,.05,1.05,.45));i.push(E(V3.cone(1,1,4),0x56626c,0,-.45,-.3,Math.PI/2+.4,0,0,.05,.55,.28))},mouth:function(i){i.push(E(V3.box(.5,.02,.3),0x2a1010,0,-.32,1.9));for(var k=0;k<10;k++)[-1,1].forEach(function(s){i.push(E(V3.cone(.025,.1,5),0xf4f0e0,s*(.05+k*.03),-.3,2.05+k*.0,Math.PI,0,0))})}})},5);
+add('marinos','ballena','Ballena azul','Balaenoptera musculus',[['Longitud','25–30 m'],['Peso','150.000 kg'],['Corazón','pesa 180 kg'],['Dieta','Krill (4 toneladas al día)'],['Vida','80–90 años'],['Hábitat','Todos los océanos']],'Es el animal más grande que ha existido, más que cualquier dinosaurio. Su canto llega a 188 decibelios, más fuerte que un avión, y se oye a cientos de km.',{f:[34,20],d:4.2,n:.05,t:'sine',lp:120,vib:.4,deep:true},
+ function(){return marine({L:25,W:3.4,H:3.3,fat:.5,top:[.28,.38,.5],bot:[.55,.65,.72],split:1.4,eyeX:.9,eyeZ:.3,y:3.5,slim:.5,
+  fins:function(i){i.push(E(V3.cone(1,1,4),0x3a4e60,0,3.3,-4,0,0,0,.2,.7,.8));[-1,1].forEach(function(s){i.push(E(V3.cone(1,1,4),0x3a4e60,s*3,-1.4,2.5,.8,0,s*-1.1,.2,4,1.2))});i.push(V3.I(V3.box(2.2,.14,9),0xb8c6d2,0,-3.1,6.5))},
+  tail:function(i){i.push(E(V3.cone(1,1,4),0x34485a,0,0,-1.5,Math.PI/2,0,0,.4,2.6,.7));i.push(E(V3.cone(1,1,4),0x34485a,1.4,0,-2,Math.PI/2,0,.5,.18,2,.7));i.push(E(V3.cone(1,1,4),0x34485a,-1.4,0,-2,Math.PI/2,0,-.5,.18,2,.7))},mouth:null})},25);
+/* dinosaurios */
+add('dinos','trex','Tiranosaurio Rex','Tyrannosaurus rex',[['Longitud','12 m'],['Altura','4 m a la cadera'],['Peso','8.000 kg'],['Mordida','60.000 N, la mayor de un animal terrestre'],['Vivió','hace 68–66 millones de años'],['Dieta','Carnívoro']],'Sus dientes medían hasta 30 cm. Su cabeza medía 1,5 m. Sus brazos pequeños aún podían levantar 200 kg. Probablemente tenía un olfato excelente.',{f:[58,38],d:2.6,n:.7,t:'sawtooth',lp:420,vib:9,trem:true},
+ function(){return quad({biped:1,L:3.8,H:.95,W:.7,hindLegH:2.3,legH:2.3,legR:.3,claw:0xe0d8c0,col:0x6b6a3a,belly:.9,neckL:1.2,neckA:.5,neckR0:.55,neckR1:.5,headL:1.5,headR:.4,snW:.75,snH:.55,snL:.6,jaw:1,jawC:0x6a6035,teeth:1,armL:.8,tailL:4.8,tailR:.5,tailY:.1,tailUp:.06,tailDrop:.2,tailX:null,pat:function(x,y,z){var s=Math.sin(z*7+y*3);return y>.3&&s>.4?[.28,.27,.12,.55]:null},seed:10,back:null})},12);
+add('dinos','triceratops','Triceratops','Triceratops horridus',[['Longitud','9 m'],['Altura','3 m'],['Peso','6.000–9.000 kg'],['Cuernos','3 (hasta 1 m de largo)'],['Vivió','hace 68–66 millones de años'],['Dieta','Herbívoro']],'Su cráneo medía hasta 2,5 m, de los más grandes de cualquier animal terrestre. El collar óseo protegía el cuello y quizás servía para exhibirse.',{f:[95,70],d:1.6,n:.6,t:'sawtooth',lp:350,vib:6},
+ function(){return quad({L:4.6,H:1.0,W:.95,legH:1.05,legR:.3,round:1,foot:0x6a5a40,col:0x76705a,belly:.7,neckL:.25,neckA:.1,neckR0:.6,neckR1:.55,headL:1.55,headR:.5,snW:.5,snH:.5,snL:.5,headTilt:.35,tailL:2.0,tailR:.35,tailDrop:.3,
+  headX:function(h,hR,hL){h.push(E(V3.cyl(1,1,.12,26),0x8a5a3a,0,hR*.6,-hL*.1,Math.PI/2+.45,0,0,hR*1.9,1,hR*1.7));h.push(E(V3.cyl(1,1,.12,26),0xc85a3a,0,hR*.6,-hL*.1+.02,Math.PI/2+.45,0,0,hR*1.4,1.2,hR*1.2));for(var k=0;k<14;k++){var a=-1.5+k*.23;h.push(E(V3.cone(hR*.1,hR*.3,5),0xe8d8b0,Math.sin(a)*hR*1.8,hR*.6+Math.cos(a)*hR*1.55*.7-.05,-hL*.1-Math.cos(a)*hR*.65,.45,0,-a*1.0))}h.push(E(V3.cone(hR*.18,hR*1.6,8),0xf0e8c8,0,hR*.35,hL*.78,Math.PI/2-.2,0,0));h.push(E(V3.cone(hR*.2,hR*.5,6),0xe0c890,0,-hR*.28,hL*1.0,Math.PI/2+.2,0,0))},
+  horn:function(h,s,hR,hL){h.push(E(V3.cone(hR*.18,hR*2.2,8),0xf0e8c8,s*hR*.5,hR*.75,hL*.35,Math.PI/2-.45,0,0))},pat:null,seed:11})},9);
+add('dinos','raptor','Velociraptor','Velociraptor mongoliensis',[['Longitud','2 m'],['Altura','0,5 m a la cadera'],['Peso','15 kg'],['Velocidad','60 km/h'],['Vivió','hace 75–71 millones de años'],['Dieta','Carnívoro']],'En realidad era del tamaño de un pavo y estaba cubierto de plumas. Tenía una garra curva de 6,5 cm en cada pie.',{f:[900,2200,1100],d:.8,n:.7,t:'sawtooth',lp:3500,vib:25,rep:2},
+ function(){return quad({biped:1,L:.9,H:.2,W:.16,hindLegH:.72,legH:.72,legR:.055,claw:0xe8e0c8,col:0x7a4a2a,belly:.9,neckL:.35,neckA:.5,neckR0:.12,neckR1:.09,headL:.38,headR:.08,snW:.5,snH:.4,snL:.7,jaw:1,jawC:0x7a4a2a,teeth:1,armL:.22,tailL:1.3,tailR:.09,tailY:.05,tailUp:.05,pat:function(x,y,z){var s=Math.sin(z*14);return s>.55?[.15,.1,.08,.7]:y>.1?[.35,.5,.6,Math.max(0,V3.noise(x*20,z*20)-.55)*1.5]:null},seed:12,
+  back:function(i,yy,H,L,W){for(var k=0;k<10;k++)i.push(E(V3.cone(.012,.1,4),0x2a6a8a,(Math.random()-.5)*W*1.8,yy+H*.8,-L*.5+k*L*.1,-.4,0,0))}})},2);
+add('dinos','braqui','Braquiosaurio','Brachiosaurus altithorax',[['Longitud','26 m'],['Altura','13 m'],['Peso','35.000–50.000 kg'],['Cuello','9 m'],['Vivió','hace 154–150 millones de años'],['Dieta','Herbívoro (hojas de árbol)']],'Era más alto que una jirafa multiplicada por tres: alcanzaba las copas de los árboles. Debía comer más de 400 kg de hojas al día.',{f:[48,38],d:2.8,n:.15,t:'sine',lp:260,vib:3},
+ function(){return quad({L:7,H:1.7,W:1.4,legH:4.2,frontLegH:4.8,hindLegH:3.9,legR:.5,round:1,foot:0x7a7058,col:0x8a8a5c,belly:.5,neckL:8.5,neckA:1.25,neckR0:.75,neckR1:.28,headL:.9,headR:.22,snW:.6,snH:.5,snL:.5,headTilt:-.7,tailL:5.5,tailR:.6,tailDrop:.5,hump:0,pat:function(x,y,z){return V3.noise(x*3,z*3)>.55?[.45,.5,.3,.4]:null},seed:13,
+  headX:function(h,hR,hL){h.push(E(V3.sph(hR*.55,8,6),0x7a7a50,0,hR*.9,hL*.2,0,0,0,.9,1,1.2))}})},26);
+add('dinos','estegosaurio','Estegosaurio','Stegosaurus stenops',[['Longitud','9 m'],['Altura','4 m con las placas'],['Peso','5.000 kg'],['Cerebro','como una nuez (80 g)'],['Vivió','hace 155–150 millones de años'],['Dieta','Herbívoro']],'Las placas de la espalda regulaban la temperatura y servían para exhibirse. Los 4 pinchos de la cola, el «thagomizer», medían 90 cm.',{f:[80,60],d:1.2,n:.5,t:'sawtooth',lp:300,vib:5},
+ function(){return quad({L:4.4,H:1.05,W:.8,legH:.9,frontLegH:.75,hindLegH:1.2,legR:.26,round:1,foot:0x6a604a,col:0x6a7a46,belly:.7,neckL:.7,neckA:-.1,neckR0:.5,neckR1:.28,headL:.62,headR:.17,snW:.5,snH:.5,snL:.75,headTilt:.5,tailL:2.8,tailR:.38,tailDrop:.2,hipH:1.2,
+  back:function(i,yy,H,L,W){for(var k=0;k<9;k++){var z=L*.34-k*L*.095,s=1+Math.sin((k+1)/10*3.14)*.9;var c=k%2?0xd8643a:0xe88a46;i.push(E(V3.cone(1,1,4),c,(k%2?.1:-.1),yy+H*.95+.12*s,z,0,.4,0,.03,.5*s,.4*s))}},
+  tailX:function(t,c,r,L){[-1,1].forEach(function(s){t.push(E(V3.cone(r*.28,r*3.2,6),0xe8dcc0,s*r*.4,c.y+r*.5,c.z+r,-.4,0,s*.4));t.push(E(V3.cone(r*.28,r*2.8,6),0xe8dcc0,s*r*.4,c.y+r*.2,c.z+r*2,-.9,0,s*.9))})},pat:function(x,y,z){return V3.noise(x*6,z*6)>.6?[.3,.4,.2,.5]:null},seed:14})},9);
+add('dinos','anquilosaurio','Anquilosaurio','Ankylosaurus magniventris',[['Longitud','7 m'],['Altura','1,7 m'],['Peso','6.000 kg'],['Cola','con una maza ósea de 50 kg'],['Vivió','hace 68–66 millones de años'],['Dieta','Herbívoro']],'Era un tanque viviente: todo su lomo estaba cubierto de placas óseas, hasta los párpados. Un golpe de su cola podía romper el hueso de un T. rex.',{f:[110,75],d:.9,n:.7,t:'sawtooth',lp:500,vib:3},
+ function(){return quad({L:3.8,H:.6,W:1.1,legH:.65,legR:.2,round:1,foot:0x5a4a38,col:0x6a5a3e,belly:.5,neckL:.3,neckA:.1,neckR0:.45,neckR1:.4,headL:.8,headR:.35,snW:.55,snH:.45,snL:.45,headTilt:.4,tailL:2.8,tailR:.28,tailDrop:0,chest:1.1,
+  back:function(i,yy,H,L,W){for(var r=0;r<9;r++)for(var k=-2;k<=2;k++){var z=L*.42-r*L*.1,x=k*W*.36;i.push(E(V3.sph(.1,8,6),(r+k)%2?0x8a7650:0x7a6a46,x,yy+H*(.92-Math.abs(k)*.1),z,0,0,0,1,.6,1));if(Math.abs(k)===2||r%3===0)i.push(E(V3.cone(.07,.26,5),0xd8cfae,x,yy+H*(.95-Math.abs(k)*.12)+.1,z,0,0,k*.2))}},
+  tailX:function(t,c,r){ell(t,0x7a6a46,c.x,c.y,c.z-r*.4,r*2.8,r*1.5,r*2.2);t.push(E(V3.cone(r*.5,r*1.4,6),0xd8cfae,r*2.5,c.y,c.z-r*.4,0,0,-Math.PI/2));t.push(E(V3.cone(r*.5,r*1.4,6),0xd8cfae,-r*2.5,c.y,c.z-r*.4,0,0,Math.PI/2))},
+  headX:function(h,hR,hL){[-1,1].forEach(function(s){h.push(E(V3.cone(hR*.3,hR*1.0,5),0xe0d6b0,s*hR*.9,hR*.2,hL*.1,0,0,s*-1.2));h.push(E(V3.cone(hR*.25,hR*.8,5),0xe0d6b0,s*hR*.7,-hR*.4,hL*.2,0,0,s*-1.5))})},pat:null,seed:15})},7);
+add('dinos','pteranodon','Pteranodon','Pteranodon longiceps',[['Envergadura','6 m'],['Peso','25 kg'],['Cresta','solo tenía en la cabeza, no dientes'],['Vivió','hace 86–84 millones de años'],['Dieta','Peces'],['Nota','no era un dinosaurio, sino un reptil volador']],'No era un dinosaurio, sino un pterosaurio. Sin dientes, atrapaba peces al vuelo. Sus huesos eran huecos y finísimos para pesar poco.',{f:[1600,2800,2000],d:1,n:.9,t:'sawtooth',lp:5200,vib:30},
+ function(){return ptero()},6);
+/* ---------- humano de referencia ---------- */
+var human=(function(){var it=[];var C=0xd8a888;ell(it,C,0,1.58,0,.1,.12,.11);it.push(E(V3.cyl(.045,.05,.1,8),C,0,1.45,0));ell(it,0x3a5a8a,0,1.18,0,.19,.34,.1);[-1,1].forEach(function(s){seg(it,V(s*.22,1.42,0),V(s*.27,.88,.02),.04,.032,0x3a5a8a);it.push(E(V3.sph(.04,8,6),C,s*.28,.84,.02));seg(it,V(s*.09,.86,0),V(s*.1,.45,.02),.08,.055,0x2a2e4a);seg(it,V(s*.1,.45,.02),V(s*.1,.06,0),.055,.04,0x2a2e4a);it.push(E(V3.box(.09,.06,.22),0x1a1a1a,s*.1,.03,.05))});
+ var m=new T.Mesh(V3.merge(it),new T.MeshStandardMaterial({vertexColors:true,roughness:.8,transparent:true,opacity:.85}));m.castShadow=true;m.visible=false;scene.add(m);return m})();
+var humLabel=V3.label('Persona 1,75 m',{w:.7,color:'#ffe08a'});human.add(humLabel);humLabel.position.set(0,2.1,0);humLabel.scale.set(.8,.2,1);
+/* ---------- selección ---------- */
+var cur=null,curRoot=null,curCat='mamiferos',idx=0,walk=false,compare=false,spin=true;
+var catBtns={};
+Object.keys(CAT).forEach(function(k){var b=document.createElement('button');b.textContent=CAT[k];b.onclick=function(){curCat=k;buildBar();var f=SP.filter(function(s){return s.c===k})[0];show(f)};catsEl.appendChild(b);catBtns[k]=b});
+function buildBar(){bar.innerHTML='';Object.keys(catBtns).forEach(function(k){catBtns[k].classList.toggle('on',k===curCat)});SP.filter(function(s){return s.c===curCat}).forEach(function(s){var c=V3.chip(bar,s.n,function(){show(s)});c.dataset.id=s.id})}
+function show(s){if(curRoot){scene.remove(curRoot);curRoot.traverse(function(o){if(o.geometry)o.geometry.dispose()})}cur=s;curRoot=s.build();scene.add(curRoot);
+ var L=s.len;curRoot.userData.t0=0;
+ /* escala del entorno / sombras */
+ var sc=Math.max(L,2);sun.position.set(sc*1.2,sc*1.6,sc*.9);sun.shadow.camera.left=-sc*1.3;sun.shadow.camera.right=sc*1.3;sun.shadow.camera.top=sc*1.3;sun.shadow.camera.bottom=-sc*1.3;sun.shadow.camera.near=.1;sun.shadow.camera.far=sc*6;sun.shadow.camera.updateProjectionMatrix();sun.target.position.set(0,0,0);
+ disc.scale.setScalar(sc*.95);
+ var marine=s.c==='marinos';ground.visible=!marine;disc.visible=!marine;
+ if(marine){scene.background.set(0x1a6a90);scene.fog.color.set(0x1a6a90);scene.fog.near=sc*1.5;scene.fog.far=sc*9;hemi.color.set(0x9fd8ff);hemi.groundColor.set(0x1a3a50)}else{scene.background.set(s.c==='dinos'?0xb8cba0:0x9ac0d8);scene.fog.color.copy(scene.background);scene.fog.near=sc*4;scene.fog.far=sc*30;hemi.color.set(0xdfeeff);hemi.groundColor.set(0x4a5a3a)}
+ ground.material.color.set(s.c==='dinos'?0x7a8a4a:0x6a8a50);
+ var bb=new T.Box3().setFromObject(curRoot),bs=bb.getSize(new T.Vector3()),bc=bb.getCenter(new T.Vector3());O.tgt.set(0,bc.y,0);O.dist=Math.max(bs.x,bs.y*1.2,bs.z)*1.9+.6;O.min=sc*.5;O.max=sc*6;O.yaw=.7;O.pitch=.12;
+ human.visible=compare;if(compare){human.position.set(sc*(s.c==='marinos'?.5:.55),marine?curRoot.userData.yy-1.2:0,sc*.2);human.rotation.y=-.6}
+ if(!card.dataset.hid)card.style.display='block';card.innerHTML='<h3>'+s.n+'</h3><div class="sb"><i>'+s.sci+'</i></div><table>'+s.rows.map(function(r){return'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>'}).join('')+'</table><p>'+s.txt+'</p>';
+ Array.prototype.forEach.call(bar.children,function(c){c.classList.toggle('on',c.dataset.id===s.id)});
+ setTimeout(function(){roar(true)},350)}
+V3.chip(side,'🔊 Sonido',function(){roar(false)});
+V3.chip(side,'ℹ️ Datos',function(b){var h=card.style.display==='none';card.style.display=h?'block':'none';b.classList.toggle('on',h)},true);
+V3.chip(side,'🚶 Caminar',function(b){walk=!walk;b.classList.toggle('on',walk)});
+V3.chip(side,'🧍 Comparar con una persona',function(b){compare=!compare;b.classList.toggle('on',compare);human.visible=compare;if(compare&&cur){var sc=Math.max(cur.len,2);human.position.set(sc*.55,cur.c==='marinos'?curRoot.userData.yy-1.2:0,sc*.2)}});
+V3.chip(side,'🔄 Girar',function(b){spin=!spin;O.auto=spin?.25:0;b.classList.toggle('on',spin)},true);
+/* ---------- sonido sintético ---------- */
+var lastRoar=0;
+function roar(auto){var s=cur;if(!s)return;var ac=V3.audio();if(!ac||(auto&&!window.__sndOk))return;if(!auto)window.__sndOk=true;var now=ac.currentTime,sd=s.snd;if(sd.mute){V3.shot('splash',.35,.7);return}
+ var reps=sd.rep||1;for(var r=0;r<reps;r++){var t0=now+r*(sd.d+.06);var o=ac.createOscillator();o.type=sd.t;var f=sd.f;var dur=sd.d;
+  o.frequency.setValueAtTime(f[0],t0);for(var k=1;k<f.length;k++)o.frequency.exponentialRampToValueAtTime(f[k],t0+dur*k/(f.length-1));if(f.length===2)o.frequency.exponentialRampToValueAtTime(f[1],t0+dur);
+  var lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(sd.lp*.4,t0);lp.frequency.linearRampToValueAtTime(sd.lp,t0+dur*.3);lp.frequency.linearRampToValueAtTime(sd.lp*.5,t0+dur);lp.Q.value=2;
+  var g=ac.createGain();var vol=sd.deep?.7:sd.hi?.22:.35;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+Math.min(.12,dur*.15));g.gain.setValueAtTime(vol,t0+dur*.6);g.gain.exponentialRampToValueAtTime(.001,t0+dur);
+  if(sd.vib){var lfo=ac.createOscillator(),lg=ac.createGain();lfo.frequency.value=sd.vib;lg.gain.value=sd.vd?f[0]*sd.vd:f[0]*.03;lfo.connect(lg);lg.connect(o.frequency);lfo.start(t0);lfo.stop(t0+dur+.1)}
+  if(sd.trem){var l2=ac.createOscillator(),g2=ac.createGain();l2.frequency.value=22;g2.gain.value=.25;l2.connect(g2);g2.connect(g.gain);l2.start(t0);l2.stop(t0+dur+.1)}
+  o.connect(lp);lp.connect(g);g.connect(V3.master);o.start(t0);o.stop(t0+dur+.1);
+  if(sd.n){var nz=ac.createBufferSource();nz.buffer=V3.noiseBuf();var bp=ac.createBiquadFilter();bp.type='bandpass';bp.frequency.setValueAtTime(sd.hi?3500:Math.max(300,f[0]*3),t0);bp.Q.value=.8;var ng=ac.createGain();ng.gain.setValueAtTime(0,t0);ng.gain.linearRampToValueAtTime(sd.n*vol*.8,t0+.1);ng.gain.exponentialRampToValueAtTime(.001,t0+dur);nz.connect(bp);bp.connect(ng);ng.connect(V3.master);nz.start(t0,Math.random(),dur+.1)}
+  if(sd.chirp){for(var c=1;c<4;c++){var o2=ac.createOscillator(),g3=ac.createGain();var tt=t0+c*.28;o2.frequency.setValueAtTime(2400,tt);o2.frequency.exponentialRampToValueAtTime(5200,tt+.14);g3.gain.setValueAtTime(0,tt);g3.gain.linearRampToValueAtTime(.12,tt+.02);g3.gain.exponentialRampToValueAtTime(.001,tt+.18);o2.connect(g3);g3.connect(V3.master);o2.start(tt);o2.stop(tt+.2)}}
+ }}
+addEventListener('pointerdown',function(){V3.audio();window.__sndOk=true},{once:true});
+/* ---------- cámara y bucle ---------- */
+var O=V3.orbit({dist:7,pitch:.12,min:1,max:60,auto:.25,smooth:7});
+var tt=0;
+V3.on(function(dt,t){dt=Math.min(dt||.016,.05);tt+=dt;
+ if(curRoot){var P=curRoot.userData.parts,w=walk?1:0;var sp=cur.len>8?1.2:cur.len>3?2.2:3.5;
+  if(P.legs&&P.legs.length){var ph=tt*sp*2;P.legs.forEach(function(l,i){var dir=(i===0||i===3)?1:-1;if(P.legs.length===2)dir=i?1:-1;l.rotation.x=w?Math.sin(ph)*.35*dir:0})}
+  if(P.body){var br=1+Math.sin(tt*1.6)*.008;P.body.scale.set(1,br,1)}
+  if(P.head){P.head.rotation.y=Math.sin(tt*.6)*.1;P.head.rotation.x+=0}
+  if(P.tail){P.tail.rotation.y=Math.sin(tt*(w?3:1.2))*(cur.c==='marinos'?.12:.25);if(cur.c==='marinos'){P.tail.rotation.x=Math.sin(tt*(w?3:1.6))*.16}}
+  if(P.wings){var fl=Math.sin(tt*(cur.id==='pteranodon'?2.4:3.2))*(cur.id==='pinguino'?.12:.5);P.wings.forEach(function(wg,i){var s=i?1:-1;if(cur.id==='pteranodon'){wg.rotation.z=-wg.userData.s*fl*.7}else if(cur.id==='aguila'){wg.rotation.z=s*fl*-1}else wg.rotation.z=(i?1:-1)*(.12+fl*.15)})}
+  if(cur.c==='marinos'){curRoot.position.y=Math.sin(tt*1.1)*.08*Math.max(1,cur.len*.2);curRoot.rotation.z=Math.sin(tt*.8)*.03}
+  if(cur.id==='aguila'||cur.id==='pteranodon'){curRoot.position.y=1.0+Math.sin(tt*1.4)*.1;}
+  if(P.trunk){P.trunk.rotation.x=Math.sin(tt*.9)*.12}}
+ O.update(dt)});
+buildBar();show(SP[0]);
+</script>
+</body>
+</html>

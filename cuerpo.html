@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0e18">
+<title>Cuerpo Humano 3D</title>
+</head>
+<body>
+<script src="three.min.js"></script><script src="v3d.js"></script>
+<script>
+V3.css();V3.init({fov:38,far:60,exposure:1.05,pr:2});V3.back();
+var T=THREE,scene=V3.scene,cam=V3.cam;
+function R(a,b){return a+Math.random()*(b-a)}function clamp(x,a,b){return x<a?a:x>b?b:x}
+function px(w,h,fn,rep){var c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d'),im=x.createImageData(w,h),d=im.data;for(var j=0;j<h;j++)for(var i=0;i<w;i++){var q=fn(i,j),o=(j*w+i)*4;d[o]=q[0];d[o+1]=q[1];d[o+2]=q[2];d[o+3]=q.length>3?q[3]:255}x.putImageData(im,0,0);var t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;if(rep)t.wrapS=t.wrapT=T.RepeatWrapping;return t}
+var title=document.createElement('div');title.className='v-title';title.textContent='Cuerpo humano';document.body.appendChild(title);
+var bar=document.createElement('div');bar.className='v-bar';document.body.appendChild(bar);
+var side=document.createElement('div');side.className='v-side';document.body.appendChild(side);
+var card=document.createElement('div');card.className='v-card v-glass';document.body.appendChild(card);
+scene.background=new T.Color(0x0a0e18);scene.fog=new T.Fog(0x0a0e18,6,16);
+scene.add(new T.HemisphereLight(0xcfe0ff,0x2a1a22,.9));
+var key=new T.DirectionalLight(0xfff0e0,1.5);key.position.set(2,4,4);scene.add(key);var rim=new T.DirectionalLight(0x6a9aff,.6);rim.position.set(-3,2,-3);scene.add(rim);var fillL=new T.DirectionalLight(0xff9a80,.4);fillL.position.set(-3,0,3);scene.add(fillL);
+/* podio */
+var pod=new T.Mesh(new T.CylinderGeometry(.75,.8,.05,60),new T.MeshStandardMaterial({color:0x1a2236,roughness:.4,metalness:.5}));pod.position.y=-.03;scene.add(pod);
+var ring=new T.Mesh(new T.RingGeometry(.55,.58,60),new T.MeshBasicMaterial({color:0x4a7aff,transparent:true,opacity:.5,side:T.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=.003;scene.add(ring);
+var body=new T.Group();scene.add(body);
+var layers={piel:new T.Group(),musculo:new T.Group(),hueso:new T.Group(),organo:new T.Group(),sangre:new T.Group()};
+Object.keys(layers).forEach(function(k){body.add(layers[k])});
+var pickable=[];
+function V(x,y,z){return new T.Vector3(x,y,z)}
+var UPV=V(0,1,0);
+/* hueso entre dos puntos: caña con extremos abultados */
+function boneItems(a,b,r,col,bulb){var it=[],d=b.clone().sub(a),L=d.length(),m=a.clone().add(b).multiplyScalar(.5);var q=new T.Quaternion().setFromUnitVectors(UPV,d.clone().normalize()),e=new T.Euler().setFromQuaternion(q);
+ it.push(V3.I(V3.cyl(r*.72,r*.72,L*.84,10),col,m.x,m.y,m.z,e.x,e.y,e.z));it.push(V3.I(V3.sph(r*(bulb||1.35),10,8),col,a.x,a.y,a.z,0,0,0,1,1.1,1));it.push(V3.I(V3.sph(r*(bulb||1.35),10,8),col,b.x,b.y,b.z,0,0,0,1,1.1,1));return it}
+var boneCol=0xe8dfc8;
+var boneMat=new T.MeshStandardMaterial({vertexColors:true,roughness:.55,metalness:0});
+var INFO={};
+function part(layer,name,geo,mat,info){var m=new T.Mesh(geo,mat);m.userData.name=name;m.userData.layer=layer;m.userData.info=info;layers[layer].add(m);pickable.push(m);INFO[name]=info;return m}
+function bone(name,items,info){return part('hueso',name,V3.merge(items),boneMat.clone(),info)}
+/* ---------- ESQUELETO ---------- */
+(function(){
+ var sk=new T.SphereGeometry(1,28,22),p=sk.attributes.position,col=[];
+ for(var i=0;i<p.count;i++){var x=p.getX(i),y=p.getY(i),z=p.getZ(i);var s=1;if(y<-.25&&z>0){var t=clamp((-y-.25)/.75,0,1);s=1-t*.38;p.setXYZ(i,x*s*.92,y,z*(1-t*.1))}else p.setXYZ(i,x*.92,y*1.02,z*1.08)}
+ sk.computeVertexNormals();var sc=[];for(i=0;i<p.count;i++)sc.push(.93,.9,.8);sk.setAttribute('color',new T.Float32BufferAttribute(sc,3));
+ var skG=sk.clone();skG.scale(.095,.095,.095);skG.translate(0,1.7,.0);
+ var jaw=V3.merge([V3.I(V3.box(.1,.035,.08),boneCol,0,1.6,.04),V3.I(V3.box(.012,.05,.07),boneCol,-.045,1.625,.035),V3.I(V3.box(.012,.05,.07),boneCol,.045,1.625,.035)]);
+ var eye1=V3.merge([V3.I(V3.sph(.026,10,8),0x16120e,-.037,1.69,.083),V3.I(V3.sph(.026,10,8),0x16120e,.037,1.69,.083),V3.I(V3.cone(.012,.04,4),0x16120e,0,1.655,.09,Math.PI,0,0)]);
+ var teeth=[];for(var k=0;k<10;k++)teeth.push(V3.I(V3.box(.009,.014,.008),0xf4f0e0,-.04+k*.0088,1.617,.084));
+ var items=[[skG,null,undefined],[jaw,null,undefined],[eye1,null,undefined]].concat([[V3.merge(teeth),null,undefined]]);
+ bone('Cráneo',items,{t:'Cráneo',d:'Protege el cerebro',rows:[['Huesos','22 (8 craneales y 14 de la cara)'],['Grosor','de 3 a 7 mm'],['Hueso más fuerte','la mandíbula']],x:'Es el escudo del cerebro. Los huesos del cráneo de un bebé están sin unir para que la cabeza pueda crecer.'});
+ /* columna */
+ var sp=[],pts=[];for(var i=0;i<24;i++){var t=i/23,y=1.55-t*.62;var z=-.02+Math.sin(t*3.1)*.03-(t<.3?-.02:0)+(t>.55?-.012:.0);var w=.014+t*.012;pts.push(V(0,y,z));sp.push(V3.I(V3.cyl(w,w*1.05,.017,10),0xe2d8bc,0,y,z));sp.push(V3.I(V3.box(.008,.015,.03),0xe2d8bc,0,y+.005,z-.02));sp.push(V3.I(V3.box(.04+t*.02,.005,.008),0xe2d8bc,0,y+.004,z-.005))}
+ sp.push(V3.I(V3.cone(.026,.07,6),0xe2d8bc,0,.89,-.052,Math.PI,0,0));
+ bone('Columna',sp,{t:'Columna vertebral',d:'El eje del cuerpo',rows:[['Vértebras','33'],['Zonas','cervical, dorsal, lumbar, sacra'],['Discos','almohadillas entre vértebras']],x:'Protege la médula espinal, por donde viajan las órdenes del cerebro. Tiene forma de S para absorber los golpes al andar y saltar.'});
+ /* costillas */
+ var rb=[];for(var r=0;r<12;r++){var t=r/11,y=1.47-r*.0425;var wd=r<7?(.075+Math.sin(t*2.2)*.075):(.145-(r-7)*.016);var dp=.095+Math.sin(t*2)*.03-(r>8?.02:0);
+   [-1,1].forEach(function(sg){var cp=[],steps=14;for(var k=0;k<=steps;k++){var a=k/steps;var ang=a*Math.PI*(r<7?.88:.62);var x=sg*(Math.sin(ang)*wd+ (r<7?0:0)),zz=-.03+Math.cos(ang)*dp*(a<.0?1:1)-dp*.0;var yy=y-a*(r<7?.045:.075)-Math.sin(a*3.1)*.007;cp.push(V(x,yy,zz-.0))}
+    var curve=new T.CatmullRomCurve3(cp),tg=new T.TubeGeometry(curve,24,.0085-(r>9?.002:0),7,false);tg.translate(0,0,0);var c=r<7?0xeee6cc:0xe0d6b8;var ca=[];for(var q=0;q<tg.attributes.position.count;q++)ca.push(((c>>16)&255)/255,((c>>8)&255)/255,(c&255)/255);tg.setAttribute('color',new T.Float32BufferAttribute(ca,3));rb.push([tg,null,undefined])})}
+ var ster=[V3.I(V3.box(.04,.15,.012),0xe8dfc4,0,1.37,.098),V3.I(V3.box(.075,.035,.012),0xe8dfc4,0,1.46,.092),V3.I(V3.cone(.012,.04,4),0xe8dfc4,0,1.28,.098,Math.PI,0,0)];
+ bone('Costillas',rb.concat([[V3.merge(ster),null,undefined]]),{t:'Caja torácica',d:'Costillas y esternón',rows:[['Costillas','12 pares (24)'],['Verdaderas','7 pares unidas al esternón'],['Flotantes','2 pares sin unir']],x:'Forma una jaula flexible que protege corazón y pulmones y se mueve con cada respiración. Puedes tener una costilla de más, es poco común pero normal.'});
+ /* clavículas y escápulas */
+ var cl=[];[-1,1].forEach(function(s){boneItems(V(s*.025,1.475,.07),V(s*.19,1.465,.0),.0085,boneCol,1.2).forEach(function(i){cl.push(i)});cl.push(V3.I(V3.box(.1,.12,.012),0xe4dbc0,s*.13,1.38,-.075,.2,0,s*.2))});
+ bone('Clavículas y escápulas',cl,{t:'Clavícula y omóplato',d:'Unen el brazo al tronco',rows:[['Clavícula','el hueso que más se rompe'],['Escápula','hueso plano triangular']],x:'La clavícula funciona como una barra que mantiene el hombro separado del cuerpo. Es el único hueso que une el brazo al esqueleto central.'});
+ /* pelvis */
+ var pel=[];[-1,1].forEach(function(s){var g=new T.SphereGeometry(1,16,12);g.scale(.062,.062,.04);g.translate(s*.085,.96,-.015);pel.push([g,V3.MX(0,0,0,0,0,s*.3),0xe6dcc2]);pel.push(V3.I(V3.sph(.026,8,6),0xe6dcc2,s*.1,.88,.012))});pel.push(V3.I(V3.box(.12,.07,.035),0xdcd2b8,0,.9,-.055));pel.push(V3.I(V3.box(.03,.06,.02),0xe6dcc2,0,.89,.07));
+ bone('Pelvis',pel,{t:'Pelvis',d:'Sostiene el cuerpo',rows:[['Soporta','el peso del tronco'],['Une','columna con piernas']],x:'Es una cuenca de huesos fuertes. Sostiene los órganos del abdomen y es donde se encajan las caderas.'});
+ /* brazos */
+ var hu=[],ra=[],hands=[];[-1,1].forEach(function(s){var sh=V(s*.205,1.43,0),el=V(s*.265,1.14,-.005),wr=V(s*.31,.88,.04);
+   boneItems(sh,el,.014,boneCol,1.3).forEach(function(i){hu.push(i)});
+   boneItems(el,wr,.0085,boneCol,1.25).forEach(function(i){ra.push(i)});boneItems(V(el.x+s*.014,el.y,el.z),V(wr.x+s*.012,wr.y,wr.z),.007,boneCol,1.2).forEach(function(i){ra.push(i)});
+   for(var f=0;f<5;f++){var bx=wr.x+s*(f-2)*.01+s*.012,by=wr.y-.02;var L=f===0?.045:.075;var p1=V(bx,by,wr.z+.003),p2=V(bx+s*(f-2)*.004+s*.004,by-L*.55,wr.z+.008),p3=V(bx+s*(f-2)*.006+s*.007,by-L*.9-.03,wr.z+.016);boneItems(p1,p2,.0042,0xe2d9c0,1.2).forEach(function(i){hands.push(i)});boneItems(p2,p3,.0036,0xe2d9c0,1.2).forEach(function(i){hands.push(i)})}
+   for(var c=0;c<8;c++)hands.push(V3.I(V3.sph(.0075,6,5),0xdcd3b8,wr.x+s*(c%4-1.5)*.011,wr.y+(c<4?0:-.012),wr.z+.004))});
+ bone('Húmero',hu,{t:'Húmero',d:'Hueso del brazo',rows:[['Longitud','unos 30 cm'],['Une','hombro con codo']],x:'Es el hueso largo del brazo. El nervio que pasa por detrás del codo se llama «hueso de la risa», aunque no es un hueso.'});
+ bone('Radio y cúbito',ra,{t:'Radio y cúbito',d:'Hueso del antebrazo',rows:[['Huesos','2 por antebrazo'],['Función','girar la muñeca']],x:'Se cruzan entre sí para que puedas girar la mano con la palma hacia arriba o abajo.'});
+ bone('Manos',hands,{t:'Manos',d:'Una obra maestra de ingeniería',rows:[['Huesos por mano','27'],['Muñeca','8 huesos pequeños'],['Dedos','14 falanges']],x:'Entre las dos manos tienes 54 huesos: más de la cuarta parte de todos los huesos del cuerpo (206).'});
+ /* piernas */
+ var fe=[],ti=[],fo=[];[-1,1].forEach(function(s){var hip=V(s*.095,.9,.0),kn=V(s*.105,.5,.012),an=V(s*.1,.075,-.005);
+   var nk=V(s*.055,.935,.0);fe.push.apply(fe,boneItems(nk,hip,.014,boneCol,1.1));fe.push.apply(fe,boneItems(hip,kn,.019,boneCol,1.45));
+   ti.push.apply(ti,boneItems(kn,an,.0155,boneCol,1.3));ti.push.apply(ti,boneItems(V(kn.x+s*.03,kn.y-.02,kn.z-.005),V(an.x+s*.03,an.y+.03,an.z-.005),.006,boneCol,1.2));ti.push(V3.I(V3.sph(.022,10,8),0xf0e8d0,kn.x,kn.y+.012,kn.z+.03,0,0,0,1,1.2,.7));
+   fo.push(V3.I(V3.sph(.025,8,6),0xe0d7bc,an.x-s*.0,.045,-.025));fo.push(V3.I(V3.box(.05,.012,.1),0xe0d7bc,an.x,.014,.03));for(var f=0;f<5;f++)fo.push(V3.I(V3.cyl(.0055,.005,.045,6),0xe4dbc2,an.x+s*(f-2)*.012,.012,.1+(f===0?.004:0),Math.PI/2));fo.push(V3.I(V3.box(.04,.02,.045),0xe0d7bc,an.x,.03,-.02))});
+ bone('Fémur',fe,{t:'Fémur',d:'El hueso más largo y fuerte',rows:[['Longitud','unos 48 cm (el 26 % de tu altura)'],['Aguanta','más de 1.000 kg de compresión']],x:'Es el hueso más largo del cuerpo y más resistente que el hormigón en algunos aspectos. Un golpe fuerte puede romperlo, pero cura bien.'});
+ bone('Tibia y peroné',ti,{t:'Tibia y peroné',d:'Huesos de la pierna',rows:[['Tibia','soporta el peso'],['Peroné','estabiliza el tobillo'],['Rótula','protege la rodilla']],x:'La tibia es el segundo hueso más largo. La rótula es un hueso flotante que no se une a ninguno.'});
+ bone('Pies',fo,{t:'Pies',d:'Sostienen todo el cuerpo',rows:[['Huesos por pie','26'],['Ligamentos','más de 100 por pie']],x:'Los pies aguantan tu peso en cada paso: al correr soportan hasta 3 veces tu peso corporal.'});
+})();
+/* ---------- ÓRGANOS ---------- */
+function fleshTex(base,vein,sc){return px(128,128,function(x,y){var n=V3.fbm(x*.05*sc,y*.05*sc,4),m=V3.noise(x*.18,y*.18);var v=Math.pow(Math.abs(V3.noise(x*.04*sc+7,y*.04*sc)-.5)*2,.3);return[base[0]*(.8+n*.4)+vein[0]*(1-v)*.6,base[1]*(.8+n*.4)+vein[1]*(1-v)*.6,base[2]*(.8+n*.4)+vein[2]*(1-v)*.6]},true)}
+function orgMat(base,vein,rough,sc){return new T.MeshStandardMaterial({map:fleshTex(base,vein,sc||1),roughness:rough==null?.45:rough,metalness:0,emissive:0x100000,emissiveIntensity:.0})}
+var heartG=new T.Group(),lungs=[],liver,stomachM,beatMeshes=[];
+(function(){
+ /* cerebro */
+ var bg=new T.SphereGeometry(.07,40,30),p=bg.attributes.position;for(var i=0;i<p.count;i++){var x=p.getX(i),y=p.getY(i),z=p.getZ(i);var l=Math.hypot(x,y,z);var n=V3.fbm(x*60+3,y*60+z*50,4)*.5+Math.sin((x+y*.7)*95)*.1+Math.sin(z*80+y*40)*.08;var f=1+(n-.3)*.12;p.setXYZ(i,x*f*.92,y*f*.8,z*f*1.15);if(Math.abs(x)<.004&&y>0){p.setY(i,y*.93)}}bg.computeVertexNormals();
+ var brain=part('organo','Cerebro',bg,orgMat([225,160,160],[130,60,80],.55,2.2),{t:'Cerebro',d:'El centro de mando',rows:[['Peso','1,4 kg'],['Neuronas','86.000 millones'],['Consumo','20 % de la energía'],['Agua','75 %']],x:'Procesa todo lo que ves, sientes y piensas. Funciona con unos 20 vatios, menos que una bombilla. Nunca se apaga, ni siquiera cuando duermes.'});brain.position.set(0,1.71,-.005);
+ var cb=part('organo','Cerebelo',new T.SphereGeometry(.03,18,14),orgMat([200,130,130],[90,40,50],.6,3),{t:'Cerebelo',d:'Coordina el equilibrio',rows:[['Tamaño','el 10 % del cerebro'],['Neuronas','más de la mitad de todas']],x:'Controla el equilibrio y los movimientos precisos. Es lo que te permite andar en bici sin pensarlo.'});cb.position.set(0,1.665,-.055);cb.scale.set(1.5,.8,1);
+ /* médula */
+ var sc=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([V(0,1.64,-.03),V(0,1.5,-.045),V(0,1.2,-.05),V(0,.97,-.058)]),30,.007,8),new T.MeshStandardMaterial({color:0xf0e0c0,roughness:.5,emissive:0x2a2418}));layers.organo.add(sc);
+ /* corazón (grupo, late) */
+ var hm=orgMat([200,40,50],[110,20,30],.3,1.6);
+ var hv=new T.SphereGeometry(.045,28,22);var hp=hv.attributes.position;for(var i=0;i<hp.count;i++){var x=hp.getX(i),y=hp.getY(i),z=hp.getZ(i);var t=clamp((-y+.01)/.05,0,1);hp.setXYZ(i,x*(1-t*.55)*1.05,y*(1+t*.55),z*(1-t*.3))}hv.computeVertexNormals();
+ var h1=part('organo','Corazón',hv,hm,{t:'Corazón',d:'La bomba de la vida',rows:[['Peso','unos 300 g'],['Latidos','100.000 al día'],['Sangre','7.500 litros al día'],['Cámaras','4']],x:'Late unas 2.500 millones de veces en una vida. Es del tamaño de tu puño. Toca para sentir cómo late en pantalla.'});
+ h1.position.set(.015,1.345,.04);h1.rotation.set(.2,.2,-.5);
+ var au=part('organo','Aurículas',new T.SphereGeometry(.026,18,14),orgMat([170,40,60],[90,20,40],.35),{t:'Aurículas',d:'Reciben la sangre',rows:[['Cámaras','2'],['Función','recibir sangre venosa y de los pulmones']],x:'Son las cámaras de entrada del corazón. Se contraen primero, empujando la sangre a los ventrículos.'});au.position.set(.0,1.385,.015);au.scale.set(2.2,.9,1);
+ var ao=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([V(.0,1.38,.03),V(-.015,1.43,.03),V(-.04,1.44,.0),V(-.045,1.38,-.04),V(-.04,1.2,-.05)]),20,.0105,10),new T.MeshStandardMaterial({color:0xd0303a,roughness:.35}));
+ layers.organo.add(ao);var pa=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([V(.015,1.38,.05),V(.035,1.43,.04),V(.05,1.44,.02)]),12,.009,8),new T.MeshStandardMaterial({color:0x4a60c8,roughness:.35}));layers.organo.add(pa);
+ beatMeshes=[h1,au];
+ /* pulmones */
+ var lm=orgMat([225,150,160],[180,100,120],.55,1.4);
+ function lungGeo(s){var g=new T.SphereGeometry(1,28,22),p=g.attributes.position;for(var i=0;i<p.count;i++){var x=p.getX(i),y=p.getY(i),z=p.getZ(i);var cut=(x*s>0&&y<.3)?-.28*clamp(1-y,0,1):0;p.setXYZ(i,(x+cut*s*(y<0?1:0))*.065,y*.13,z*.075*(1-Math.max(0,-y)*.1));var n=V3.noise(x*3+s*5,y*3)*.01;p.setX(i,p.getX(i)+n)}g.computeVertexNormals();return g}
+ [-1,1].forEach(function(s){var l=part('organo',s<0?'Pulmón derecho':'Pulmón izquierdo',lungGeo(s),lm,{t:s<0?'Pulmón derecho':'Pulmón izquierdo',d:'Intercambian el oxígeno',rows:[['Capacidad','unos 6 litros'],['Alvéolos','300 millones'],['Respiras','12 a 20 veces por minuto'],['Superficie','como una pista de tenis']],x:s<0?'El derecho tiene 3 lóbulos. Los pulmones flotarían en el agua, porque están llenos de aire.':'El izquierdo es más pequeño, tiene 2 lóbulos, para dejar espacio al corazón.'});l.position.set(s*.075,1.35,-.0);l.userData.s=s;lungs.push(l)});
+ /* tráquea */
+ var tr=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([V(0,1.58,.0),V(0,1.46,.008),V(0,1.4,.01)]),16,.0085,10),new T.MeshStandardMaterial({color:0xeec8c8,roughness:.5}));layers.organo.add(tr);
+ [-1,1].forEach(function(s){var br=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([V(0,1.4,.01),V(s*.025,1.37,.01),V(s*.05,1.32,.0)]),12,.006,8),new T.MeshStandardMaterial({color:0xeec8c8,roughness:.5}));layers.organo.add(br)});
+ /* hígado */
+ var lvg=new T.SphereGeometry(1,24,18),lp=lvg.attributes.position;for(var i=0;i<lp.count;i++){var x=lp.getX(i),y=lp.getY(i),z=lp.getZ(i);var tp=1-Math.max(0,x)*.55;lp.setXYZ(i,x*.11,y*.055*tp,z*.065*tp)}lvg.computeVertexNormals();
+ liver=part('organo','Hígado',lvg,orgMat([130,50,40],[70,20,20],.4,1.2),{t:'Hígado',d:'La fábrica química',rows:[['Peso','1,5 kg (el órgano interno más grande)'],['Funciones','más de 500'],['Regenera','puede volver a crecer'],['Filtra','1,4 litros de sangre por minuto']],x:'Limpia la sangre, produce bilis para digerir las grasas y guarda energía. Puede regenerarse aunque se pierda hasta el 70 %.'});liver.position.set(-.06,1.19,.035);liver.rotation.z=.1;
+ var gb=part('organo','Vesícula',new T.SphereGeometry(.013,12,10),new T.MeshStandardMaterial({color:0x4a8a30,roughness:.3}),{t:'Vesícula biliar',d:'Guarda la bilis',rows:[['Tamaño','como una pera pequeña'],['Guarda','50 ml de bilis']],x:'Almacena la bilis que fabrica el hígado y la suelta cuando comes algo graso.'});gb.position.set(-.05,1.155,.065);gb.scale.set(1,1.8,1);
+ /* estómago */
+ var sg=new T.SphereGeometry(1,24,18),sp2=sg.attributes.position;for(var i=0;i<sp2.count;i++){var x=sp2.getX(i),y=sp2.getY(i),z=sp2.getZ(i);var bend=Math.pow(clamp(x,-1,1)*.5+.5,1.5);sp2.setXYZ(i,x*.07,y*.045*(1+(1-bend)*.8)-(bend)*.02,z*.04)}sg.computeVertexNormals();
+ stomachM=part('organo','Estómago',sg,orgMat([225,140,130],[170,80,80],.35,1.3),{t:'Estómago',d:'Mezcla y digiere',rows:[['Capacidad','1 a 1,5 litros'],['Ácido','pH 1,5 a 2'],['Digestión','de 2 a 4 horas'],['Mucosa','se renueva cada 3 días']],x:'Su ácido es tan fuerte que podría disolver metal, pero una capa de moco lo protege. Se renueva constantemente para no digerirse a sí mismo.'});stomachM.position.set(.045,1.17,.045);stomachM.rotation.z=.4;
+ /* páncreas, bazo, riñones */
+ var pc=part('organo','Páncreas',V3.cap(.012,.09),orgMat([220,180,130],[170,130,90],.5),{t:'Páncreas',d:'Fabrica la insulina',rows:[['Largo','unos 15 cm'],['Produce','insulina y enzimas']],x:'Controla el azúcar en sangre. Si falla, aparece la diabetes.'});pc.position.set(.0,1.12,.0);pc.rotation.z=Math.PI/2+.1;
+ var bz=part('organo','Bazo',V3.sph(.03,12,10),orgMat([110,30,50],[60,10,30],.4),{t:'Bazo',d:'Filtro y defensas',rows:[['Peso','150 g'],['Función','filtra sangre vieja']],x:'Elimina glóbulos rojos viejos y ayuda al sistema inmune. Se puede vivir sin él.'});bz.position.set(.1,1.2,-.03);bz.scale.set(.7,1.3,.7);
+ [-1,1].forEach(function(s){var kg=new T.SphereGeometry(.03,18,14),kp=kg.attributes.position;for(var i=0;i<kp.count;i++){var x=kp.getX(i),y=kp.getY(i),z=kp.getZ(i);if(x*s>.015)kp.setX(i,x-(.012-Math.abs(y)*.2)*s)}kg.computeVertexNormals();var k=part('organo',s<0?'Riñón derecho':'Riñón izquierdo',kg,orgMat([150,40,50],[90,20,30],.35,1.5),{t:s<0?'Riñón derecho':'Riñón izquierdo',d:'Filtran la sangre',rows:[['Tamaño','como un puño'],['Filtran','180 litros de sangre al día'],['Producen','1,5 litros de orina']],x:'Limpian la sangre de desechos y controlan el agua del cuerpo. Con un solo riñón se puede vivir.'});k.position.set(s*.065,1.1,-.055);k.scale.set(.9,1.5,.9);
+  var ur=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([V(s*.058,1.07,-.045),V(s*.045,.99,-.03),V(s*.022,.92,.01)]),14,.0035,6),new T.MeshStandardMaterial({color:0xe8c868,roughness:.5}));layers.organo.add(ur)});
+ var vj=part('organo','Vejiga',V3.sph(.03,14,12),orgMat([220,150,140],[180,100,100],.4),{t:'Vejiga',d:'Guarda la orina',rows:[['Capacidad','300 a 500 ml'],['Avisa','cuando tiene 200 ml']],x:'Es un músculo elástico: se estira y se contrae para vaciarse.'});vj.position.set(0,.925,.03);
+ /* intestino delgado: tubo enrollado */
+ var cp=[],N=70;for(var i=0;i<N;i++){var t=i/(N-1),row=Math.floor(t*6),inRow=(t*6)%1;var x=(row%2?1-inRow:inRow)*.14-.07,y=1.075-row*.017+Math.sin(inRow*9+row)*.004,z=.04+Math.sin(t*20)*.012;cp.push(V(x,y,z))}
+ var sm=part('organo','Intestino delgado',new T.TubeGeometry(new T.CatmullRomCurve3(cp),240,.0105,10),orgMat([240,170,150],[200,110,100],.4,1.8),{t:'Intestino delgado',d:'Absorbe los nutrientes',rows:[['Longitud','unos 6 metros'],['Superficie','como una cancha de baloncesto'],['Absorbe','el 90 % de los nutrientes']],x:'Está lleno de vellosidades diminutas que aumentan muchísimo la superficie para absorber lo que comes.'});
+ var cl=[V(-.07,.98,.045),V(-.083,1.04,.045),V(-.083,1.12,.04),V(-.06,1.14,.042),V(.0,1.145,.042),V(.065,1.14,.04),V(.083,1.12,.04),V(.083,1.03,.04),V(.07,.97,.035),V(.04,.95,.0),V(.0,.94,-.02)];
+ var co=part('organo','Intestino grueso',new T.TubeGeometry(new T.CatmullRomCurve3(cl),90,.0165,12),orgMat([200,120,110],[150,70,70],.45,1.3),{t:'Intestino grueso',d:'Absorbe agua y forma desechos',rows:[['Longitud','1,5 metros'],['Bacterias','billones (la microbiota)'],['Tiempo','de 12 a 48 horas']],x:'En él viven billones de bacterias buenas que te ayudan a digerir y a defenderte de las malas.'});
+})();
+/* ---------- SANGRE ---------- */
+var flows=[];
+(function(){
+ function vessel(pts,col,r,name){var cv=new T.CatmullRomCurve3(pts),g=new T.TubeGeometry(cv,80,r,8);var m=new T.Mesh(g,new T.MeshStandardMaterial({color:col,roughness:.35,emissive:col,emissiveIntensity:.18}));layers.sangre.add(m);
+  var NP=14,sp=[];for(var i=0;i<NP;i++){var s=new T.Mesh(V3.sph(r*1.35,6,5),new T.MeshBasicMaterial({color:col===0xd0303a?0xff8a8a:0x8aa0ff}));layers.sangre.add(s);sp.push({m:s,t:i/NP})}flows.push({cv:cv,sp:sp,speed:.12+r*5})}
+ var A=0xd0303a,B=0x4a60c8;
+ [-1,1].forEach(function(s){
+  vessel([V(-.04,1.2,-.045),V(s*.04,.97,-.02),V(s*.095,.88,.0),V(s*.105,.6,.04),V(s*.105,.3,.04),V(s*.1,.06,.045)],A,.0085,'arteria pierna');
+  vessel([V(s*.1,.06,.03),V(s*.12,.3,.01),V(s*.115,.6,.0),V(s*.09,.88,-.02),V(.02,.98,-.04),V(.02,1.2,-.025)],B,.0095,'vena pierna');
+  vessel([V(-.04,1.42,.0),V(s*.12,1.44,.0),V(s*.2,1.38,.0),V(s*.24,1.2,-.005),V(s*.29,.95,.03)],A,.0058,'arteria brazo');
+  vessel([V(s*.3,.95,.03),V(s*.25,1.2,-.025),V(s*.2,1.38,-.02),V(s*.1,1.43,-.01),V(.01,1.4,.0)],B,.0062,'vena brazo');
+  vessel([V(-.04,1.43,.0),V(s*.02,1.52,.0),V(s*.03,1.6,.005),V(s*.025,1.68,.0)],A,.0045,'carótida');
+  vessel([V(s*.02,1.68,-.01),V(s*.04,1.6,-.01),V(s*.03,1.5,-.01),V(.015,1.42,.0)],B,.0045,'yugular');
+ })})();
+/* ---------- MÚSCULOS ---------- */
+var muscleTex=px(128,128,function(x,y){var f=Math.sin(x*1.3+V3.noise(x*.05,y*.05)*7)*.5+.5,n=V3.noise(x*.12,y*.12)*.3;var k=.55+f*.3+n;return[150*k+60,28*k+12,34*k+12]},true);
+var mMat=new T.MeshStandardMaterial({map:muscleTex,roughness:.5,metalness:.0,color:0xffffff});
+function mus(name,geo,pos,rot,sc,info){var m=part('musculo',name,geo,mMat.clone(),info);m.material.map=muscleTex.clone();m.material.map.needsUpdate=true;m.material.map.repeat.set(2,1.4);m.position.copy(pos);if(rot)m.rotation.set(rot[0],rot[1],rot[2]);if(sc)m.scale.set(sc[0],sc[1],sc[2]);return m}
+function spindle(len,rad,belly){var g=new T.CylinderGeometry(rad*.45,rad*.45,len,16,10),p=g.attributes.position;for(var i=0;i<p.count;i++){var y=p.getY(i);var t=y/len+.5;var f=Math.sin(Math.PI*clamp(t,0,1));var w=.3+f*.7*(belly||1);p.setX(i,p.getX(i)*w*2.2);p.setZ(i,p.getZ(i)*w*2.2)}g.computeVertexNormals();return g}
+(function(){
+ var pecI={t:'Pectoral mayor',d:'Empuja y cierra los brazos',rows:[['Músculos','2 (uno a cada lado)'],['Función','empujar, abrazar, lanzar']],x:'Es el gran músculo plano del pecho. Entrena cada vez que haces flexiones.'};
+ [-1,1].forEach(function(s){
+  var pg=new T.SphereGeometry(1,18,14);pg.scale(.1,.075,.03);mus('Pectoral',pg,V(s*.1,1.38,.095),[0,s*-.25,s*.5],null,pecI);
+  var dg=new T.SphereGeometry(1,16,12);dg.scale(.055,.065,.05);mus('Deltoides',dg,V(s*.22,1.42,0),[0,0,s*-.3],null,{t:'Deltoides',d:'Levanta el brazo',rows:[['Forma','triangular, cubre el hombro'],['Función','elevar el brazo en todas direcciones']],x:'Es el músculo redondeado del hombro, el que da movilidad total al brazo.'});
+  mus('Bíceps',spindle(.26,.052,1.2),V(s*.235,1.27,.02),[0,0,s*.12],null,{t:'Bíceps braquial',d:'Dobla el codo',rows:[['Cabezas','2'],['Función','flexionar el codo y girar el antebrazo']],x:'Su nombre significa «dos cabezas». Es el músculo que se «hincha» al doblar el brazo.'});
+  mus('Tríceps',spindle(.25,.05,1.1),V(s*.245,1.27,-.03),[0,0,s*.12],null,{t:'Tríceps braquial',d:'Estira el codo',rows:[['Cabezas','3'],['Función','extender el codo']],x:'Ocupa casi dos tercios del brazo, más que el bíceps. Trabaja siempre que empujas.'});
+  mus('Antebrazo',spindle(.26,.044,1.15),V(s*.288,1.0,.01),[0,0,s*.14],null,{t:'Músculos del antebrazo',d:'Mueven la mano y los dedos',rows:[['Músculos','más de 20'],['Función','agarrar y mover la muñeca']],x:'Los dedos no tienen músculos propios: los mueven tendones largos desde el antebrazo, como cuerdas de marioneta.'});
+  mus('Oblicuo',spindle(.22,.07,1),V(s*.095,1.1,.04),[0,0,s*-.15],null,{t:'Oblicuos',d:'Giran y flexionan el tronco',rows:[['Capas','externo e interno'],['Función','girar el torso']],x:'Se cruzan en diagonal por los costados y ayudan a girar el cuerpo.'});
+  var gg=new T.SphereGeometry(1,16,14);gg.scale(.085,.1,.07);mus('Glúteo',gg,V(s*.085,.88,-.065),null,null,{t:'Glúteo mayor',d:'El músculo más grande del cuerpo',rows:[['Función','extender la cadera, subir escaleras'],['Es','el músculo más grande']],x:'Te mantiene erguido y te impulsa al correr, saltar y subir cuestas.'});
+  mus('Cuádriceps',spindle(.4,.075,1.25),V(s*.1,.7,.025),[0,0,s*-.02],null,{t:'Cuádriceps',d:'Extiende la rodilla',rows:[['Cabezas','4'],['Fuerza','el grupo más potente de la pierna']],x:'Cuatro músculos que se unen en la rótula. Son los que más trabajan al andar en bici o subir una cuesta.'});
+  mus('Isquiotibiales',spindle(.38,.065,1.2),V(s*.1,.7,-.035),[0,0,s*-.02],null,{t:'Isquiotibiales',d:'Doblan la rodilla',rows:[['Músculos','3'],['Función','flexionar la rodilla y extender la cadera']],x:'Tres músculos en la parte trasera del muslo. Si están cortos, cuesta tocarse los pies.'});
+  mus('Gemelos',spindle(.3,.06,1.35),V(s*.1,.3,-.025),null,null,{t:'Gemelos',d:'Impulsan al caminar',rows:[['Tendón','Aquiles, el más grueso del cuerpo'],['Función','ponerse de puntillas']],x:'La pantorrilla bombea sangre hacia arriba, de vuelta al corazón: se la llama «segundo corazón».'});
+  mus('Tibial',spindle(.28,.04,1),V(s*.1,.28,.035),null,null,{t:'Tibial anterior',d:'Levanta el pie',rows:[['Función','subir la punta del pie']],x:'Evita que arrastres los pies al caminar.'});
+  var tg=new T.SphereGeometry(1,14,10);tg.scale(.075,.07,.035);mus('Trapecio',tg,V(s*.055,1.48,-.04),[.3,0,s*.4],null,{t:'Trapecio',d:'Mueve y sostiene los hombros',rows:[['Forma','de rombo, del cuello a la espalda media']],x:'Cuando tensas el cuello o encoges los hombros, usas el trapecio.'});
+  var dr=new T.SphereGeometry(1,16,12);dr.scale(.095,.16,.025);mus('Dorsal',dr,V(s*.1,1.25,-.085),[0,0,s*-.1],null,{t:'Dorsal ancho',d:'Tira del brazo hacia el cuerpo',rows:[['Es','el músculo más ancho de la espalda']],x:'Es el músculo clave al trepar o hacer dominadas.'})});
+ /* abdominales */
+ var ab=new T.Group();for(var r=0;r<3;r++)[-1,1].forEach(function(s){var g=new T.BoxGeometry(.05,.04,.025,4,3,3),p=g.attributes.position;for(var i=0;i<p.count;i++){var x=p.getX(i),y=p.getY(i),z=p.getZ(i);var l=Math.hypot(x*1.2,y*1.2,z*3);p.setZ(i,z+.01*(1-Math.abs(x)*10)*(1-Math.abs(y)*10))}g.computeVertexNormals();var m=mus('Abdominales',g,V(s*.03,1.2-r*.052,.082),null,null,{t:'Recto abdominal',d:'El «six-pack»',rows:[['Divisiones','tendones que forman los cuadros'],['Función','flexionar el tronco']],x:'Todos tenemos «six-pack», pero suele estar tapado por la grasa. Los cuadros son bandas de tendón.'})});
+ var cu=new T.CylinderGeometry(.04,.05,.13,12);mus('Cuello',cu,V(0,1.56,.0),null,null,{t:'Esternocleidomastoideo',d:'Gira la cabeza',rows:[['Función','girar y doblar el cuello']],x:'Es el músculo del cuello que se marca cuando giras la cabeza hacia un lado.'});
+ var dg2=new T.SphereGeometry(1,14,10);dg2.scale(.12,.05,.02);mus('Serrato',dg2,V(0,1.33,.1),null,null,{t:'Serrato anterior',d:'Mueve el omóplato',rows:[['Aspecto','como dientes de sierra']],x:'Se llama «músculo del boxeador», porque ayuda a dar puñetazos.'});
+})();
+/* ---------- PIEL ---------- */
+var skinMat=new T.MeshStandardMaterial({color:0xe0a888,roughness:.65,transparent:true,opacity:.3,depthWrite:false,side:T.FrontSide});
+(function(){
+ var it=[];var C=0xffffff;
+ it.push(V3.I(V3.sph(.1,26,20),C,0,1.7,0,0,0,0,.94,1.08,1.1));it.push(V3.I(V3.cyl(.05,.058,.14,14),C,0,1.56,0));
+ var tg=new T.SphereGeometry(1,28,22),p=tg.attributes.position;for(var i=0;i<p.count;i++){var x=p.getX(i),y=p.getY(i),z=p.getZ(i);var t=(y+1)/2;var w=.17-(t<.4?(.4-t)*.07:0)+(t>.8?-(t-.8)*.35:0),d=.105-(t<.3?(.3-t)*.0:0)-(t>.85?(t-.85)*.1:0);p.setXYZ(i,x*w*(t>.2&&t<.75?1.05:.97),y*.34+1.175,z*d)}tg.computeVertexNormals();
+ it.push([tg,null,C]);it.push(V3.I(V3.sph(.1,18,14),C,0,.93,0,0,0,0,1.5,.8,.95));
+ [-1,1].forEach(function(s){it.push(V3.I(V3.sph(.052,12,10),C,s*.22,1.4,0));it.push(V3.I(V3.cyl(.043,.036,.3,12),C,s*.235,1.27,0,0,0,s*.1));it.push(V3.I(V3.sph(.038,10,8),C,s*.268,1.13,0));it.push(V3.I(V3.cyl(.036,.026,.29,12),C,s*.29,.99,.02,0,0,s*.12));it.push(V3.I(V3.sph(.04,10,8),C,s*.31,.82,.04,0,0,0,.9,1.3,.55));
+  it.push(V3.I(V3.cyl(.082,.062,.42,14),C,s*.1,.7,.01));it.push(V3.I(V3.sph(.062,12,10),C,s*.103,.5,.01));it.push(V3.I(V3.cyl(.06,.036,.4,14),C,s*.103,.28,-.005));it.push(V3.I(V3.sph(.035,10,8),C,s*.1,.075,.03,0,0,0,.9,.8,1.2));it.push(V3.I(V3.box(.065,.04,.14),C,s*.1,.03,.045))});
+ var g=V3.merge(it);var m=new T.Mesh(g,skinMat);m.userData.name='Piel';m.userData.layer='piel';m.userData.info={t:'Piel',d:'El órgano más grande',rows:[['Superficie','unos 2 m²'],['Peso','4 kg'],['Capas','epidermis, dermis, hipodermis'],['Se renueva','cada 28 días']],x:'Te protege del frío, el calor y los microbios. Pierdes unas 30.000 células muertas cada minuto.'};layers.piel.add(m);pickable.push(m);INFO.Piel=m.userData.info;
+ /* pelo suave */
+ var hg=new T.SphereGeometry(.102,22,16,0,6.283,0,1.3);var hr=new T.Mesh(hg,new T.MeshStandardMaterial({color:0x3a2616,roughness:.8,transparent:true,opacity:.35,depthWrite:false}));hr.position.set(0,1.71,-.008);hr.scale.set(.96,1.06,1.1);layers.piel.add(hr)})();
+/* ---------- visibilidad de capas ---------- */
+var on={piel:true,musculo:false,hueso:true,organo:false,sangre:false};
+var chipEl={};
+[['piel','🧍 Piel'],['musculo','💪 Músculos'],['hueso','🦴 Huesos'],['organo','🫀 Órganos'],['sangre','🩸 Sangre']].forEach(function(l){chipEl[l[0]]=V3.chip(bar,l[1],function(){on[l[0]]=!on[l[0]];apply()},on[l[0]])});
+function apply(){Object.keys(layers).forEach(function(k){layers[k].visible=on[k];chipEl[k].classList.toggle('on',on[k])});
+ skinMat.opacity=(on.musculo||on.hueso||on.organo||on.sangre)?.18:.95;skinMat.depthWrite=skinMat.opacity>.9;
+ mMat.opacity=1;layers.musculo.children.forEach(function(m){m.material.transparent=on.organo||on.hueso;m.material.opacity=(on.organo||on.hueso)?.45:1;m.material.depthWrite=!(on.organo||on.hueso)})}
+apply();
+V3.chip(side,'🧠 Solo órganos',function(){on.piel=false;on.musculo=false;on.hueso=false;on.organo=true;on.sangre=false;apply()});
+V3.chip(side,'💀 Esqueleto',function(){on.piel=false;on.musculo=false;on.hueso=true;on.organo=false;on.sangre=false;apply()});
+V3.chip(side,'💪 Músculos',function(){on.piel=false;on.musculo=true;on.hueso=false;on.organo=false;on.sangre=false;apply()});
+V3.chip(side,'🏃 Pulso: reposo',function(b){bpm=bpm<80?150:60;b.textContent='🏃 Pulso: '+(bpm<80?'reposo':'ejercicio');b.classList.toggle('on',bpm>100);resp=bpm>100?.45:.2});
+V3.chip(side,'🔊 Latidos',function(b){beat=!beat;b.classList.toggle('on',beat)},false);
+var bpm=64,beat=false,resp=.2;
+/* ---------- selección ---------- */
+var sel=null,selOrig=null;
+function select(m){if(sel&&sel.material&&sel.material.emissive){sel.material.emissive.setHex(selOrig);sel.material.emissiveIntensity=selI}sel=m;if(!m){card.style.display='none';return}
+ if(m.material.emissive){selOrig=m.material.emissive.getHex();selI=m.material.emissiveIntensity;m.material.emissive.setHex(0x3a6aff);m.material.emissiveIntensity=.7}
+ var i=m.userData.info;card.style.display='block';card.innerHTML='<h3>'+i.t+'</h3><div class="sb">'+i.d+'</div><table>'+i.rows.map(function(r){return'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>'}).join('')+'</table><p>'+i.x+'</p>'}
+var selI=0;
+var O=V3.orbit({dist:3.2,pitch:.05,min:1.2,max:6,auto:.2,smooth:7});O.tgt.set(0,.95,0);
+O.onTap=function(x,y){var objs=pickable.filter(function(m){return layers[m.userData.layer].visible&&(m.userData.layer!=='piel'||skinMat.opacity>.9||true)});
+ /* si hay capas internas visibles, la piel no se elige */
+ var inner=on.musculo||on.hueso||on.organo;objs=objs.filter(function(m){return!(inner&&m.userData.layer==='piel')});
+ var r=O.ray(x,y,objs,false);if(r.length){select(r[0].object);O.auto=0}else{select(null);O.auto=.2}};
+var chips2=V3.chip(side,'🎯 Centrar',function(){O.dist=3.2;O.tgt.set(0,.95,0);O.pitch=.05;O.auto=.2});
+/* ---------- bucle ---------- */
+var bt=0,lastBeat=0;
+V3.on(function(dt,t){
+ dt=Math.min(dt||.016,.05);var per=60/bpm;bt+=dt;if(bt>per)bt-=per;var ph=bt/per;
+ var pulse=Math.exp(-ph*14)*Math.sin(Math.min(ph,.4)/.4*3.14)*1+Math.exp(-Math.pow((ph-.28)*12,2))*.55;
+ beatMeshes.forEach(function(m,i){var k=1+pulse*(i?.07:.12);m.scale.set(k,k,k);if(i===0)m.scale.y=k*1.0;if(m.material.emissive){m.material.emissive.setRGB(.25*pulse,0,0);m.material.emissiveIntensity=1}});
+ if(beat&&ph<dt/per+.001&&lastBeat!==Math.floor(t/per*1000)){V3.shot('heart',.55,1);lastBeat=Math.floor(t/per*1000)}
+ var rp=Math.sin(t*Math.PI*2*resp);lungs.forEach(function(l){var s=1+rp*.05;l.scale.set(1+rp*.05,1+rp*.06,1+rp*.06)});if(liver)liver.position.y=1.19-rp*.004;if(stomachM)stomachM.position.y=1.17-rp*.004;
+ layers.hueso.children.forEach(function(m){if(m.userData.name==='Costillas'){m.scale.set(1+rp*.012,1,1+rp*.02)}});
+ flows.forEach(function(f){f.sp.forEach(function(s){var nt=(s.t+dt*f.speed*(bpm/64))%1;s.t=nt>=0&&nt<1?nt:0;s.m.position.copy(f.cv.getPoint(Math.min(.999,s.t)))})});
+ var Q=Math.sin(t*.4)*.03;ring.rotation.z+=dt*.2;
+ O.update(dt)});
+addEventListener('pointerdown',function(){V3.audio()},{once:true});
+</script>
+</body>
+</html>

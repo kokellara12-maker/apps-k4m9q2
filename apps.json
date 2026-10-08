@@ -1,6 +1,28 @@
 {
  "apps": [
   {
+   "nombre": "Enciclopedia Animal 3D",
+   "desc": "18 animales y dinosaurios en 3D con sonido y datos reales: león, elefante, tiburón, ballena azul, T. rex, triceratops… Compáralos con una persona.",
+   "href": "enciclopedia.html",
+   "icono": "🦖",
+   "color": "#6aa84f",
+   "cat": "explorar",
+   "img": "img/enciclopedia.webp",
+   "sub": "ciencia",
+   "tags": "animales dinosaurios enciclopedia leon elefante trex ballena tiburon"
+  },
+  {
+   "nombre": "Cuerpo Humano 3D",
+   "desc": "Huesos, músculos, órganos y vasos sanguíneos en 3D. Toca cualquier parte para ver sus datos. El corazón late y los pulmones respiran.",
+   "href": "cuerpo.html",
+   "icono": "🫀",
+   "color": "#e0485a",
+   "cat": "explorar",
+   "img": "img/cuerpo.webp",
+   "sub": "ciencia",
+   "tags": "cuerpo humano anatomia huesos musculos organos corazon esqueleto"
+  },
+  {
    "nombre": "Fuego y Lluvia",
    "desc": "Chimenea, tormenta, bosque nocturno y cafetería con sonido real. Con temporizador para dormir o concentrarte.",
    "href": "ambientes.html",
