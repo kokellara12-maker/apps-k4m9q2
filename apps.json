@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Ciudad Viva",
+   "desc": "Una ciudad 3D para mirar como un acuario: coches, gente, semáforos, día y noche, lluvia, tormenta, niebla y nieve. Toca un coche para seguirlo.",
+   "href": "ciudadviva.html",
+   "icono": "🌆",
+   "color": "#3a7bd5",
+   "cat": "explorar",
+   "img": "img/ciudadviva.webp",
+   "sub": "mundo",
+   "tags": "ciudad coches gente dia noche lluvia tormenta relax mirar"
+  },
+  {
    "nombre": "Enciclopedia Animal 3D",
    "desc": "18 animales y dinosaurios en 3D con sonido y datos reales: león, elefante, tiburón, ballena azul, T. rex, triceratops… Compáralos con una persona.",
    "href": "enciclopedia.html",
