@@ -32,7 +32,7 @@ function buildMap(){hmap=new Float32Array(N*N).fill(WALLH);
  barrels=[[20.5,19.5],[24.5,24.5],[16.5,16.5],[27.5,27.5],[14.5,6.5],[29.5,37.5],[5.5,21.5],[38.5,21.5],[21.5,9.5],[22.5,34.5],[9.5,21.5],[33.5,21.5],[7.5,7.5],[36.5,7.5],[7.5,36.5],[36.5,36.5]].map(function(p){return{x:(p[0])*CELL,z:(p[1])*CELL,r:.55}});
  spawns=[[6,6],[37,6],[6,37],[37,37],[21,5],[22,38],[5,21],[38,22],[21,12],[22,31],[12,21],[31,22]].map(function(p){return{x:(p[0]+.5)*CELL,z:(p[1]+.5)*CELL}});
  nodes=[[21,21],[17,17],[26,17],[17,26],[26,26],[21,5],[22,38],[5,21],[38,22],[6,6],[37,6],[6,37],[37,37],[21,11],[22,32],[11,21],[32,22],[8,10],[35,10],[8,33],[35,33]].map(function(p){return{cx:p[0],cz:p[1]}});
- fields=nodes.map(function(n){return makeField(n.cx,n.cz)});
+ spawns=spawns.filter(function(s){return hmap[Math.floor(s.z/CELL)*N+Math.floor(s.x/CELL)]===0});nodes=nodes.filter(function(n){return hmap[n.cz*N+n.cx]===0});fields=nodes.map(function(n){return makeField(n.cx,n.cz)});
  mini=document.createElement('canvas');mini.width=mini.height=N*3;var m=mini.getContext('2d');m.fillStyle='rgba(10,12,18,.75)';m.fillRect(0,0,N*3,N*3);for(var y=0;y<N;y++)for(var x=0;x<N;x++){var h=hmap[y*N+x];if(h===0){m.fillStyle='#9c8660';m.fillRect(x*3,y*3,3,3)}else if(h<WALLH){m.fillStyle='#6a5030';m.fillRect(x*3,y*3,3,3)}}}
 function solidC(cx,cz){if(cx<0||cz<0||cx>=N||cz>=N)return true;return hmap[cz*N+cx]>0}
 function makeField(cx,cz){var d=new Int16Array(N*N).fill(-1);if(solidC(cx,cz))return d;var q=[cz*N+cx];d[q[0]]=0;for(var i=0;i<q.length;i++){var c=q[i],x=c%N,z=(c/N)|0;for(var k=0;k<4;k++){var nx=x+(k===0?1:k===1?-1:0),nz=z+(k===2?1:k===3?-1:0);if(solidC(nx,nz))continue;var ni=nz*N+nx;if(d[ni]<0){d[ni]=d[c]+1;q.push(ni)}}}return d}
