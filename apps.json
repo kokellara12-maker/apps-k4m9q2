@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "99 Noches en el Bosque",
+   "desc": "Sobrevive 99 noches: mantén la hoguera viva, tala, cocina, mejora el campamento, rescata a 4 niños y huye de lobos, ciervos y osos. Estilo Roblox, en horizontal.",
+   "href": "bosque99.html",
+   "icono": "🔥",
+   "color": "#d9822b",
+   "cat": "juegos",
+   "img": "img/bosque99.webp",
+   "sub": "terror",
+   "tags": "99 noches bosque roblox supervivencia hoguera lobos ciervo nights forest"
+  },
+  {
    "nombre": "Criadero Acuario",
    "desc": "Sandbox de vida: suelta macho y hembra de peces, tortugas, cangrejos, caballitos de mar, medusas y tiburones. Crían, hay que alimentarlos, curarlos y mantener el agua limpia.",
    "href": "criadero.html",
