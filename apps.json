@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Koke Zombies",
+   "desc": "Shooter 3D de oleadas de zombis de noche: linterna, tienda de armas y mejoras entre oleadas, brutos y corredores.",
+   "href": "zombies.html",
+   "icono": "🧟",
+   "color": "#7bd13a",
+   "cat": "juegos",
+   "img": "img/zombies.webp",
+   "sub": "accion",
+   "tags": "zombies shooter fps oleadas call of duty noche"
+  },
+  {
    "nombre": "Koke Road",
    "desc": "Crossy Road en 3D: cruza carreteras, ríos con troncos y vías de tren. Skins desbloqueables con monedas.",
    "href": "road.html",
