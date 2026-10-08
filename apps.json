@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Koke Bronx",
+   "desc": "Mundo abierto 3D en el Bronx: crews, opps, territorio, armas, camellos y rap con minijuego de ritmo. Conquista el barrio bloque a bloque.",
+   "href": "bronx.html",
+   "icono": "🏙️",
+   "color": "#e8601a",
+   "cat": "juegos",
+   "img": "img/bronx.webp",
+   "sub": "accion",
+   "tags": "bronx barrio gangs crews opps armas droga rap gta mundo abierto 3d calle"
+  },
+  {
    "nombre": "Koke League",
    "desc": "Fútbol con coches 3D estilo Rocket League: 2 contra 2, turbo, saltos con voltereta, conducir por las paredes y demoliciones.",
    "href": "league.html",
