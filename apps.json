@@ -1,6 +1,39 @@
 {
  "apps": [
   {
+   "nombre": "Fuego y Lluvia",
+   "desc": "Chimenea, tormenta, bosque nocturno y cafetería con sonido real. Con temporizador para dormir o concentrarte.",
+   "href": "ambientes.html",
+   "icono": "🔥",
+   "color": "#ff7a30",
+   "cat": "explorar",
+   "img": "img/ambientes.webp",
+   "sub": "relax",
+   "tags": "fuego lluvia chimenea tormenta dormir relax concentrarte ruido"
+  },
+  {
+   "nombre": "Acuario Virtual",
+   "desc": "Peces, tiburones, mantas y medusas nadando en un arrecife. Dales de comer, cambia la luz y mira el atardecer o la noche.",
+   "href": "acuario.html",
+   "icono": "🐠",
+   "color": "#1fa7d6",
+   "cat": "explorar",
+   "img": "img/acuario.webp",
+   "sub": "relax",
+   "tags": "acuario peces tiburon medusas mar arrecife relax"
+  },
+  {
+   "nombre": "Paseo por el Espacio",
+   "desc": "Viaja por el sistema solar y por las galaxias: toca cada planeta para ver sus datos reales. Tour automático y velocidad del tiempo.",
+   "href": "espacio.html",
+   "icono": "🪐",
+   "color": "#5b6cff",
+   "cat": "explorar",
+   "img": "img/espacio.webp",
+   "sub": "ciencia",
+   "tags": "espacio planetas sistema solar galaxias universo luna sol"
+  },
+  {
    "nombre": "Contador de Dinero",
    "desc": "Cuenta billetes y monedas (euro, dólar y libra): pones cuántos tienes de cada tipo y suma el total. Con objetivo para cuadrar la caja.",
    "href": "contador.html",

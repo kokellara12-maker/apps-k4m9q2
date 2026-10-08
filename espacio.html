@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#05060c">
+<title>Paseo por el Espacio</title>
+</head>
+<body>
+<script src="three.min.js"></script><script src="v3d.js"></script>
+<script>
+V3.css();V3.init({fov:55,far:9000,exposure:1.05});V3.back();
+var T=THREE,scene=V3.scene,cam=V3.cam,cl=V3.cl;
+var title=document.createElement('div');title.className='v-title';title.textContent='Paseo por el espacio';document.body.appendChild(title);
+var card=document.createElement('div');card.className='v-card v-glass';document.body.appendChild(card);
+var bar=document.createElement('div');bar.className='v-bar';document.body.appendChild(bar);
+var side=document.createElement('div');side.className='v-side';document.body.appendChild(side);
+/* ---------- datos reales ---------- */
+var PL=[
+ {n:'Sol',r:13,a:0,d:'Estrella',data:[['Diámetro','1.391.000 km'],['Edad','4.600 millones de años'],['Superficie','5.500 °C'],['Núcleo','15 millones °C'],['Masa','99,86 % del sistema']],t:'Contiene tantas veces la Tierra que cabrían más de un millón dentro. Su luz tarda 8 minutos y 20 segundos en llegar a nosotros.',col:0xffb030},
+ {n:'Mercurio',r:.9,a:30,T:88,day:1407,d:'Planeta rocoso',data:[['Diámetro','4.879 km'],['Distancia al Sol','57,9 millones km'],['Un día','59 días terrestres'],['Un año','88 días'],['Lunas','0'],['Temperatura','de −180 a 430 °C']],t:'Es el más rápido: da una vuelta al Sol en solo 88 días. Casi no tiene atmósfera.',tex:'rock',col:0x9a948c},
+ {n:'Venus',r:1.6,a:42,T:225,day:-5832,d:'Planeta rocoso',data:[['Diámetro','12.104 km'],['Distancia al Sol','108,2 millones km'],['Un día','243 días (al revés)'],['Un año','225 días'],['Lunas','0'],['Temperatura','464 °C']],t:'Es el planeta más caliente por su efecto invernadero. Gira al revés que casi todos los demás.',tex:'venus',col:0xe0c27a},
+ {n:'Tierra',r:1.7,a:58,T:365,day:24,d:'Planeta rocoso',data:[['Diámetro','12.742 km'],['Distancia al Sol','149,6 millones km'],['Un día','24 horas'],['Un año','365 días'],['Lunas','1'],['Temperatura','15 °C de media'],['Agua','71 % de la superficie']],t:'El único lugar conocido con vida. Está a la distancia justa del Sol para tener agua líquida.',tex:'earth',col:0x4a8aff,moons:[{n:'Luna',r:.45,d:3.4,T:27}]},
+ {n:'Marte',r:1.2,a:76,T:687,day:24.6,d:'Planeta rocoso',data:[['Diámetro','6.779 km'],['Distancia al Sol','227,9 millones km'],['Un día','24,6 horas'],['Un año','687 días'],['Lunas','2 (Fobos y Deimos)'],['Temperatura','−65 °C de media']],t:'Su color rojo viene del óxido de hierro. Tiene el volcán más alto del sistema solar: el Monte Olimpo (22 km).',tex:'mars',col:0xc4623a},
+ {n:'Júpiter',r:6,a:120,T:4333,day:9.9,d:'Gigante gaseoso',data:[['Diámetro','139.820 km'],['Distancia al Sol','778,5 millones km'],['Un día','9,9 horas'],['Un año','11,9 años'],['Lunas','95 conocidas'],['Temperatura','−110 °C (nubes)']],t:'Cabrían más de 1.300 Tierras dentro. Su Gran Mancha Roja es una tormenta mayor que la Tierra que dura siglos.',tex:'jupiter',col:0xd8b48a,moons:[{n:'Ío',r:.5,d:8.6,T:1.8},{n:'Europa',r:.45,d:10.2,T:3.5},{n:'Ganímedes',r:.7,d:12.2,T:7.2},{n:'Calisto',r:.65,d:14.6,T:16.7}]},
+ {n:'Saturno',r:5,a:165,T:10759,day:10.7,d:'Gigante gaseoso',data:[['Diámetro','116.460 km'],['Distancia al Sol','1.434 millones km'],['Un día','10,7 horas'],['Un año','29,4 años'],['Lunas','146 conocidas'],['Anillos','de hielo y roca, ¡finísimos!']],t:'Sus anillos miden 280.000 km de ancho pero tienen apenas unos metros de grosor. Es tan ligero que flotaría en agua.',tex:'saturn',col:0xe6d49a,rings:true,moons:[{n:'Titán',r:.7,d:11,T:16}]},
+ {n:'Urano',r:3,a:210,T:30687,day:-17.2,d:'Gigante helado',data:[['Diámetro','50.724 km'],['Distancia al Sol','2.871 millones km'],['Un día','17,2 horas'],['Un año','84 años'],['Lunas','28 conocidas'],['Temperatura','−195 °C']],t:'Gira "tumbado": su eje está inclinado 98°, así que rueda alrededor del Sol como una bola.',tex:'uranus',col:0x9ee0e8,ringsThin:true},
+ {n:'Neptuno',r:2.9,a:250,T:60190,day:16.1,d:'Gigante helado',data:[['Diámetro','49.244 km'],['Distancia al Sol','4.495 millones km'],['Un día','16,1 horas'],['Un año','165 años'],['Lunas','16 conocidas'],['Vientos','hasta 2.100 km/h']],t:'Tiene los vientos más rápidos del sistema solar. Fue descubierto con matemáticas antes que con telescopio.',tex:'neptune',col:0x3a5ae0},
+ {n:'Plutón',r:.6,a:290,T:90560,day:153,d:'Planeta enano',data:[['Diámetro','2.377 km'],['Distancia al Sol','5.906 millones km'],['Un día','6,4 días'],['Un año','248 años'],['Lunas','5 (Caronte la mayor)'],['Temperatura','−230 °C']],t:'Dejó de ser planeta en 2006. Tiene una mancha de hielo en forma de corazón.',tex:'pluto',col:0xcdb8a0}
+];
+/* ---------- texturas procedurales ---------- */
+function wf(u,v,f,o){var vv=v*f*.5,n=V3.fbm(u*f,vv,o||5);if(u>.85){var w=(u-.85)/.15,n2=V3.fbm((u-1)*f,vv,o||5);n=n+(n2-n)*w}return n}
+function mix(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
+function paint(w,h,fn){return V3.tex(V3.cvs(w,h,function(x){var id=x.createImageData(w,h),d=id.data;for(var j=0;j<h;j++)for(var i=0;i<w;i++){var c=fn(i/w,j/h),p=(j*w+i)*4;d[p]=c[0];d[p+1]=c[1];d[p+2]=c[2];d[p+3]=255}x.putImageData(id,0,0)}))}
+var TEX={
+ rock:function(){return paint(384,192,function(u,v){var n=wf(u,v,10,5),c=Math.floor(n*9)/9;var g=70+n*120;var cr=V3.noise(u*90,v*45);if(cr>.78)g-=30;return[g,g*.96,g*.9]})},
+ venus:function(){return paint(384,192,function(u,v){var n=wf(u,v+Math.sin(u*9)*.04,5,4);return mix([205,160,80],[245,220,150],n)})},
+ earth:function(){return paint(512,256,function(u,v){var n=wf(u,v,6,6),lat=Math.abs(v-.5)*2;if(lat>.88+V3.noise(u*30,v*30)*.08)return[240,244,250];if(n>.52){var h=(n-.52)*4,biome=wf(u+.3,v,12,3);var gr=mix([60,130,50],[150,130,80],clamp01(biome*1.6-.3+lat*.5));return mix(gr,[120,100,70],clamp01(h-.3))}return mix([10,40,110],[30,90,170],clamp01(n*1.6))})},
+ mars:function(){return paint(384,192,function(u,v){var n=wf(u,v,8,5),lat=Math.abs(v-.5)*2;if(lat>.93)return[245,240,235];var c=mix([140,60,35],[210,120,70],n);if(wf(u+.5,v,14,3)>.58)c=mix(c,[70,35,25],.5);return c})},
+ jupiter:function(){return paint(512,256,function(u,v){var b=Math.sin(v*26+V3.fbm(u*6,v*10,3)*3)*.5+.5,n=V3.fbm(u*14,v*60,3);var c=mix([150,100,60],[235,215,185],b*.7+n*.5);var gx=(u-.62)*5,gy=(v-.62)*9;if(gx*gx+gy*gy<.5){c=mix(c,[190,70,40],.8-(gx*gx+gy*gy))}return c})},
+ saturn:function(){return paint(512,256,function(u,v){var b=Math.sin(v*34+V3.fbm(u*5,v*8,2)*1.5)*.5+.5;return mix([190,165,110],[240,225,170],b*.8)})},
+ uranus:function(){return paint(256,128,function(u,v){var b=Math.sin(v*10)*.5+.5;return mix([140,210,220],[170,230,235],b*.5+V3.fbm(u*4,v*6,2)*.3)})},
+ neptune:function(){return paint(384,192,function(u,v){var n=wf(u,v,6,4),c=mix([30,60,170],[70,110,230],n);if(wf(u+.2,v,22,2)>.62)c=mix(c,[230,240,255],.55);return c})},
+ pluto:function(){return paint(256,128,function(u,v){var n=wf(u,v,8,5),c=mix([120,90,70],[220,200,180],n);var hx=(u-.4)*4,hy=(v-.5)*5;if(hx*hx+hy*hy<.5)c=mix(c,[245,235,225],.8);return c})},
+ moon:function(){return paint(256,128,function(u,v){var n=wf(u,v,10,4),g=110+n*90;if(V3.noise(u*70,v*35)>.8)g-=35;return[g,g,g*.97]})},
+ sun:function(){return paint(512,256,function(u,v){var n=wf(u,v,9,5),m=V3.fbm(u*30,v*15,3);return mix([255,120,10],[255,235,120],clamp01(n*1.5+m*.4-.2))})}
+};
+function clamp01(x){return x<0?0:x>1?1:x}
+/* ---------- escena: sistema solar ---------- */
+var solar=new T.Group();scene.add(solar);
+var stars=(function(){var p=[],c=[];for(var i=0;i<5200;i++){var a=Math.random()*6.283,b=Math.acos(Math.random()*2-1),r=5000;p.push(Math.cos(a)*Math.sin(b)*r,Math.cos(b)*r,Math.sin(a)*Math.sin(b)*r);var k=.6+Math.random()*.4,t=Math.random();c.push(k*(t<.2?1:.85),k*.9,k*(t>.7?1:.8))}
+ var g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('color',new T.Float32BufferAttribute(c,3));var pt=new T.Points(g,new T.PointsMaterial({size:2.2,sizeAttenuation:false,vertexColors:true,fog:false}));scene.add(pt);return pt})();
+// via lactea de fondo
+(function(){var p=[],c=[];for(var i=0;i<9000;i++){var a=Math.random()*6.283,r=4900,y=(Math.random()+Math.random()-1)*.12,x=Math.cos(a)*r,z=Math.sin(a)*r;p.push(x,y*r+Math.sin(a*2)*300,z);var k=.25+Math.random()*.35;c.push(k,k*.9,k*1.1)}var g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('color',new T.Float32BufferAttribute(c,3));scene.add(new T.Points(g,new T.PointsMaterial({size:1.6,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:.8,fog:false})))})();
+scene.add(new T.AmbientLight(0x2a3040,.55));
+var sunLight=new T.PointLight(0xfff2dc,3.2,0,0);solar.add(sunLight);
+var bodies=[],hits=[];
+PL.forEach(function(P,i){
+ var g=new T.Group(),tex=P.tex?TEX[P.tex]():null;
+ var mat=i===0?new T.MeshBasicMaterial({map:TEX.sun()}):new T.MeshStandardMaterial({map:tex,roughness:.92,metalness:0});
+ var m=new T.Mesh(new T.SphereGeometry(P.r,48,32),mat);if(P.n==='Urano')m.rotation.z=1.7;else m.rotation.z=.2;g.add(m);P.mesh=m;
+ if(i===0){[[44,.55,0xffa030],[26,.8,0xffd070]].forEach(function(q){var s=new T.Sprite(new T.SpriteMaterial({map:V3.dot(),color:q[2],transparent:true,opacity:q[1],blending:T.AdditiveBlending,depthWrite:false,fog:false}));s.scale.set(q[0]*2,q[0]*2,1);g.add(s)})}
+ if(P.n==='Tierra'){var cl=new T.Mesh(new T.SphereGeometry(P.r*1.015,40,28),new T.MeshStandardMaterial({map:paint(256,128,function(u,v){var n=wf(u,v,7,5),a=clamp01((n-.5)*4);return[255,255,255]}),alphaMap:paint(256,128,function(u,v){var n=wf(u+.2,v,7,5),a=clamp01((n-.48)*5)*255;return[a,a,a]}),transparent:true,opacity:.85,depthWrite:false,roughness:1}));g.add(cl);P.clouds=cl;
+  var at=new T.Sprite(new T.SpriteMaterial({map:V3.dot(),color:0x6aa8ff,transparent:true,opacity:.35,blending:T.AdditiveBlending,depthWrite:false,fog:false}));at.scale.set(P.r*4.4,P.r*4.4,1);g.add(at)}
+ if(P.rings||P.ringsThin){var in_=P.r*(P.rings?1.4:1.7),out=P.r*(P.rings?2.5:2.0),rg=new T.RingGeometry(in_,out,96,1),uv=rg.attributes.uv,pos=rg.attributes.position;for(var k=0;k<pos.count;k++){var rr=Math.hypot(pos.getX(k),pos.getY(k));uv.setXY(k,(rr-in_)/(out-in_),.5)}
+  var rt=V3.tex(V3.cvs(256,4,function(x,w){var gr=x.createLinearGradient(0,0,w,0);if(P.rings){gr.addColorStop(0,'rgba(180,160,120,0)');gr.addColorStop(.1,'rgba(200,180,140,.7)');gr.addColorStop(.3,'rgba(230,210,170,.95)');gr.addColorStop(.45,'rgba(60,50,40,.12)');gr.addColorStop(.52,'rgba(220,200,160,.9)');gr.addColorStop(.8,'rgba(190,170,130,.8)');gr.addColorStop(1,'rgba(180,160,120,0)')}else{gr.addColorStop(0,'rgba(200,230,235,0)');gr.addColorStop(.5,'rgba(200,230,235,.35)');gr.addColorStop(1,'rgba(200,230,235,0)')}x.fillStyle=gr;x.fillRect(0,0,w,4)}));
+  var rm=new T.Mesh(rg,new T.MeshStandardMaterial({map:rt,transparent:true,side:T.DoubleSide,depthWrite:false,roughness:1}));rm.rotation.x=Math.PI/2+(P.n==='Urano'?1.2:.46);g.add(rm)}
+ P.group=g;P.ang=Math.random()*6.283;P.omega=P.T?2*Math.PI/(60*Math.pow(P.a/149.6*0+P.a/58,1.5)):0;
+ if(P.a){g.position.set(Math.cos(P.ang)*P.a,0,Math.sin(P.ang)*P.a);
+  var pts=[];for(var q=0;q<=160;q++){var t=q/160*6.283;pts.push(new T.Vector3(Math.cos(t)*P.a,0,Math.sin(t)*P.a))}var ol=new T.LineLoop(new T.BufferGeometry().setFromPoints(pts),new T.LineBasicMaterial({color:0x8aa4d8,transparent:true,opacity:.18,fog:false}));solar.add(ol);P.orbit=ol}
+ P.moonObjs=[];(P.moons||[]).forEach(function(M){var mm=new T.Mesh(new T.SphereGeometry(M.r,24,16),new T.MeshStandardMaterial({map:M.n==='Luna'?TEX.moon():null,color:M.n==='Luna'?0xffffff:V3.pick([0xd8c8a0,0xb8b0a0,0xe8d8b0,0x8a7a6a]),roughness:1}));mm.userData={M:M,a:Math.random()*6.283};g.add(mm);P.moonObjs.push(mm)});
+ var lb=V3.label(P.n,{w:10});g.add(lb);P.lb=lb;
+ var hit=new T.Mesh(new T.SphereGeometry(Math.max(P.r*1.6,3),8,6),new T.MeshBasicMaterial({visible:false}));hit.userData.P=P;g.add(hit);hits.push(hit);
+ solar.add(g);bodies.push(P)});
+// cinturon de asteroides
+(function(){var n=1400,im=new T.InstancedMesh(new T.IcosahedronGeometry(.35,0),new T.MeshStandardMaterial({color:0x8a8277,roughness:1}),n),o=new T.Object3D();for(var i=0;i<n;i++){var a=Math.random()*6.283,r=93+Math.random()*16+Math.random()*6;o.position.set(Math.cos(a)*r,(Math.random()-.5)*2.4,Math.sin(a)*r);o.scale.setScalar(.4+Math.random()*1.2);o.rotation.set(Math.random()*6,Math.random()*6,0);o.updateMatrix();im.setMatrixAt(i,o.matrix)}solar.add(im);window.__belt=im})();
+/* ---------- escena: galaxias ---------- */
+var gal=new T.Group();gal.visible=false;scene.add(gal);var galHits=[];
+function spiral(n,R,arms,twist,cols){var p=[],c=[],col=new T.Color();for(var i=0;i<n;i++){var r=Math.pow(Math.random(),.62)*R,arm=Math.floor(Math.random()*arms),th=r*twist/R*2.4+arm*6.283/arms+(Math.random()-.5)*(.5+(1-r/R)*.3);var sp=(Math.random()-.5)*(R*.12)*(1-r/R*.8);var core=r<R*.12;p.push(Math.cos(th)*r+(Math.random()-.5)*R*.03,sp*(core?3:1),Math.sin(th)*r+(Math.random()-.5)*R*.03);var t=r/R;if(core)col.setRGB(1,.82,.5);else col.setRGB(cols[0][0]*(1-t)+cols[1][0]*t,cols[0][1]*(1-t)+cols[1][1]*t,cols[0][2]*(1-t)+cols[1][2]*t);var k=.55+Math.random()*.45;c.push(col.r*k,col.g*k,col.b*k)}
+ var g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('color',new T.Float32BufferAttribute(c,3));return new T.Points(g,new T.PointsMaterial({size:1.3,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:.16,blending:T.AdditiveBlending,depthWrite:false,fog:false}))}
+var GAL=[
+ {n:'Vía Láctea',x:0,y:0,z:0,R:90,arms:4,tw:3.2,cols:[[1,.85,.6],[.5,.65,1]],data:[['Tipo','Espiral barrada'],['Diámetro','100.000 años luz'],['Estrellas','100.000–400.000 millones'],['Edad','13.600 millones de años'],['Nuestra casa','a 26.000 años luz del centro']],t:'Es nuestra galaxia. El Sol da una vuelta a su centro cada 230 millones de años. En el centro hay un agujero negro supermasivo.',n2:30000},
+ {n:'Andrómeda',x:300,y:40,z:-190,R:100,arms:3,tw:2.6,cols:[[1,.88,.7],[.7,.75,1]],tilt:[.9,.3],data:[['Tipo','Espiral'],['Distancia','2,5 millones de años luz'],['Diámetro','220.000 años luz'],['Estrellas','1 billón'],['Futuro','chocará con la Vía Láctea en unos 4.500 millones de años']],t:'Es la galaxia grande más cercana y se ve a simple vista como una mancha en el cielo oscuro.',n2:30000},
+ {n:'Galaxia del Triángulo',x:-250,y:-30,z:-260,R:55,arms:2,tw:2.2,cols:[[.9,.9,.8],[.5,.8,1]],tilt:[.5,-.4],data:[['Tipo','Espiral'],['Distancia','2,7 millones de años luz'],['Diámetro','60.000 años luz']],t:'Es la tercera galaxia más grande de nuestro grupo local y está llena de zonas donde nacen estrellas.',n2:14000},
+ {n:'Gran Nube de Magallanes',x:-120,y:-60,z:150,R:26,arms:1,tw:.8,cols:[[1,.85,.8],[.7,.8,1]],tilt:[.2,.2],data:[['Tipo','Galaxia enana irregular'],['Distancia','160.000 años luz'],['Diámetro','14.000 años luz']],t:'Es una galaxia satélite de la Vía Láctea. Solo se ve desde el hemisferio sur.',n2:8000}
+];
+GAL.forEach(function(G,i){var s=spiral(G.n2,G.R,G.arms,G.tw,G.cols);var gg=new T.Group();gg.position.set(G.x,G.y,G.z);if(G.tilt){gg.rotation.x=G.tilt[0];gg.rotation.z=G.tilt[1]}gg.add(s);
+ var gl=new T.Sprite(new T.SpriteMaterial({map:V3.dot(),color:0xffd89a,transparent:true,opacity:.22,blending:T.AdditiveBlending,depthWrite:false,fog:false}));gl.scale.set(G.R*.9,G.R*.9,1);gg.add(gl);
+ var lb=V3.label(G.n,{w:G.R*.9});lb.position.y=G.R*.35;lb.userData.k=G.R*.9;gg.add(lb);G.lb=lb;
+ var hit=new T.Mesh(new T.SphereGeometry(G.R*.55,8,6),new T.MeshBasicMaterial({visible:false}));hit.userData.G=G;gg.add(hit);galHits.push(hit);G.group=gg;gal.add(gg);
+ if(i===0){var me=V3.label('☀ Estás aquí',{w:16,color:'#ffe08a'});me.position.set(Math.cos(1)*G.R*.5,3,Math.sin(1)*G.R*.5);me.userData.k=1;gg.add(me);var mk=new T.Sprite(new T.SpriteMaterial({map:V3.dot(),color:0xffe08a,transparent:true,blending:T.AdditiveBlending,depthWrite:false,fog:false}));mk.scale.set(6,6,1);mk.position.copy(me.position);mk.position.y=0;gg.add(mk);G.me=me}});
+/* ---------- camara y UI ---------- */
+var O=V3.orbit({dist:430,pitch:.55,min:2,max:1600,auto:.02,smooth:4});O.yaw=.6;
+var mode='solar',focus=null,distT=430,speed=10,tour=false,tourT=0,tourI=0,showLabels=true,showOrbits=true,chipEls={};
+function showCard(P){if(!P){card.style.display='none';return}card.style.display='block';var rows=P.data.map(function(r){return'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>'}).join('');card.innerHTML='<h3>'+P.n+'</h3><div class="sb">'+(P.d||'')+'</div><table>'+rows+'</table><p>'+(P.t||'')+'</p>'}
+function setFocus(P){focus=P;O.auto=0;if(P&&P.group){O.follow=P.group;O.min=P.r*1.7;distT=Math.max(P.r*4.2,6);O.maxP=1.4;showCard(P)}else{O.follow=null;O.tgt.set(0,0,0);distT=430;O.min=2;showCard(null)}
+ Object.keys(chipEls).forEach(function(k){chipEls[k].classList.toggle('on',k===(P?P.n:'sistema'))})}
+function setMode(m){mode=m;solar.visible=m==='solar';gal.visible=m==='gal';stars.visible=m==='solar';O.follow=null;focus=null;showCard(null);O.auto=.02;O.tgt.set(0,0,0);if(m==='solar'){distT=430;O.min=2;O.max=1600;O.pitch=.55}else{distT=420;O.min=15;O.max=2000;O.pitch=.7;scene.fog=null}
+ buildBar();Object.keys(chipEls).forEach(function(k){chipEls[k].classList.toggle('on',k==='sistema'||k==='gal0')})}
+function focusGal(G){O.follow=G.group;O.auto=0;O.min=G.R*.5;distT=G.R*2.4;focus=G;showCard(G)}
+O.onTap=function(x,y){var arr=mode==='solar'?hits:galHits,r=O.ray(x,y,arr,false);if(r.length){var u=r[0].object.userData;if(u.P)setFocus(u.P);else if(u.G)focusGal(u.G)}};
+function buildBar(){bar.innerHTML='';chipEls={};
+ if(mode==='solar'){chipEls.sistema=V3.chip(bar,'☀ Sistema solar',function(){setFocus(null)},true);PL.forEach(function(P){chipEls[P.n]=V3.chip(bar,P.n,function(){setFocus(P)})})}
+ else{chipEls.gal0=V3.chip(bar,'Vista general',function(){O.follow=null;O.tgt.set(0,0,0);distT=420;focus=null;showCard(null)},true);GAL.forEach(function(G){V3.chip(bar,G.n,function(){focusGal(G)})})}
+ side.innerHTML='';
+ V3.chip(side,mode==='solar'?'🌌 Ir a las galaxias':'🪐 Volver al sistema solar',function(){setMode(mode==='solar'?'gal':'solar')});
+ if(mode==='solar'){V3.chip(side,'⏩ Velocidad ×'+speed,function(b){speed=speed===1?10:speed===10?100:speed===100?0:1;b.textContent='⏩ Velocidad '+(speed?'×'+speed:'en pausa')});
+  V3.chip(side,'🧭 Tour automático',function(b){tour=!tour;b.classList.toggle('on',tour);tourT=0;if(!tour){}});
+  V3.chip(side,'🏷 Nombres',function(b){showLabels=!showLabels;b.classList.toggle('on',showLabels)},true);
+  V3.chip(side,'⭕ Órbitas',function(b){showOrbits=!showOrbits;b.classList.toggle('on',showOrbits)},true)}}
+buildBar();setFocus(null);
+/* ---------- bucle ---------- */
+var tmp=new T.Vector3();
+V3.on(function(dt,t){
+ if(mode==='solar'){
+  bodies.forEach(function(P){if(P.a){P.ang+=P.omega*dt*speed*.35;P.group.position.set(Math.cos(P.ang)*P.a,0,Math.sin(P.ang)*P.a)}
+   if(P.day){P.mesh.rotation.y+=(P.day>0?1:-1)*dt*Math.min(speed||0,10)*.9*(24/Math.min(Math.abs(P.day),200))*.12}else if(P.n==='Sol')P.mesh.rotation.y+=dt*.03;
+   if(P.clouds)P.clouds.rotation.y+=dt*.02*speed;
+   P.moonObjs.forEach(function(mm){var M=mm.userData.M;mm.userData.a+=dt*speed*.35*2*Math.PI/(M.T*1.4+1);mm.position.set(Math.cos(mm.userData.a)*M.d,Math.sin(mm.userData.a*.5)*.3,Math.sin(mm.userData.a)*M.d)});
+   var d=cam.position.distanceTo(P.group.getWorldPosition(tmp));P.lb.visible=showLabels&&focus!==P;var s=Math.max(d*.075,P.r*1.4);P.lb.scale.set(s*2.4,s*.6,1);P.lb.position.y=P.r*1.5+s*.35;if(P.orbit)P.orbit.visible=showOrbits;
+  });
+  if(window.__belt)window.__belt.rotation.y+=dt*.004*speed;
+  if(tour){tourT-=dt;if(tourT<=0){tourT=13;tourI=(tourI+1)%PL.length;setFocus(PL[tourI]);tour=true;O.auto=0}if(focus)O.yaw+=dt*.12}
+ }else{GAL.forEach(function(G){G.group.rotation.y+=dt*.01;var d=cam.position.distanceTo(G.group.getWorldPosition(tmp));var s=Math.max(d*.1,G.R*.7);G.lb.scale.set(s*2.4,s*.6,1);G.lb.position.y=G.R*.4+s*.2;if(G.me){var q=Math.max(d*.04,3);G.me.scale.set(q*4,q,1)}});if(tour){}}
+ O.dist+=(distT-O.dist)*(1-Math.exp(-3*dt));O.update(dt)});
+document.addEventListener('visibilitychange',function(){});
+/* musica ambiente suave (tras el primer toque) */
+var padOn=false;
+function pad(){if(padOn)return;var ac=V3.audio();if(!ac)return;padOn=true;var lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=520;var g=ac.createGain();g.gain.value=0;g.gain.setTargetAtTime(.07,ac.currentTime,3);lp.connect(g);g.connect(V3.master);
+ [110,164.8,220,277.2,329.6].forEach(function(f,i){var o=ac.createOscillator();o.type=i%2?'sine':'triangle';o.frequency.value=f*(1+(i-2)*.0015);var og=ac.createGain();og.gain.value=.5/(1+i*.3);o.connect(og);og.connect(lp);o.start();var l=ac.createOscillator();l.frequency.value=.05+i*.02;var lg=ac.createGain();lg.gain.value=.25*og.gain.value;l.connect(lg);lg.connect(og.gain);l.start()});
+ var l2=ac.createOscillator();l2.frequency.value=.04;var lg2=ac.createGain();lg2.gain.value=180;l2.connect(lg2);lg2.connect(lp.frequency);l2.start()}
+addEventListener('pointerdown',pad,{once:true});
+</script>
+</body></html>

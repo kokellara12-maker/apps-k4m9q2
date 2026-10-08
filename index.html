@@ -288,9 +288,10 @@ setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.re
     return el;
   }
 
-  var CATS = [['all', '✨', 'Todo'], ['juegos', '🎮', 'Juegos'], ['herramientas', '🧰', 'Herramientas']];
+  var CATS = [['all', '✨', 'Todo'], ['juegos', '🎮', 'Juegos'], ['herramientas', '🧰', 'Herramientas'], ['explorar', '🔭', 'Explorar']];
   var SUBS = {
     juegos: [['terror', '👻', 'Terror'], ['roblox', '🧱', 'Estilo Roblox'], ['arcade', '🏃', 'Arcade'], ['puzzle', '🧩', 'Puzzle'], ['carreras', '🏎️', 'Carreras'], ['accion', '⚔️', 'Acción'], ['deportes', '🏀', 'Deportes'], ['fiesta', '🎉', 'Fiesta']],
+    explorar: [['relax', '🧘', 'Relax'], ['mundo', '🌍', 'Mundo'], ['ciencia', '🔬', 'Ciencia']],
     herramientas: [['dibujo', '🎨', 'Dibujo'], ['musica', '🎵', 'Música'], ['voz', '🎙️', 'Voz'], ['foto', '📸', 'Foto y memes'], ['relax', '🧘', 'Relax'], ['electronica', '🔌', 'Electrónica'], ['util', '🔐', 'Utilidades']]
   };
   var ALL = [], st = { q: '', cat: 'all', sub: 'all' };
@@ -394,7 +395,7 @@ setTimeout(function(){sp.classList.add('out')},1700);setTimeout(function(){sp.re
   qi.addEventListener('input', function () { st.q = qi.value; draw(); document.getElementById('sc').scrollTop = 0; });
   qx.onclick = function () { qi.value = ''; st.q = ''; draw(); qi.focus(); };
   function render(list) {
-    ALL = list.filter(function (a) { return a && a.nombre && a.href; }).map(function (a) { if (a.cat !== 'juegos' && a.cat !== 'herramientas') a.cat = 'herramientas'; return a; });
+    ALL = list.filter(function (a) { return a && a.nombre && a.href; }).map(function (a) { if (a.cat !== 'juegos' && a.cat !== 'herramientas' && a.cat !== 'explorar') a.cat = 'herramientas'; return a; });
     ALL.forEach(prep); window.__ALL = ALL; draw(); if (window.__paintProg) window.__paintProg();
   }
 
