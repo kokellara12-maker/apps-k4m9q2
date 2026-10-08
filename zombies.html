@@ -67,7 +67,7 @@ function vmShot(){var g=new T.Group();cy(g,.02,.6,0x2a2b30,0,.02,-.45,{metalness
 
 var GLOW;
 /* ---------- zombis ---------- */
-var ZT={walk:{hp:60,spd:1.5,dmg:12,sc:1,pts:100,col:0x90b080},run:{hp:40,spd:3.3,dmg:9,sc:.95,pts:120,col:0xb0c078},brute:{hp:420,spd:1.35,dmg:26,sc:1.45,pts:400,col:0x7a9078}};
+var ZT={walk:{hp:50,spd:1.4,dmg:9,sc:1,pts:100,col:0x90b080},run:{hp:40,spd:3.3,dmg:9,sc:.95,pts:120,col:0xb0c078},brute:{hp:420,spd:1.35,dmg:26,sc:1.45,pts:400,col:0x7a9078}};
 function mkZ(type){var Z=ZT[type],g=new T.Group(),skin=Z.col,cl=[0x4a3a3a,0x3a4a5a,0x4a4a32,0x5a3a2e][(Math.random()*4)|0],pn=[0x2a2a38,0x3a3226,0x1e2a2e][(Math.random()*3)|0];
  function m(geo,c,o,x,y,z,par){var me=new T.Mesh(geo,mat(c,o||{roughness:.9,metalness:0}));me.position.set(x,y,z);me.castShadow=true;(par||g).add(me);return me}
  var body=new T.Group();g.add(body);
@@ -112,8 +112,8 @@ var torch,torch2;
 /* ---------- partida ---------- */
 function selW(i){if(!owned[i])return;if(P.rt>0&&i!==wi)P.rt=0;wi=i;vmW.forEach(function(g,k){g.visible=k===i});weapons[i].cd=Math.max(weapons[i].cd,.35);scoped=false;GK.snd('click',.3);P.swap=.25;updBtns()}
 function nextW(){for(var k=1;k<=4;k++){var j=(wi+k)%4;if(owned[j]){selW(j);return}}}
-G3.reset=function(){diff=1;kills=0;heads=0;feed=[];over=false;shop=false;points=0;owned=[1,0,0,0];dmgMul=1;magMul=1;wave=0;mkWeapons();(bots||[]).forEach(function(b){scene.remove(b.m)});bots=[];P={x:0,z:0,y:0,vy:0,yaw:0,pitch:0,hp:100,rt:0,kick:0,ry:0,swap:0,bob:0,spd:0,dead:false,bloom:0,ar:0};var sp=spawns[0];P.x=39;P.z=39;unstuck(P);P.yaw=bestYaw(P);wi=0;selW(0);msg='';joy=null;look=null;fireHeld=false;pfc=-1;GK.setScore(0);document.querySelectorAll('.zshop').forEach(function(e){e.remove()});startWave()};
-function startWave(){wave++;toSpawn=6+wave*4+((wave*wave)>>2);spT=1;banner=3;bannerTxt='OLEADA '+wave;GK.snd('radio',.4);var w=weapons;w.forEach(function(x){if(x.owned){x.res=Math.min(x.res+Math.round(x.mag*1.5),x.mag*8)}});P.hp=Math.min(100,P.hp+30);interT=0}
+G3.reset=function(){diff=1;kills=0;heads=0;feed=[];over=false;shop=false;points=0;owned=[1,1,0,0];dmgMul=1;magMul=1;wave=0;mkWeapons();(bots||[]).forEach(function(b){scene.remove(b.m)});bots=[];P={x:0,z:0,y:0,vy:0,yaw:0,pitch:0,hp:100,rt:0,kick:0,ry:0,swap:0,bob:0,spd:0,dead:false,bloom:0,ar:0};var sp=spawns[0];P.x=39;P.z=39;unstuck(P);P.yaw=bestYaw(P);wi=1;selW(1);msg='';joy=null;look=null;fireHeld=false;pfc=-1;GK.setScore(0);document.querySelectorAll('.zshop').forEach(function(e){e.remove()});startWave()};
+function startWave(){wave++;toSpawn=4+wave*3+((wave*wave)>>2);spT=2;banner=3;bannerTxt='OLEADA '+wave;GK.snd('radio',.4);var w=weapons;w.forEach(function(x){if(x.owned){x.res=Math.min(x.res+Math.round(x.mag*1.5),x.mag*8)}});P.hp=Math.min(100,P.hp+30);interT=0}
 function hitPlayer(dmg,fx_,fz_){if(P.dead)return;P.hp-=dmg;GK.snd('pain'+(1+((Math.random()*4)|0)),.5);GK.shake(7);GK.vib(30);var a=Math.atan2(fx_-P.x,-(fz_-P.z))-P.yaw;dmgDirs.push({a:a,t:1});if(P.hp<=0){P.hp=0;P.dead=true;GK.snd('ugh',.6);setTimeout(function(){finish('Sobreviviste hasta la oleada '+wave)},900)}}
 function killBot(b,head){b.dead=true;b.dt=0;kills++;if(head)heads++;var pt=ZT[b.type].pts+(head?50:0);points+=pt;GK.add(pt);GK.snd(head?'headshot':'ugh2',.5);feed.unshift({t:3,txt:'+'+pt+(head?'  HEADSHOT':''),h:head});if(feed.length>4)feed.pop()}
 function finish(m){if(over)return;over=true;GK.over(m)}
@@ -142,7 +142,7 @@ function botAI(b,dt){var Z=ZT[b.type];b.hitT=Math.max(0,b.hitT-dt);
  var dx=P.x-b.x,dz=P.z-b.z,dist=Math.hypot(dx,dz);if(P.dead){b.walk=false}else{
   turn(b,Math.atan2(dx,dz),dt,4.5);
   if(dist>1.15){var dir=1;if(dist<5&&los(b.x,1.2,b.z,P.x,1.2,P.z)){moveCol(b,dx/dist*b.spd*dt,dz/dist*b.spd*dt,.35)}else if(!stepAlong(b,pfield,dt,b.spd)){moveCol(b,dx/dist*b.spd*dt,dz/dist*b.spd*dt,.35)}b.walk=true}
-  else{b.walk=false;b.atk-=dt;if(b.atk<=0){b.atk=.9;hitPlayer(Z.dmg,b.x,b.z);GK.snd('punch'+(1+((Math.random()*3)|0)),.35)}}}
+  else{b.walk=false;b.atk-=dt;if(b.atk<=0){b.atk=1.1;hitPlayer(Z.dmg,b.x,b.z);GK.snd('punch'+(1+((Math.random()*3)|0)),.35)}}}
  b.groan-=dt;if(b.groan<=0&&dist<18){b.groan=rnd(4,10);GK.snd(Math.random()<.5?'ugh2':'ugh3',Math.max(.05,.35-dist/60),.6+Math.random()*.3)}
  for(var o of bots){if(o===b||o.dead)continue;var ex=b.x-o.x,ez=b.z-o.z,d=Math.hypot(ex,ez);if(d<.75&&d>.001){moveCol(b,ex/d*.025,ez/d*.025,.3)}}
  var u=b.m.userData;b.ph+=dt*(b.walk?(b.type==='run'?12:7):0);var s=Math.sin(b.ph)*.75*(b.walk?1:0);u.legL.rotation.x=s;u.legR.rotation.x=-s;var sw=Math.sin(b.ph*.5)*.12;u.armL.rotation.x=-1.4+sw;u.armR.rotation.x=-1.5-sw;u.body.rotation.x=b.walk?.12+Math.sin(b.ph)*.05:0;
@@ -179,7 +179,7 @@ G3.update=function(dt){if(over||shop)return;unstuck(P);var w=weapons[wi];w.cd=Ma
  hitm=Math.max(0,hitm-dt);flashT-=dt;if(flashT<=0){flash.visible=false;flashL.intensity=0}
  var pc=Math.floor(P.z/CELL)*N+Math.floor(P.x/CELL);if(pc!==pfc){pfc=pc;pfield=makeField(Math.floor(P.x/CELL),Math.floor(P.z/CELL))}
  // spawn
- var alive=bots.filter(function(b){return !b.dead}).length,cap=Math.min(34,16+wave*2);if(toSpawn>0){spT-=dt;if(spT<=0&&alive<cap){spawnZ();toSpawn--;spT=Math.max(.35,1.5-wave*.08)}}
+ var alive=bots.filter(function(b){return !b.dead}).length,cap=Math.min(34,16+wave*2);if(toSpawn>0){spT-=dt;if(spT<=0&&alive<cap){spawnZ();toSpawn--;spT=Math.max(.5,2.2-wave*.1)}}
  bots.forEach(function(b){botAI(b,dt)});bots=bots.filter(function(b){return !b.gone});
  if(toSpawn<=0&&bots.every(function(b){return b.dead})&&!P.dead){interT+=dt;if(interT>1.2){openShop()}}
  for(var i=feed.length-1;i>=0;i--){feed[i].t-=dt;if(feed[i].t<=0)feed.splice(i,1)}
