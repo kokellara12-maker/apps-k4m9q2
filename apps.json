@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Koke Kart",
+   "desc": "Carreras de karts 3D estilo Mario Kart: 3 circuitos (campeonato), derrapes con turbo, cajas de objetos, caparazones, bananas y 7 rivales.",
+   "href": "kart.html",
+   "icono": "🏎️",
+   "color": "#ffb020",
+   "cat": "juegos",
+   "img": "img/kart.webp",
+   "sub": "carreras",
+   "tags": "mario kart karts carreras derrape objetos caparazon banana 3d"
+  },
+  {
    "nombre": "Astral Affinity",
    "desc": "Mundo abierto 3D gigante y psicodélico, sin misión: bosques, aldeas, castillos, lagos, montañas, animales, portales e islas flotantes",
    "href": "astral.html",
