@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Koke Birds",
+   "desc": "Estilo Angry Birds con física real: honda, pájaros rojo, amarillo, azul y negro, bloques de madera, piedra y cristal, cerdos con casco.",
+   "href": "birds.html",
+   "icono": "🐦",
+   "color": "#ff5a3a",
+   "cat": "juegos",
+   "img": "img/birds.webp",
+   "sub": "arcade",
+   "tags": "angry birds pajaros cerdos honda fisica destruir"
+  },
+  {
    "nombre": "Super Koke",
    "desc": "Plataformas estilo Super Mario: 3 mundos, goombas y koopas, bloques con monedas y setas, tuberías y bandera final.",
    "href": "mario.html",
