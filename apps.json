@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Koke Strike",
+   "desc": "Shooter 3D tipo Counter-Strike: deathmatch contra bots con Glock, AK-47, AWP con mira y escopeta. Headshots, radar y 3 dificultades.",
+   "href": "strike.html",
+   "icono": "🔫",
+   "color": "#ff8a3a",
+   "cat": "juegos",
+   "img": "img/strike.webp",
+   "sub": "accion",
+   "tags": "shooter fps counter strike cs disparos armas bots 3d ak awp"
+  },
+  {
    "nombre": "Koke City",
    "desc": "GTA 3D gigante: misiones con historia, atracos, coches, motos, helicóptero, lanchas, Club Tacón, casas con vecinos, camello, desguace y policía 🚔",
    "href": "gta.html",
