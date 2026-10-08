@@ -96,7 +96,7 @@ function draw(c,W,H){var L=lay(W,H),T0=performance.now()/1000;
  var sx=px0+PL.length*(pw+6);c.fillStyle=shovel?'#ffe28a':'#c8a878';c.beginPath();c.roundRect(sx,6,54,L.tb-12,8);c.fill();c.strokeStyle='#6a4a2a';c.lineWidth=2;c.stroke();c.fillStyle='#8a8f98';c.beginPath();c.moveTo(sx+18,L.tb/2+14);c.lineTo(sx+36,L.tb/2+14);c.lineTo(sx+27,L.tb/2-4);c.fill();c.fillStyle='#6a4a2a';c.fillRect(sx+25,10,4,L.tb/2-8);GK.text('PALA',sx+27,L.tb-10,10,'#3a2208','center',false);
  if(bannerT>0){c.globalAlpha=Math.min(1,bannerT*1.5);GK.text(bannerTxt,W/2,H*.5,Math.min(34,W/16),'#ff4a3a','center');c.globalAlpha=1}
  if(sel>=0)GK.text('Toca el césped para plantar: '+PL[sel].n,W/2,H-10,12,'#fff','center',false)}
-GK.start({real:true,dither:false,title:'PLANTAS VS ZOMBIS',color:'#7bd13a',bg:'#6ec6f0',help:'Planta girasoles para conseguir soles y defiende tu jardín. Toca los soles para recogerlos, elige una planta arriba y toca el césped. ¡No dejes que lleguen a tu casa!',reset:reset,update:update,draw:draw,down:down});
+GK.start({px:2,title:'PLANTAS VS ZOMBIS',color:'#7bd13a',bg:'#6ec6f0',help:'Planta girasoles para conseguir soles y defiende tu jardín. Toca los soles para recogerlos, elige una planta arriba y toca el césped. ¡No dejes que lleguen a tu casa!',reset:reset,update:update,draw:draw,down:down});
 })();
 
 </script></body></html>

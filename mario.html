@@ -138,7 +138,7 @@ function hitBtn(x,y){var W=GK.W(),H=GK.H(),by=H-84;function inn(bx,byy,w,h){retu
 function recalc(){btn.l=btn.r=btn.j=btn.run=0;for(var k in pts){var b=hitBtn(pts[k][0],pts[k][1]);if(b)btn[b]=1}}
 function down(x,y,e){pts[e.pointerId]=[x,y];recalc()}function move(x,y,e){if(pts[e.pointerId]){pts[e.pointerId]=[x,y];recalc()}}function up(x,y,e){delete pts[e.pointerId];recalc()}
 function key(c){keys[c]=1}window.addEventListener('keyup',function(e){keys[e.code]=0});
-GK.start({real:true,dither:false,title:'SUPER KOKE',color:'#e8402a',bg:'#4aa8f0',help:'Corre y salta por 3 mundos: pisa a los enemigos, rompe ladrillos, coge setas y llega a la bandera. Izquierda: flechas · Derecha: SALTO (mantén para saltar más alto) y CORRER.',reset:reset,update:update,draw:draw,down:down,move:move,up:up,key:key});
+GK.start({px:2,title:'SUPER KOKE',color:'#e8402a',bg:'#4aa8f0',help:'Corre y salta por 3 mundos: pisa a los enemigos, rompe ladrillos, coge setas y llega a la bandera. Izquierda: flechas · Derecha: SALTO (mantén para saltar más alto) y CORRER.',reset:reset,update:update,draw:draw,down:down,move:move,up:up,key:key});
 })();
 
 </script></body></html>

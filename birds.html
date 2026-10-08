@@ -102,7 +102,7 @@ function draw(c,W,H){ppm=H/13;var gs=groundScreen();
  if(state==='aim'&&cur&&!drag&&birdQ.length===(LEVELS[lvl%LEVELS.length].b.length-1))GK.text('Arrastra el pájaro hacia atrás y suelta',W/2,H*.3,15,'#fff');
  if(state==='fly'&&!usedPower&&cur&&cur.t!=='red'&&stT>.25)GK.text('Toca la pantalla: poder del pájaro',W/2,H*.2,14,'#fff');
  if(msgT>0)GK.text(msg+(stars?'  '+'*'.repeat(stars):''),W/2,H*.4,32,'#ffd23a')}
-GK.start({real:true,dither:false,title:'KOKE BIRDS',color:'#ff5a3a',bg:'#5ab8f0',help:'Lanza pájaros con la honda y destruye todos los cerdos. Arrastra hacia atrás y suelta. Toca la pantalla en el aire para activar el poder: el amarillo acelera, el azul se divide y el negro explota.',reset:reset,update:update,draw:draw,down:down,move:move,up:up});
+GK.start({px:2,title:'KOKE BIRDS',color:'#ff5a3a',bg:'#5ab8f0',help:'Lanza pájaros con la honda y destruye todos los cerdos. Arrastra hacia atrás y suelta. Toca la pantalla en el aire para activar el poder: el amarillo acelera, el azul se divide y el negro explota.',reset:reset,update:update,draw:draw,down:down,move:move,up:up});
 })();
 
 </script></body></html>
