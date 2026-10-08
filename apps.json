@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Plantas vs Zombis",
+   "desc": "Estilo Plants vs Zombies: girasoles, lanzaguisantes, nueces, hielo y petacerezas contra oleadas de zombis con cono y cubo. Cortacéspedes y modo infinito.",
+   "href": "plantas.html",
+   "icono": "🌻",
+   "color": "#7bd13a",
+   "cat": "juegos",
+   "img": "img/plantas.webp",
+   "sub": "estrategia",
+   "tags": "plantas zombis plants vs zombies defensa torre jardin girasol"
+  },
+  {
    "nombre": "Koke Zombies",
    "desc": "Shooter 3D de oleadas de zombis de noche: linterna, tienda de armas y mejoras entre oleadas, brutos y corredores.",
    "href": "zombies.html",
