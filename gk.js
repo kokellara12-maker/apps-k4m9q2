@@ -32,7 +32,8 @@
     '.btn{font:inherit;font-weight:900;font-size:19px;letter-spacing:.5px;color:#1a1530;background:linear-gradient(180deg,#fff7c4,var(--acc,#ffd23a) 45%,var(--acc,#ffd23a));border:0;border-radius:18px;padding:14px 32px;box-shadow:0 6px 0 rgba(0,0,0,.32),0 10px 22px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.7);cursor:pointer;touch-action:manipulation;animation:pu 1.6s ease-in-out infinite}' +
     '@keyframes pu{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}' +
     '.btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.32);animation:none}.btn.g{background:rgba(255,255,255,.16);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.3);font-size:16px;padding:11px 22px;text-decoration:none;animation:none}' +
-    '@keyframes pp{from{transform:scale(.8) translateY(20px);opacity:0}to{transform:scale(1);opacity:1}}';
+    '@keyframes pp{from{transform:scale(.8) translateY(20px);opacity:0}to{transform:scale(1);opacity:1}}' +
+    '@media (max-height:480px){.card{padding:12px 18px;max-height:96vh;overflow:auto;gap:6px}.card h1{font-size:22px}.card p{font-size:12px;line-height:1.3}.card .ic,.card img.cov{display:none}.btn{padding:9px 26px;font-size:16px}}';
   function el(t, cls, html) { var e = document.createElement(t); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   GK.start = function (g) {
     G = g;

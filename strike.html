@@ -106,7 +106,7 @@ function spawnPoint(far){var best=null,bd=-1;for(var s of spawns){var m=1e9;for(
 function newBot(i){var g=mkBot(i);scene.add(g);var b={m:g,x:0,z:0,yaw:0,hp:100,dead:false,dt:0,state:'roam',goal:0,react:0,burst:0,bt:0,ph:Math.random()*6,seen:0,lx:0,lz:0,strafe:1,st:0,hitT:0,flT:0,ai:i};respawnBot(b);return b}
 function respawnBot(b){var s=spawnPoint(false),tries=0;while(P&&Math.hypot(s.x-P.x,s.z-P.z)<24&&tries++<8)s=spawnPoint(false);b.x=s.x+rnd(-1,1);b.z=s.z+rnd(-1,1);b.hp=100;b.dead=false;b.dt=0;b.state='roam';b.goal=(Math.random()*nodes.length)|0;b.m.visible=true;b.m.rotation.set(0,0,0);b.m.position.y=0;b.m.traverse(function(o){if(o.material&&o.material.transparent&&o.material.map!==GLOW){o.material.opacity=1}});b.react=0;b.seen=0}
 function selW(i){if(P.rt>0&&i!==wi)P.rt=0;wi=i;vmW.forEach(function(g,k){g.visible=k===i});weapons[i].cd=Math.max(weapons[i].cd,.35);scoped=false;GK.snd('click',.3);P.swap=.25;updBtns()}
-G3.reset=function(){diff=GK.store.get('diff',1);var D=DIFFS[diff];kills=0;deaths=0;heads=0;tmatch=MATCH;feed=[];over=false;mkWeapons();(bots||[]).forEach(function(b){scene.remove(b.m)});bots=[];P={x:0,z:0,y:0,vy:0,yaw:0,pitch:0,hp:100,rt:0,kick:0,ry:0,swap:0,bob:0,spd:0,dead:false,bloom:0,ar:0};var sp=spawnPoint(false);P.x=sp.x;P.z=sp.z;P.yaw=Math.atan2(44*CELL/2-P.x,-(44*CELL/2-P.z));selW(1);for(var i=0;i<D.bots;i++)bots.push(newBot(i));respawnT=0;msg='';joy=null;look=null;fireHeld=false;pfc=-1;GK.setScore(0)};
+G3.reset=function(){diff=GK.store.get('diff',1);var D=DIFFS[diff];kills=0;deaths=0;heads=0;tmatch=MATCH;feed=[];over=false;mkWeapons();(bots||[]).forEach(function(b){scene.remove(b.m)});bots=[];P={x:0,z:0,y:0,vy:0,yaw:0,pitch:0,hp:100,rt:0,kick:0,ry:0,swap:0,bob:0,spd:0,dead:false,bloom:0,ar:0};var sp=spawnPoint(false);P.x=sp.x;P.z=sp.z;P.yaw=Math.atan2(-(44-P.x),-(44-P.z));selW(1);for(var i=0;i<D.bots;i++)bots.push(newBot(i));respawnT=0;msg='';joy=null;look=null;fireHeld=false;pfc=-1;GK.setScore(0)};
 function hitPlayer(dmg,fromx,fromz){if(P.dead)return;P.hp-=dmg;GK.snd('pain'+(1+((Math.random()*4)|0)),.5);GK.shake(6);GK.vib(30);var a=Math.atan2(fromx-P.x,-(fromz-P.z))-P.yaw;dmgDirs.push({a:a,t:1});if(P.hp<=0){P.hp=0;P.dead=true;deaths++;respawnT=3;fireHeld=false;GK.snd('ugh',.6);msg='Has muerto';msgT=3;GK.add(-30)}}
 function killBot(b,head,w){b.dead=true;b.dt=0;kills++;if(head)heads++;GK.add(100+(head?50:0));P.hp=Math.min(100,P.hp+15);GK.snd(head?'headshot':'ugh',.6);if(!head)GK.snd('yell'+(1+((Math.random()*4)|0)),.35);feed.unshift({t:4,txt:'TÚ  ['+weapons[wi].n+']'+(head?'  HEADSHOT':'')+'  Enemigo '+(b.ai+1),h:head});if(feed.length>4)feed.pop();if(kills>=TARGET)finish('¡VICTORIA!')}
 function finish(m){if(over)return;over=true;GK.over(m)}
@@ -178,7 +178,7 @@ G3.key=function(c,e){if(c==='KeyR')reload();else if(c==='Space')jump();else if(c
 /* ---------- bucle ---------- */
 G3.update=function(dt){if(over)return;var D=DIFFS[diff];tmatch-=dt;if(tmatch<=0){finish('¡Se acabó el tiempo!');return}
  var w=weapons[wi];w.cd=Math.max(0,w.cd-dt);P.swap=Math.max(0,P.swap-dt);
- if(P.dead){respawnT-=dt;if(respawnT<=0){var sp=spawnPoint(true);P.x=sp.x;P.z=sp.z;P.hp=100;P.dead=false;P.pitch=0;mkWeapons();selW(1);msg='';GK.snd('ok',.3)}}
+ if(P.dead){respawnT-=dt;if(respawnT<=0){var sp=spawnPoint(true);P.x=sp.x;P.z=sp.z;P.yaw=Math.atan2(-(44-P.x),-(44-P.z));P.hp=100;P.dead=false;P.pitch=0;mkWeapons();selW(1);msg='';GK.snd('ok',.3)}}
  // movimiento
  var mx=0,mz=0;if(joy){var L=Math.hypot(joy.dx,joy.dy);if(L>6){var k=Math.min(1,L/55);mx=joy.dx/L*k;mz=joy.dy/L*k}}if(keys.KeyW||GK.keys.KeyW)mz-=1;if(GK.keys.KeyS)mz+=1;if(GK.keys.KeyA)mx-=1;if(GK.keys.KeyD)mx+=1;var ml=Math.hypot(mx,mz);if(ml>1){mx/=ml;mz/=ml}
  var sp0=w.speed*(scoped?.55:1)*(P.rt>0?.9:1);if(P.dead){mx=mz=0}
@@ -205,12 +205,12 @@ G3.frame=function(dt){var playing=P&&GK.state()==='play';
  if(!playing){orbit+=dt*.15;cam.position.set(44+Math.cos(orbit)*20,9,44+Math.sin(orbit)*20);cam.lookAt(44,1.5,44);cam.fov=72;cam.updateProjectionMatrix();return}
  var bobY=Math.sin(P.bob)*.035*P.spd,bobX=Math.cos(P.bob*.5)*.02*P.spd;var w=weapons[wi];
  var pit=P.pitch+(P.dead?0:0);cam.position.set(P.x,EYE+P.y+bobY-(P.dead?1.1:0),P.z);cam.rotation.order='YXZ';cam.rotation.y=P.yaw;cam.rotation.x=pit;cam.rotation.z=P.dead?.9:bobX*.5;
- var tf=scoped&&w.sniper?18:(72+(P.spd>.8?3:0));fovT+=(tf-fovT)*Math.min(1,dt*14);cam.fov=fovT;cam.updateProjectionMatrix();vcam.aspect=cam.aspect;vcam.updateProjectionMatrix();cam.updateMatrixWorld(true);
+ var asp=GK.W()/GK.H(),land=asp>1.2,tf=scoped&&w.sniper?18:((land?62:72)+(P.spd>.8?3:0));fovT+=(tf-fovT)*Math.min(1,dt*14);cam.fov=fovT;cam.updateProjectionMatrix();vcam.aspect=cam.aspect;vcam.fov=land?44:58;vcam.updateProjectionMatrix();cam.updateMatrixWorld(true);
  sun.target.position.set(44,0,44);
  flashL.position.set(P.x-Math.sin(P.yaw)*1.2,EYE+P.y,P.z-Math.cos(P.yaw)*1.2);
  // viewmodel
  var g=vmW[wi];vmGroup.visible=!P.dead&&!(scoped&&w.sniper&&fovT<30);var ra=P.recoilAnim||0,rl=P.rt>0?Math.sin(Math.min(1,(1-P.rt/(P.rtMax||1)))*Math.PI):0,sw=P.swap>0?P.swap/.25:0;
- vmGroup.position.set(.12+bobX*.8,-.16+Math.abs(Math.sin(P.bob))*.012*P.spd-ra*.02-rl*.14-sw*.25,-.4+ra*.07);vmGroup.rotation.set(ra*.09+rl*.55+sw*.5,-.03+Math.sin(P.bob*.5)*.01*P.spd,rl*.2);
+ vmGroup.position.set((land?.15:.12)+bobX*.8,(land?-.15:-.16)+Math.abs(Math.sin(P.bob))*.012*P.spd-ra*.02-rl*.14-sw*.25,-.4+ra*.07);vmGroup.scale.setScalar(land?.78:1);vmGroup.rotation.set(ra*.09+rl*.55+sw*.5,-.03+Math.sin(P.bob*.5)*.01*P.spd,rl*.2);
  var mz=g.userData.muz;flash.position.set(mz[0],mz[1],mz[2]);flash.material.rotation=Math.random()*6;flash.scale.setScalar(.2+Math.random()*.2);
  bots.forEach(function(b){if(!b.dead){}});
 };
