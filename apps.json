@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Super Koke",
+   "desc": "Plataformas estilo Super Mario: 3 mundos, goombas y koopas, bloques con monedas y setas, tuberías y bandera final.",
+   "href": "mario.html",
+   "icono": "🍄",
+   "color": "#e8402a",
+   "cat": "juegos",
+   "img": "img/mario.webp",
+   "sub": "arcade",
+   "tags": "mario plataformas super saltar goomba koopa seta bandera"
+  },
+  {
    "nombre": "Plantas vs Zombis",
    "desc": "Estilo Plants vs Zombies: girasoles, lanzaguisantes, nueces, hielo y petacerezas contra oleadas de zombis con cono y cubo. Cortacéspedes y modo infinito.",
    "href": "plantas.html",
