@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f1115">
+<title>Contador de Dinero</title>
+<style>
+:root{--bg:#0f1115;--card:#181b22;--line:#262a34;--ink:#f3f4f7;--dim:#8b91a1;--acc:#4f8cff;--ok:#34d27b;--bad:#ff5a5f;--font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font)}
+body{padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 170px)}
+main{max-width:520px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between}
+.back{color:var(--acc);text-decoration:none;font-size:17px;font-weight:500}
+h1{margin:6px 0 10px;font-size:30px;font-weight:700;letter-spacing:-.02em}
+.sel{display:flex;gap:8px;margin-bottom:12px}
+.sel button{flex:1;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--dim);font:600 15px var(--font)}
+.sel button.on{background:var(--acc);color:#fff;border-color:transparent}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:16px 4px 8px}
+.row{display:grid;grid-template-columns:78px 1fr auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px 10px;margin-bottom:8px}
+.row.has{border-color:rgba(79,140,255,.55)}
+.bill{height:44px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45);box-shadow:inset 0 0 0 2px rgba(255,255,255,.28),inset 0 -10px 18px rgba(0,0,0,.18);position:relative;overflow:hidden}
+.bill:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 6px,transparent 6px 12px)}
+.coin{width:44px;height:44px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#2a2200;box-shadow:inset 0 0 0 3px rgba(0,0,0,.18),inset 0 3px 6px rgba(255,255,255,.5);position:relative}
+.coin.two:before{content:"";position:absolute;inset:11px;border-radius:50%;background:#c9ccd4;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+.coin span{position:relative}
+.sub{font-size:13px;color:var(--dim);text-align:right;min-width:64px}
+.sub b{display:block;font-size:16px;color:var(--ink);font-weight:700}
+.ctl{display:flex;align-items:center;gap:6px;justify-content:center}
+.ctl button{width:42px;height:42px;border-radius:50%;border:0;background:#242936;color:var(--ink);font-size:22px;font-weight:600}
+.ctl button:active{filter:brightness(.8);transform:scale(.94)}
+.ctl input{width:62px;height:42px;text-align:center;border-radius:12px;border:1px solid var(--line);background:#10131a;color:var(--ink);font:700 19px var(--font);-moz-appearance:textfield}
+.ctl input::-webkit-outer-spin-button,.ctl input::-webkit-inner-spin-button{-webkit-appearance:none}
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(15,17,21,.92);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:10px 14px calc(env(safe-area-inset-bottom) + 10px)}
+.bar .in{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.tot{flex:1}
+.tot small{color:var(--dim);font-size:12px;display:block}
+.tot b{font-size:30px;font-weight:800;letter-spacing:-.02em;color:var(--ok)}
+.bar button{border:0;border-radius:13px;padding:13px 15px;font:700 15px var(--font)}
+.cp{background:var(--acc);color:#fff}.rs{background:#242936;color:var(--ink)}
+.cnt{font-size:12px;color:var(--dim);margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:14px}
+.card label{font-size:13px;color:var(--dim);display:block;margin-bottom:6px}
+.card input{width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:#10131a;color:var(--ink);font:700 18px var(--font);padding:0 12px}
+#diff{margin-top:8px;font-weight:700;font-size:15px}
+</style>
+</head>
+<body><main>
+<div class="top"><a class="back" href="index.html">‹ Apps</a></div>
+<h1>Contador de dinero</h1>
+<div class="sel" id="sel"></div>
+<div id="list"></div>
+<div class="card"><label>Objetivo (opcional) · compara con lo que debería haber</label><input id="goal" type="number" inputmode="decimal" placeholder="0,00"><div id="diff"></div></div>
+</main>
+<div class="bar"><div class="in"><div class="tot"><small id="cnt">0 billetes · 0 monedas</small><b id="tot">0,00 €</b></div><button class="cp" id="cp">Copiar</button><button class="rs" id="rs">Borrar</button></div></div>
+<script>
+var CUR={
+ EUR:{sym:'€',after:true,b:[[500,'#7b4fa8'],[200,'#c9a21a'],[100,'#2e9a58'],[50,'#e07a1f'],[20,'#3a78d6'],[10,'#d9483f'],[5,'#8d9299']],c:[[2,'#d8b24a','two'],[1,'#d8b24a','one'],[.5,'#e0a63a'],[.2,'#e0a63a'],[.1,'#e0a63a'],[.05,'#c4693a'],[.02,'#c4693a'],[.01,'#c4693a']]},
+ USD:{sym:'$',after:false,b:[[100,'#4e8f5a'],[50,'#6d8f4e'],[20,'#4f9a63'],[10,'#8f8f4e'],[5,'#7a6aa0'],[2,'#5a8f8a'],[1,'#5a8f5a']],c:[[1,'#d8b24a','one'],[.5,'#c8ccd4'],[.25,'#c8ccd4'],[.1,'#c8ccd4'],[.05,'#c8ccd4'],[.01,'#c4693a']]},
+ GBP:{sym:'£',after:false,b:[[50,'#c0384a'],[20,'#6a4aa0'],[10,'#e0872a'],[5,'#3a9aa8']],c:[[2,'#d8b24a','two'],[1,'#d8b24a','one'],[.5,'#c8ccd4'],[.2,'#c8ccd4'],[.1,'#c8ccd4'],[.05,'#c8ccd4'],[.02,'#c4693a'],[.01,'#c4693a']]}
+};
+var cur='EUR',store={};
+try{var sv=JSON.parse(localStorage.getItem('contador_v1')||'null');if(sv){cur=sv.cur||'EUR';store=sv.store||{}}}catch(e){}
+function save(){try{localStorage.setItem('contador_v1',JSON.stringify({cur:cur,store:store}))}catch(e){}}
+function fmt(n){var s=n.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,function(m,o,str){return str.indexOf(',')>o?'.':''});var C=CUR[cur];return C.after?s+' '+C.sym:C.sym+s}
+function key(v){return cur+':'+v}
+function get(v){return store[key(v)]||0}
+function setv(v,n){n=Math.max(0,Math.min(99999,Math.floor(n)||0));if(n)store[key(v)]=n;else delete store[key(v)];save();upd()}
+function lbl(v,coin){return coin&&v<1?(Math.round(v*100)+'c'):String(v)}
+function build(){
+ var sel=document.getElementById('sel');sel.innerHTML='';
+ Object.keys(CUR).forEach(function(k){var b=document.createElement('button');b.textContent=k+' '+CUR[k].sym;if(k===cur)b.className='on';b.onclick=function(){cur=k;save();build();upd()};sel.appendChild(b)});
+ var L=document.getElementById('list');L.innerHTML='';
+ [['Billetes',CUR[cur].b,false],['Monedas',CUR[cur].c,true]].forEach(function(g){
+  var h=document.createElement('h2');h.textContent=g[0];L.appendChild(h);
+  g[1].forEach(function(d){
+   var v=d[0],r=document.createElement('div');r.className='row';r.id='r'+v;
+   var vis=g[2]?'<div class="coin '+(d[2]||'')+'" style="background:radial-gradient(circle at 35% 30%,#fff8,'+d[1]+' 60%)"><span>'+lbl(v,true)+'</span></div>':'<div class="bill" style="background:linear-gradient(135deg,'+d[1]+',#0003),'+d[1]+'">'+v+' '+CUR[cur].sym+'</div>';
+   r.innerHTML=vis+'<div class="ctl"><button data-a="-">−</button><input type="number" inputmode="numeric" min="0" value="0"><button data-a="+">+</button></div><div class="sub">subtotal<b>0</b></div>';
+   var inp=r.querySelector('input');
+   r.querySelector('[data-a="-"]').onclick=function(){setv(v,get(v)-1);hap()};
+   r.querySelector('[data-a="+"]').onclick=function(){setv(v,get(v)+1);hap()};
+   inp.onchange=function(){setv(v,parseInt(inp.value,10))};inp.onfocus=function(){inp.select()};
+   L.appendChild(r)})})
+}
+function hap(){try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}}
+function num(){var t=0,nb=0,nc=0;CUR[cur].b.forEach(function(d){var n=get(d[0]);t+=n*d[0];nb+=n});CUR[cur].c.forEach(function(d){var n=get(d[0]);t+=Math.round(n*d[0]*100)/100;nc+=n});return{t:Math.round(t*100)/100,nb:nb,nc:nc}}
+function upd(){
+ var all=CUR[cur].b.concat(CUR[cur].c);
+ all.forEach(function(d){var r=document.getElementById('r'+d[0]);if(!r)return;var n=get(d[0]),i=r.querySelector('input');if(document.activeElement!==i)i.value=n;r.classList.toggle('has',n>0);r.querySelector('.sub b').textContent=fmt(Math.round(n*d[0]*100)/100)});
+ var s=num();document.getElementById('tot').textContent=fmt(s.t);document.getElementById('cnt').textContent=s.nb+' billete'+(s.nb===1?'':'s')+' · '+s.nc+' moneda'+(s.nc===1?'':'s');
+ var g=parseFloat(String(document.getElementById('goal').value).replace(',','.')),D=document.getElementById('diff');
+ if(isFinite(g)&&document.getElementById('goal').value!==''){var df=Math.round((s.t-g)*100)/100;D.style.color=df===0?'var(--ok)':df>0?'#ffb020':'var(--bad)';D.textContent=df===0?'✔ Cuadra exacto':df>0?'Sobran '+fmt(df):'Faltan '+fmt(-df)}else D.textContent=''
+}
+document.getElementById('goal').oninput=upd;
+document.getElementById('rs').onclick=function(){if(num().t&&!confirm('¿Borrar todo el recuento?'))return;Object.keys(store).forEach(function(k){if(k.indexOf(cur+':')===0)delete store[k]});save();upd()};
+document.getElementById('cp').onclick=function(){
+ var lines=[];CUR[cur].b.concat(CUR[cur].c).forEach(function(d){var n=get(d[0]);if(n)lines.push(n+' × '+fmt(d[0])+' = '+fmt(Math.round(n*d[0]*100)/100))});
+ var s=num(),txt='Recuento ('+cur+')\n'+lines.join('\n')+'\nTOTAL: '+fmt(s.t);
+ var b=document.getElementById('cp');function ok(){b.textContent='¡Copiado!';setTimeout(function(){b.textContent='Copiar'},1200)}
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,function(){prompt('Copia el recuento:',txt)});else{prompt('Copia el recuento:',txt)}
+};
+build();upd();
+</script>
+</body></html>

@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Contador de Dinero",
+   "desc": "Cuenta billetes y monedas (euro, dólar y libra): pones cuántos tienes de cada tipo y suma el total. Con objetivo para cuadrar la caja.",
+   "href": "contador.html",
+   "icono": "💶",
+   "color": "#34d27b",
+   "cat": "herramientas",
+   "img": "img/contador.webp",
+   "sub": "util",
+   "tags": "contador dinero billetes monedas euros caja calculadora cuadrar"
+  },
+  {
    "nombre": "Koke Bronx",
    "desc": "Mundo abierto 3D en el Bronx: crews, opps, territorio, armas, camellos y rap con minijuego de ritmo. Conquista el barrio bloque a bloque.",
    "href": "bronx.html",
