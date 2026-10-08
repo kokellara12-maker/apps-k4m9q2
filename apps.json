@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Koke Road",
+   "desc": "Crossy Road en 3D: cruza carreteras, ríos con troncos y vías de tren. Skins desbloqueables con monedas.",
+   "href": "road.html",
+   "icono": "🐔",
+   "color": "#7bd13a",
+   "cat": "juegos",
+   "img": "img/road.webp",
+   "sub": "arcade",
+   "tags": "crossy road cruzar gallina 3d saltar carretera tren rio"
+  },
+  {
    "nombre": "Koke Strike",
    "desc": "Shooter 3D tipo Counter-Strike: deathmatch contra bots con Glock, AK-47, AWP con mira y escopeta. Headshots, radar y 3 dificultades.",
    "href": "strike.html",
