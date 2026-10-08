@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Viaje 3D",
+   "desc": "Recorre Nueva York, París y Tokio con cámara libre o dron: Torre Eiffel, Estatua de la Libertad, Shibuya, Skytree… de día y de noche. Con foto de recuerdo.",
+   "href": "ciudades.html",
+   "icono": "🗼",
+   "color": "#e0508a",
+   "cat": "explorar",
+   "img": "img/ciudades.webp",
+   "sub": "mundo",
+   "tags": "viaje ciudades nueva york paris tokio eiffel libertad shibuya fotos turismo"
+  },
+  {
    "nombre": "Ciudad Viva",
    "desc": "Una ciudad 3D para mirar como un acuario: coches, gente, semáforos, día y noche, lluvia, tormenta, niebla y nieve. Toca un coche para seguirlo.",
    "href": "ciudadviva.html",
