@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Criadero Acuario",
+   "desc": "Sandbox de vida: suelta macho y hembra de peces, tortugas, cangrejos, caballitos de mar, medusas y tiburones. Crían, hay que alimentarlos, curarlos y mantener el agua limpia.",
+   "href": "criadero.html",
+   "icono": "🐢",
+   "color": "#18b0a0",
+   "cat": "explorar",
+   "img": "img/criadero.webp",
+   "sub": "relax",
+   "tags": "acuario sandbox cria peces tortuga cangrejo tiburon medusa worldbox simulador"
+  },
+  {
    "nombre": "Viaje 3D",
    "desc": "Recorre Nueva York, París y Tokio con cámara libre o dron: Torre Eiffel, Estatua de la Libertad, Shibuya, Skytree… de día y de noche. Con foto de recuerdo.",
    "href": "ciudades.html",
