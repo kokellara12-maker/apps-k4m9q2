@@ -2,7 +2,7 @@
  "apps": [
   {
    "nombre": "Súper Drift",
-   "desc": "Eres un carrito de supermercado en 3D: sigue la lista de la compra, derrapa por los pasillos, esquiva a la gente y gana dinero con cada drift para comprar mejoras y carros nuevos.",
+   "desc": "Eres un carrito de supermercado en 3D: recorre los pasillos, sigue la lista de la compra, derrapa, esquiva a la gente y gana dinero con cada drift para comprar mejoras y carros nuevos.",
    "href": "superdrift.html",
    "icono": "🛒",
    "color": "#0e8a48",
