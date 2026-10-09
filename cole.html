@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#3a78c8">
+<title>Patinete Escolar</title>
+<style>
+#hud{position:fixed;inset:0;z-index:5;pointer-events:none;font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff}
+.pn{background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);border-radius:12px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#money{position:absolute;left:calc(env(safe-area-inset-left) + 78px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 14px;font-weight:900;font-size:20px;color:#ffe45a}
+#timer{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);padding:5px 16px;font-weight:900;font-size:20px;text-align:center}
+#timer small{display:block;font-size:10px;opacity:.8;font-weight:700;letter-spacing:.1em}
+#list{position:absolute;right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 8px);padding:8px 12px;font-size:12.5px;font-weight:700;line-height:1.5;min-width:150px;max-width:210px}
+#list b{display:block;margin-bottom:2px;letter-spacing:.06em;color:#ffe45a;font-size:11px}
+#list .d{opacity:.45;text-decoration:line-through}
+#list small{opacity:.7;font-weight:600}
+#drift{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 62px);text-align:center;font-weight:900;font-size:26px;text-shadow:0 2px 6px #000;transition:transform .1s}
+#drift small{display:block;font-size:12px;opacity:.9}
+#pop{position:absolute;left:50%;top:38%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px}
+#pop div{font-weight:900;font-size:22px;color:#ffe45a;text-shadow:0 2px 6px #000;animation:up 1.4s forwards}
+@keyframes up{from{transform:translateY(0);opacity:1}to{transform:translateY(-50px);opacity:0}}
+#joy{position:fixed;z-index:6;left:calc(env(safe-area-inset-left) + 26px);bottom:calc(env(safe-area-inset-bottom) + 26px);width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);touch-action:none}
+#joy i{position:absolute;left:41px;top:41px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.6)}
+.btn{position:fixed;z-index:7;border-radius:50%;border:3px solid rgba(255,255,255,.5);color:#fff;font:900 14px system-ui;display:flex;align-items:center;justify-content:center;text-align:center;touch-action:none;line-height:1.1;text-shadow:0 1px 3px #000}
+.btn:active,.btn.on{transform:scale(.93);filter:brightness(1.25)}
+#bDrift{right:calc(env(safe-area-inset-right) + 24px);bottom:calc(env(safe-area-inset-bottom) + 30px);width:96px;height:96px;background:rgba(220,60,30,.85);font-size:16px}
+#bTurbo{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 24px);width:70px;height:70px;background:rgba(40,120,230,.85)}
+#bHint{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 104px);width:56px;height:56px;background:rgba(230,170,30,.85);font-size:11px}
+#bShop{right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 130px);width:54px;height:54px;background:rgba(10,120,60,.9);font-size:11px;display:none}
+.ov{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(4,30,16,.55),rgba(2,12,6,.92));font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff;padding:10px}
+.ov .card{background:#0d2e1c;border:2px solid #2a8a52;border-radius:20px;padding:14px 16px;max-width:540px;width:100%;max-height:94vh;overflow:auto;box-shadow:0 10px 40px #000}
+.ov h2{margin:0 0 4px;font-size:22px;color:#ffe45a}.ov p{margin:3px 0 8px;font-size:13px;opacity:.9;line-height:1.4}
+.ov button{font:900 14px system-ui;padding:10px 16px;border-radius:12px;border:0;background:#ffd23a;color:#1c1604;margin:3px}
+.ov button.g{background:rgba(255,255,255,.15);color:#fff}
+.sh{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sh .it{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:7px 9px;font-size:12px;display:flex;flex-direction:column;gap:3px}
+.sh .it b{font-size:13px}.sh .it small{opacity:.75}
+.sh .it button{padding:6px 8px;font-size:12px;margin:0;align-self:flex-start}
+.sh .it button[disabled]{opacity:.35}
+.tabs{display:flex;gap:5px;margin:6px 0}.tabs button{padding:7px 12px;font-size:12px}.tabs button.on{background:#ffd23a;color:#1c1604}
+#rot{position:fixed;inset:0;z-index:99;background:#0b2a18;color:#fff;display:none;align-items:center;justify-content:center;text-align:center;font:700 18px system-ui;padding:30px}
+@media (orientation:portrait){#rot{display:flex}}
+#flashW{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:8;transition:opacity .25s}
+</style>
+</head>
+<body>
+<div id="rot">Gira el móvil en horizontal<br>para jugar</div>
+<script src="three.min.js"></script><script src="v3d.js"></script>
+<a href="index.html" style="position:fixed;z-index:20;left:calc(env(safe-area-inset-left) + 12px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 12px;border-radius:999px;background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;font:800 13px system-ui">‹ Apps</a>
+<div id="flashW"></div>
+<div id="hud">
+ <div id="money" class="pn">0 €</div>
+ <div id="timer" class="pn"><small>TIEMPO</small><span id="tm">2:00</span></div>
+ <div id="list" class="pn"></div>
+ <div id="drift"></div><div id="pop"></div>
+</div>
+<div id="joy"><i></i></div>
+<div class="btn" id="bDrift">DRIFT</div><div class="btn" id="bTurbo">TURBO</div><div class="btn" id="bHint">PISTA<br>5 €</div><div class="btn" id="bShop">TIENDA</div>
+<div class="ov" id="ovStart" style="display:flex"><div class="card" style="text-align:center"><h2>Patinete Escolar</h2><p>Eres un patinete en el colegio a la hora del recreo: recoge todo lo de la lista por aulas, pasillos y patio, derrapa entre pupitres y evita al director.</p><p style="font-size:12px">Joystick: girar y acelerar (arriba acelera, abajo frena y marcha atrás) · <b>DRIFT</b> = freno de mano · TURBO · PISTA para ver dónde está el objetivo</p><button id="startB">¡A jugar!</button><br><button class="g" id="shopB0">Tienda</button></div></div>
+<div class="ov" id="ovSum"><div class="card" style="text-align:center"><h2 id="sumT"></h2><p id="sumP"></p><button id="sumNext">Siguiente lista</button><button class="g" id="sumShop">Tienda</button></div></div>
+<div class="ov" id="ovShop"><div class="card"><h2>Tienda · <span id="shMoney"></span></h2><div class="tabs"><button id="t1" class="on">Mejoras</button><button id="t2">Vehículos</button><button id="t3">Extras</button></div><div class="sh" id="shList"></div><div style="text-align:right;margin-top:8px"><button id="shClose">Cerrar</button></div></div></div>
+<script>
+/* utilidades comunes de los mundos (se ejecutan cuando el motor ya existe) */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function carShape(it,x,z,vert,col){var L=4.4,W=2,sx=vert?W:L,sz=vert?L:W;
+ it.push(bx(sx,.7,sz,col,x,.55,z));var cx=vert?0:-.3,cz=vert?-.3:0;it.push(bx(vert?1.7:2.2,.55,vert?2.2:1.7,col,x+cx,1.15,z+cz),bx(vert?1.72:2.0,.38,vert?2.0:1.72,0x1a2a3a,x+cx,1.17,z+cz));
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(w){it.push(I(V3.cyl(.34,.34,.3,10),0x111111,x+(vert?w[0]*1.0:w[1]*1.4),.34,z+(vert?w[1]*1.4:w[0]*.95),0,0,vert?Math.PI/2:0,1,1,1))});box(x,z,sx+.2,sz+.2)}
+function parkedCar(it,x,z,vert){carShape(it,x,z,vert,pick([0xc02828,0x2848b0,0xdedede,0x1a1a1a,0x888888,0xe0a020,0x2a7a4a,0xf0f0f0,0x6a2a8a,0x2a8aa8]))}
+function windowsFront(it,x,z,w,d,h,side){for(var y=3;y<h-1;y+=3.2)for(var k=-w/2+1.5;k<w/2-1;k+=3){it.push(bx(1.6,1.5,.1,0x2a4a6a,x+k,y,z+(side||1)*(d/2+.03)))}}
+function building(it,x,z,w,d,h,col){it.push(bx(w,h,d,col,x,h/2,z),bx(w+.3,.4,d+.3,0x9a9a9a,x,h+.2,z));windowsFront(it,x,z,w,d,h,1);windowsFront(it,x,z,w,d,h,-1);box(x,z,w,d)}
+function crateBox(it,x,z,s,c){it.push(bx(s,s,s,c||0xc8a070,x,s/2,z),bx(s*1.02,s*.12,s*1.02,0x9a7a50,x,s*.55,z));box(x,z,s,s)}
+function mg(a){return V3.merge(a)}
+function mkTargets(defs,spots,secs){return defs.map(function(d,i){var q=spots[(i*3+1)%spots.length];var f=freeNear(q[0]+rnd(-2,2),q[1]+rnd(-2,2),1.2,6);return{id:d.id,n:d.n,sec:(secs&&secs[i%secs.length])||d.sec||'',x:f[0],z:f[1],geo:d.geo,sc:d.sc}})}
+function wheelsOf(list,r,w,col){return list.map(function(p){return I(V3.cyl(r,r,w,10),col||0x1a1a1a,p[0],r,p[1],0,0,Math.PI/2)})}
+function shopFront(it,x,z,w,face,col,name){/* face: 1 mira hacia +z, -1 hacia -z; fachada pegada a la pared en z */
+ it.push(bx(w,.3,3,col,x,3.9,z+face*1.5),bx(w,4.2,.3,0xe8e4dc,x,2.1,z-face*0.1),bx(w-2,3,.2,0x9ad8f0,x,1.8,z+face*.3));
+ for(var k=-w/2+2;k<w/2-1;k+=2.6){it.push(bx(1.8,.9,1.2,0xc8a070,x+k,.45,z+face*1.8),bx(1.6,.3,.9,pick([0xe03a2a,0x2a8ad8,0xf0c030,0x2aa860]),x+k,1.1,z+face*1.8));box(x+k,z+face*1.8,2,1.4)}
+ sign(name,x,5.4,z+face*1.2,Math.min(w-2,8),face>0?0:Math.PI,'#'+('000000'+col.toString(16)).slice(-6))}
+
+var SP=[];
+var CFG={id:'cole',b:[-60,60,-40,40],light:{bg:0xbfe0f4,fog:0xd8ecf6,near:60,far:220,hi:1.4,si:1.1},
+ listTitle:'LISTA DEL RECREO',lines:['¡Profe, mire!','¡Mi mochila!','¡No se corre!','¡Qué guay!','¡Mi bocadillo!','¡Va a sonar el timbre!'],npcScale:.6,npcN:36,
+ pa:{welcome:'Buenos días. Ha sonado el timbre del recreo.',random:['Se recuerda que está prohibido ir en patinete por los pasillos','Los alumnos de cuarto deben acudir al gimnasio','Se ha perdido una mochila azul en el patio','El director ruega silencio en los pasillos']},
+ chaser:{look:{skin:0xf2c8a0,shirt:0x5a5a64,pants:0x2a2a30,hair:0xc8c8c8},scale:.78,pa:'Atención. El director te está buscando. Se acabó el patinete en el colegio.',fine:'¡Castigo! -10 €',speed:7},
+ winTitle:'¡Recreo completado!',winLabel:'Premio del profe',failLabel:'Sonó el timbre y no terminaste.',orbit:[50,30,34,0,0],camH:2.5,camD:4.8,cargo:{x:.2,z:.1,y:.9,oz:-.2},cargoSc:.45,arrowY:2.4,
+ world:function(){
+  var ft=px(128,128,function(x,y){var c=((x>>5)+(y>>5))%2;var n=Math.random()*6;return c?[190+n,196+n,186+n]:[170+n,176+n,166+n]},true);floorPlane(120,80,0xffffff,ft,[30,20]);
+  patch(30,0,56,76,0x6a9a50);patch(32,6,26,16,0xc87a50);patch(32,6,25,.3,0xffffff);
+  var it=PI,W=0xf0e6d0,B=0x3a78c8;
+  /* perímetro bajo + muro del edificio con puertas */
+  walls(4,0xe8e0d0,0x3a78c8);
+  function wallX(x,z0,z1,gaps){var a=z0;gaps.sort(function(p,q){return p-q}).forEach(function(g){if(g-2>a){it.push(bx(.5,3.5,g-2-a,W,x,1.75,(a+g-2)/2));box(x,(a+g-2)/2,.6,g-2-a)}a=g+2});if(z1>a){it.push(bx(.5,3.5,z1-a,W,x,1.75,(a+z1)/2));box(x,(a+z1)/2,.6,z1-a)}}
+  function wallZ(z,x0,x1,gaps){var a=x0;gaps.sort(function(p,q){return p-q}).forEach(function(g){if(g-2>a){it.push(bx(g-2-a,3.5,.5,W,(a+g-2)/2,1.75,z));box((a+g-2)/2,z,g-2-a,.6)}a=g+2});if(x1>a){it.push(bx(x1-a,3.5,.5,W,(a+x1)/2,1.75,z));box((a+x1)/2,z,x1-a,.6)}}
+  /* edificio: x de -58 a -4; pasillo central z entre -4 y 4; aulas arriba y abajo */
+  wallX(-4,-38,38,[0,-20,20]);wallZ(-4,-58,-4,[-48,-34,-20,-10]);wallZ(4,-58,-4,[-48,-34,-20,-10]);
+  [-40,-26,-12].forEach(function(x){wallX(x,-38,-4,[]);wallX(x,4,38,[])});
+  /* aulas con pupitres, pizarra, taquillas */
+  var lanes=[];for(var side=-1;side<=1;side+=2){for(var r=0;r<4;r++){var cx=-49+r*13,cz=side*21;
+    for(var i=0;i<3;i++)for(var j=0;j<3;j++){var x=cx-3+i*3,z=cz-4*side+(j-1)*(-2.8*side)+0;var zz=cz+(j-1)*3.2;it.push(bx(1.3,.8,1.0,0xc8a070,x,.55,zz),bx(.9,.5,.08,0x3a78c8,x,.9,zz-.5),bx(.6,.5,.6,0xb88a5a,x,.3,zz+.8));box(x,zz,1.4,2.2)}
+    it.push(bx(8,2,.15,0x1a3a2a,cx,2,cz+side*9.6),bx(8.2,.15,.2,0xc8a070,cx,1,cz+side*9.6));
+    lanes.push([cx,cz+side*4])}}
+  for(var x=-56;x<=-6;x+=2)if(Math.abs(x+30)>3){it.push(bx(1.2,2.4,.6,pick([0x2a78d8,0xd8402a,0x2aa860]),x,1.2,-3.6),bx(1.2,2.4,.6,pick([0x2a78d8,0xd8402a,0x2aa860]),x,1.2,3.6));if(x%6===0)box(x,-3.6,1.3,.8),box(x,3.6,1.3,.8)}
+  for(var x=-56;x<-8;x+=6)SP.push([x,0]);
+  /* patio: pista de baloncesto, porterías, columpios, arenero, árboles, bancos */
+  it.push(bx(.4,3.6,.4,0x888888,18,1.8,6),bx(2.4,1.6,.1,0xffffff,18,3.6,6),I(V3.cyl(.4,.4,.06,10),0xe86a20,18.8,2.9,6),bx(.4,3.6,.4,0x888888,46,1.8,6),bx(2.4,1.6,.1,0xffffff,46,3.6,6));box(18,6,1,1);box(46,6,1,1);
+  [[30,-26],[30,26]].forEach(function(p){it.push(bx(.2,2.4,.2,0xffffff,p[0]-3,1.2,p[1]),bx(.2,2.4,.2,0xffffff,p[0]+3,1.2,p[1]),bx(6.2,.2,.2,0xffffff,p[0],2.4,p[1]));box(p[0],p[1],6.4,.6)});
+  it.push(bx(.2,3,.2,0xd83a3a,26,1.5,-10),bx(.2,3,.2,0xd83a3a,30,1.5,-10),bx(4.4,.2,.2,0xd83a3a,28,3,-10),bx(.12,2.8,.12,0x666666,26.6,1.5,-10.1));box(28,-10,4.6,.6);it.push(bx(8,.4,6,0xe8d08a,48,.2,-22));box(48,-22,8,6);
+  for(var i=0;i<14;i++){var q=freeNear(rnd(6,56),rnd(-36,36),2,4);if(isFree(q[0],q[1],1.6)){tree(it,q[0],q[1],rnd(.9,1.3));box(q[0],q[1],1.2,1.2)}}
+  for(var i=0;i<6;i++){var q=freeNear(rnd(6,56),rnd(-36,36),2,4);if(isFree(q[0],q[1],1.6)){it.push(bx(2.4,.5,.8,0x8a5a2a,q[0],.5,q[1]),bx(2.4,.7,.2,0x6a4a2a,q[0],.9,q[1]-.3));box(q[0],q[1],2.5,1)}}
+  for(var i=0;i<6;i++){var q=freeNear(rnd(8,56),rnd(-30,30),2,4);if(isFree(q[0],q[1],1.5)){for(var k=0;k<6;k++)it.push(bx(.1,.6,.6,0x888888,q[0]+k*.4,.45,q[1]));box(q[0],q[1],2.6,1)}SP.push([q[0],q[1]])}
+  SP.push([30,18],[30,-18],[20,-4],[44,12],[12,30],[40,-8]);
+  sign('COLEGIO PÚBLICO',-30,4.6,-39.6,12,0,'#3a78c8');sign('COMEDOR',-12,3,-4.3,5,0,'#d8402a');sign('GIMNASIO',-48,3,3.8,5,Math.PI,'#2a8a58');
+  return{spawn:[10,0,-Math.PI/2]}},
+ targets:function(){var d=[{id:'mochila',n:'Mochila',geo:function(){return mg([bx(.6,.8,.3,0xd83a3a,0,.45,0),bx(.5,.3,.32,0xf0c030,0,.35,0),bx(.1,.5,.1,0x333333,-.25,.5,-.15)])}},{id:'libro',n:'Libro',geo:function(){return mg([bx(.6,.12,.8,0x2a8ad8,0,.1,0),bx(.55,.08,.75,0xffffff,0,.1,.02)])}},{id:'boca',n:'Bocadillo',geo:function(){return mg([I(V3.sph(.4,8,6),0xd8a050,0,.2,0,0,0,0,1.5,.55,.7),bx(.7,.05,.3,0x6ac060,0,.28,0)])}},{id:'balon',n:'Balón',geo:function(){return mg([I(V3.sph(.4,10,8),0xe86a20,0,.4,0),bx(.8,.04,.04,0x222222,0,.4,0),bx(.04,.8,.04,0x222222,0,.4,0)])}},{id:'cuaderno',n:'Cuaderno',geo:function(){return mg([bx(.5,.7,.06,0x2aa860,0,.4,0),bx(.4,.4,.07,0xffffff,0,.4,0)])}},{id:'estuche',n:'Estuche',geo:function(){return mg([bx(.8,.2,.3,0x8a3ad0,0,.12,0),bx(.7,.05,.1,0xf0c030,0,.25,0)])}},{id:'examen',n:'Examen',geo:function(){return mg([bx(.6,.04,.8,0xffffff,0,.06,0),bx(.2,.05,.2,0xd83a3a,.15,.09,.2)])}},{id:'bufanda',n:'Bufanda',geo:function(){return mg([bx(1,.1,.3,0xd83a3a,0,.1,0),bx(.2,.12,.3,0xffffff,-.25,.12,0),bx(.2,.12,.3,0xffffff,.25,.12,0)])}}];
+  var sec=['Aula 1','Aula 2','Aula 3','Aula 4','Aula 5','Pasillo','Cancha','Patio'];return mkTargets(d,SP,sec)},
+ vehicle:function(g,sk,P){var m1=new T.MeshStandardMaterial({color:sk.a,roughness:.4,metalness:.3}),m2=new T.MeshStandardMaterial({color:sk.b,roughness:.4,metalness:.6});P.tint.push(m1);
+  g.add(new T.Mesh(V3.merge([bx(.6,.12,1.6,0xffffff,0,.28,0),bx(.12,.12,.12,0xffffff,0,.1,.2)].concat(wheelsOf([[0,.8],[0,-.8]],.26,.12))),m1));
+  g.add(new T.Mesh(V3.merge([bx(.1,1.5,.1,0xffffff,0,1.0,.75),bx(1.1,.1,.1,0xffffff,0,1.75,.75),bx(.12,.2,.2,0x222222,-.55,1.75,.75),bx(.12,.2,.2,0x222222,.55,1.75,.75)]),m2));P.rider=new T.Group()}};
+
+</script>
+<script src="dcore.js"></script>
+</body>
+</html>

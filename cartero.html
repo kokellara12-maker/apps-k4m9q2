@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f0c030">
+<title>Cartero Drift</title>
+<style>
+#hud{position:fixed;inset:0;z-index:5;pointer-events:none;font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff}
+.pn{background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);border-radius:12px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#money{position:absolute;left:calc(env(safe-area-inset-left) + 78px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 14px;font-weight:900;font-size:20px;color:#ffe45a}
+#timer{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);padding:5px 16px;font-weight:900;font-size:20px;text-align:center}
+#timer small{display:block;font-size:10px;opacity:.8;font-weight:700;letter-spacing:.1em}
+#list{position:absolute;right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 8px);padding:8px 12px;font-size:12.5px;font-weight:700;line-height:1.5;min-width:150px;max-width:210px}
+#list b{display:block;margin-bottom:2px;letter-spacing:.06em;color:#ffe45a;font-size:11px}
+#list .d{opacity:.45;text-decoration:line-through}
+#list small{opacity:.7;font-weight:600}
+#drift{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 62px);text-align:center;font-weight:900;font-size:26px;text-shadow:0 2px 6px #000;transition:transform .1s}
+#drift small{display:block;font-size:12px;opacity:.9}
+#pop{position:absolute;left:50%;top:38%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px}
+#pop div{font-weight:900;font-size:22px;color:#ffe45a;text-shadow:0 2px 6px #000;animation:up 1.4s forwards}
+@keyframes up{from{transform:translateY(0);opacity:1}to{transform:translateY(-50px);opacity:0}}
+#joy{position:fixed;z-index:6;left:calc(env(safe-area-inset-left) + 26px);bottom:calc(env(safe-area-inset-bottom) + 26px);width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);touch-action:none}
+#joy i{position:absolute;left:41px;top:41px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.6)}
+.btn{position:fixed;z-index:7;border-radius:50%;border:3px solid rgba(255,255,255,.5);color:#fff;font:900 14px system-ui;display:flex;align-items:center;justify-content:center;text-align:center;touch-action:none;line-height:1.1;text-shadow:0 1px 3px #000}
+.btn:active,.btn.on{transform:scale(.93);filter:brightness(1.25)}
+#bDrift{right:calc(env(safe-area-inset-right) + 24px);bottom:calc(env(safe-area-inset-bottom) + 30px);width:96px;height:96px;background:rgba(220,60,30,.85);font-size:16px}
+#bTurbo{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 24px);width:70px;height:70px;background:rgba(40,120,230,.85)}
+#bHint{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 104px);width:56px;height:56px;background:rgba(230,170,30,.85);font-size:11px}
+#bShop{right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 130px);width:54px;height:54px;background:rgba(10,120,60,.9);font-size:11px;display:none}
+.ov{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(4,30,16,.55),rgba(2,12,6,.92));font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff;padding:10px}
+.ov .card{background:#0d2e1c;border:2px solid #2a8a52;border-radius:20px;padding:14px 16px;max-width:540px;width:100%;max-height:94vh;overflow:auto;box-shadow:0 10px 40px #000}
+.ov h2{margin:0 0 4px;font-size:22px;color:#ffe45a}.ov p{margin:3px 0 8px;font-size:13px;opacity:.9;line-height:1.4}
+.ov button{font:900 14px system-ui;padding:10px 16px;border-radius:12px;border:0;background:#ffd23a;color:#1c1604;margin:3px}
+.ov button.g{background:rgba(255,255,255,.15);color:#fff}
+.sh{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sh .it{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:7px 9px;font-size:12px;display:flex;flex-direction:column;gap:3px}
+.sh .it b{font-size:13px}.sh .it small{opacity:.75}
+.sh .it button{padding:6px 8px;font-size:12px;margin:0;align-self:flex-start}
+.sh .it button[disabled]{opacity:.35}
+.tabs{display:flex;gap:5px;margin:6px 0}.tabs button{padding:7px 12px;font-size:12px}.tabs button.on{background:#ffd23a;color:#1c1604}
+#rot{position:fixed;inset:0;z-index:99;background:#0b2a18;color:#fff;display:none;align-items:center;justify-content:center;text-align:center;font:700 18px system-ui;padding:30px}
+@media (orientation:portrait){#rot{display:flex}}
+#flashW{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:8;transition:opacity .25s}
+</style>
+</head>
+<body>
+<div id="rot">Gira el móvil en horizontal<br>para jugar</div>
+<script src="three.min.js"></script><script src="v3d.js"></script>
+<a href="index.html" style="position:fixed;z-index:20;left:calc(env(safe-area-inset-left) + 12px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 12px;border-radius:999px;background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;font:800 13px system-ui">‹ Apps</a>
+<div id="flashW"></div>
+<div id="hud">
+ <div id="money" class="pn">0 €</div>
+ <div id="timer" class="pn"><small>TIEMPO</small><span id="tm">2:00</span></div>
+ <div id="list" class="pn"></div>
+ <div id="drift"></div><div id="pop"></div>
+</div>
+<div id="joy"><i></i></div>
+<div class="btn" id="bDrift">DRIFT</div><div class="btn" id="bTurbo">TURBO</div><div class="btn" id="bHint">PISTA<br>5 €</div><div class="btn" id="bShop">TIENDA</div>
+<div class="ov" id="ovStart" style="display:flex"><div class="card" style="text-align:center"><h2>Cartero Drift</h2><p>Eres un cartero en moto por un barrio con jardines, vallas y coches: entrega cada carta en su buzón derrapando y que no te pille el vecino de la escoba.</p><p style="font-size:12px">Joystick: girar y acelerar (arriba acelera, abajo frena y marcha atrás) · <b>DRIFT</b> = freno de mano · TURBO · PISTA para ver dónde está el objetivo</p><button id="startB">¡A jugar!</button><br><button class="g" id="shopB0">Tienda</button></div></div>
+<div class="ov" id="ovSum"><div class="card" style="text-align:center"><h2 id="sumT"></h2><p id="sumP"></p><button id="sumNext">Siguiente lista</button><button class="g" id="sumShop">Tienda</button></div></div>
+<div class="ov" id="ovShop"><div class="card"><h2>Tienda · <span id="shMoney"></span></h2><div class="tabs"><button id="t1" class="on">Mejoras</button><button id="t2">Vehículos</button><button id="t3">Extras</button></div><div class="sh" id="shList"></div><div style="text-align:right;margin-top:8px"><button id="shClose">Cerrar</button></div></div></div>
+<script>
+/* utilidades comunes de los mundos (se ejecutan cuando el motor ya existe) */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function carShape(it,x,z,vert,col){var L=4.4,W=2,sx=vert?W:L,sz=vert?L:W;
+ it.push(bx(sx,.7,sz,col,x,.55,z));var cx=vert?0:-.3,cz=vert?-.3:0;it.push(bx(vert?1.7:2.2,.55,vert?2.2:1.7,col,x+cx,1.15,z+cz),bx(vert?1.72:2.0,.38,vert?2.0:1.72,0x1a2a3a,x+cx,1.17,z+cz));
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(w){it.push(I(V3.cyl(.34,.34,.3,10),0x111111,x+(vert?w[0]*1.0:w[1]*1.4),.34,z+(vert?w[1]*1.4:w[0]*.95),0,0,vert?Math.PI/2:0,1,1,1))});box(x,z,sx+.2,sz+.2)}
+function parkedCar(it,x,z,vert){carShape(it,x,z,vert,pick([0xc02828,0x2848b0,0xdedede,0x1a1a1a,0x888888,0xe0a020,0x2a7a4a,0xf0f0f0,0x6a2a8a,0x2a8aa8]))}
+function windowsFront(it,x,z,w,d,h,side){for(var y=3;y<h-1;y+=3.2)for(var k=-w/2+1.5;k<w/2-1;k+=3){it.push(bx(1.6,1.5,.1,0x2a4a6a,x+k,y,z+(side||1)*(d/2+.03)))}}
+function building(it,x,z,w,d,h,col){it.push(bx(w,h,d,col,x,h/2,z),bx(w+.3,.4,d+.3,0x9a9a9a,x,h+.2,z));windowsFront(it,x,z,w,d,h,1);windowsFront(it,x,z,w,d,h,-1);box(x,z,w,d)}
+function crateBox(it,x,z,s,c){it.push(bx(s,s,s,c||0xc8a070,x,s/2,z),bx(s*1.02,s*.12,s*1.02,0x9a7a50,x,s*.55,z));box(x,z,s,s)}
+function mg(a){return V3.merge(a)}
+function mkTargets(defs,spots,secs){return defs.map(function(d,i){var q=spots[(i*3+1)%spots.length];var f=freeNear(q[0]+rnd(-2,2),q[1]+rnd(-2,2),1.2,6);return{id:d.id,n:d.n,sec:(secs&&secs[i%secs.length])||d.sec||'',x:f[0],z:f[1],geo:d.geo,sc:d.sc}})}
+function wheelsOf(list,r,w,col){return list.map(function(p){return I(V3.cyl(r,r,w,10),col||0x1a1a1a,p[0],r,p[1],0,0,Math.PI/2)})}
+function shopFront(it,x,z,w,face,col,name){/* face: 1 mira hacia +z, -1 hacia -z; fachada pegada a la pared en z */
+ it.push(bx(w,.3,3,col,x,3.9,z+face*1.5),bx(w,4.2,.3,0xe8e4dc,x,2.1,z-face*0.1),bx(w-2,3,.2,0x9ad8f0,x,1.8,z+face*.3));
+ for(var k=-w/2+2;k<w/2-1;k+=2.6){it.push(bx(1.8,.9,1.2,0xc8a070,x+k,.45,z+face*1.8),bx(1.6,.3,.9,pick([0xe03a2a,0x2a8ad8,0xf0c030,0x2aa860]),x+k,1.1,z+face*1.8));box(x+k,z+face*1.8,2,1.4)}
+ sign(name,x,5.4,z+face*1.2,Math.min(w-2,8),face>0?0:Math.PI,'#'+('000000'+col.toString(16)).slice(-6))}
+
+var SP=[];var BOX=[];
+var CFG={id:'cartero',b:[-80,80,-55,55],light:{bg:0xb8dcf0,fog:0xd0e8f4,near:80,far:300,hi:1.3,si:1.2},
+ listTitle:'CARTAS POR ENTREGAR',lines:['¡El correo!','¡Mi paquete!','¡Eh, la moto!','¡Qué ruido!','¡Despacio en mi calle!','¡Guau!'],npcN:24,
+ pa:{welcome:'Buenos días, cartero. Hay cartas pendientes en el barrio.',random:['Se ruega a los carteros respetar los jardines','Hoy toca reparto de paquetes grandes','Aviso a vecinos: hay una moto de correos sin frenos']},
+ chaser:{look:{skin:0xf2c8a0,shirt:0x6a8a4a,pants:0x3a3a3a,hair:0x8a6a3a,cap:0x6a8a4a},scale:.74,pa:'Atención. Un vecino te persigue con una escoba por pisar su jardín.',fine:'¡Escobazo! -10 €',speed:7},
+ winTitle:'¡Reparto completado!',winLabel:'Propina del barrio',failLabel:'Se hizo de noche sin repartir.',orbit:[65,40,40,0,0],camH:2.8,camD:5.6,cargo:{x:.2,z:.2,y:1.3,oz:-.5},cargoSc:.45,arrowY:2.6,
+ world:function(){
+  floorPlane(180,120,0x6a9a50);var it=PI;
+  /* calles en cuadrícula con barrios distintos */
+  var rs=[[-80,-12,160,8],[-80,24,160,8],[-30,-55,8,110],[34,-55,8,110]];
+  rs.forEach(function(r){patch(r[0]+r[2]/2,r[1]+r[3]/2,r[2],r[3],0x4a4d52,.02)});
+  var ln=[];for(var x=-78;x<78;x+=6){ln.push(bx(3,.02,.25,0xe8d070,x,.04,-8),bx(3,.02,.25,0xe8d070,x,.04,28))}for(var z=-52;z<52;z+=6){ln.push(bx(.25,.02,3,0xe8d070,-26,.04,z),bx(.25,.02,3,0xe8d070,38,.04,z))}mk(ln);
+  var cols=[0xe8d8b0,0xe0b8a0,0xb8d0e0,0xd8e0b0,0xe8c8d0,0xd0c0a0],roof=[0xa8442a,0x6a4a3a,0x4a5a6a,0x8a3a2a];
+  function house(x,z,face,w,d){/* face: 1 puerta hacia +z, -1 hacia -z */var c=pick(cols);it.push(bx(w,3.6,d,c,x,1.8,z),bx(w+.6,.3,d+.6,pick(roof),x,3.8,z),I(V3.cone(Math.max(w,d)*.75,2.4,4),pick(roof),x,5.2,z,0,Math.PI/4,0,1,1,1),bx(1.3,2.2,.15,0x6a3a1a,x+(w>8?1:0),1.1,z+face*(d/2+.05)),bx(1.4,1.2,.15,0x9ad8f0,x-w/3,2,z+face*(d/2+.05)));box(x,z,w,d);
+   /* jardín, valla, buzón */
+   var gz=z+face*(d/2+4);patch(x,gz,w+2,7,0x5aa040,.04);for(var k=-w/2-1;k<=w/2+1;k+=1.5)it.push(bx(.12,.9,.12,0xffffff,x+k,.45,z+face*(d/2+8)));it.push(bx(w+2,.1,.1,0xffffff,x,.7,z+face*(d/2+8)));
+   box(x,z+face*(d/2+8),w+2,.4);var mx=x+w/2+1.2,mz=z+face*(d/2+8.6);it.push(bx(.1,1.2,.1,0x5a4a3a,mx,.6,mz),bx(.6,.5,.4,pick([0xd83a3a,0x2a78d8,0x2aa860]),mx,1.3,mz));SP.push([x+w/2+3,mz-face*1.5]);if(Math.random()<.6){tree(it,x-w/2-2,gz,rnd(.8,1.2));box(x-w/2-2,gz,1.2,1.2)}}
+  [-70,-52,-40].forEach(function(x){house(x,-26,1,10,8);house(x,12,-1,10,8)});
+  [-18,0,16,26].forEach(function(x){house(x,-26,1,10,8);house(x,12,-1,10,8);house(x,40,-1,10,8);house(x,-44,1,10,8)});
+  [46,60,72].forEach(function(x){house(x,-26,1,10,8);house(x,12,-1,10,8);house(x,40,-1,10,8);house(x,-44,1,10,8)});
+  /* parque con estanque */
+  patch(0,-49,24,10,0x4aa8d8,.05);it.push(bx(24,.3,.4,0x8a8a8a,0,.2,-44),bx(24,.3,.4,0x8a8a8a,0,.2,-54));box(0,-44,24,.5);box(0,-54,24,.5);for(var i=0;i<12;i++){tree(it,-52+i*8,-52,rnd(.9,1.3));box(-52+i*8,-52,1.2,1.2)}
+  /* coches aparcados y contenedores */
+  for(var i=0;i<12;i++){var q=[rnd(-75,75),pick([-16,-8,3,20,28,48])];if(isFree(q[0],q[1],2.6))parkedCar(it,q[0],q[1],false)}
+  for(var i=0;i<10;i++){var q=[rnd(-75,75),rnd(-50,50)];if(isFree(q[0],q[1],1.6)&&Math.abs(q[1]+8)>6&&Math.abs(q[1]-28)>6){it.push(bx(1.4,1.2,1,0x2a8a58,q[0],.6,q[1]));box(q[0],q[1],1.5,1.1)}}
+  for(var x=-76;x<76;x+=6){SP.push([x,-8],[x,28])}
+  BOX=SP;sign('CORREOS',-6,5,-12,6,Math.PI,'#f0c030');
+  return{spawn:[-70,-8,-Math.PI/2*-1]}},
+ targets:function(){var geo=function(){return mg([bx(.9,.7,.5,pick([0xd83a3a,0x2a78d8,0x2aa860]),0,.8,0),bx(1.0,.1,.6,0x3a3a3a,0,1.2,0),bx(.4,.25,.06,0xffffff,0,.85,.28),bx(.1,1.2,.1,0x5a4a3a,0,.6,-.25)])};
+  var HS=SP.slice().sort(function(){return Math.random()-.5});var out=[];for(var i=0;i<10;i++){var h=HS[i%HS.length];var f=freeNear(h[0],h[1],1.2,5);out.push({id:'b'+i,n:'Buzón nº '+(3+i*7),sec:'Calle '+(1+i%4),x:f[0],z:f[1],geo:geo,sc:1.1})}return out},
+ vehicle:function(g,sk,P){var m1=new T.MeshStandardMaterial({color:sk.a,roughness:.4,metalness:.3}),m2=new T.MeshStandardMaterial({color:sk.b,roughness:.5});P.tint.push(m1);
+  g.add(new T.Mesh(V3.merge([bx(.45,.65,1.5,0xffffff,0,.6,.1),bx(.4,.5,.6,0xffffff,0,.95,.55),bx(1.0,.1,.1,0x222222,0,1.3,.8),bx(.5,.1,.8,0xffffff,0,.35,.4),bx(.5,.3,.7,0xffffff,0,.8,-.6)].concat(wheelsOf([[0,.85],[0,-.75]],.32,.18))),m1));
+  g.add(new T.Mesh(V3.merge([bx(.9,.6,.5,0xffd23a,0,1.2,-.9),bx(.92,.1,.52,sk.b,0,1.52,-.9),bx(.7,.35,.1,0xffffff,0,1.2,-1.16)]),m2));P.rider=new T.Group()}};
+
+</script>
+<script src="dcore.js"></script>
+</body>
+</html>

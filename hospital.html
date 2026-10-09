@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#3a9ad8">
+<title>Camilla Drift</title>
+<style>
+#hud{position:fixed;inset:0;z-index:5;pointer-events:none;font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff}
+.pn{background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);border-radius:12px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#money{position:absolute;left:calc(env(safe-area-inset-left) + 78px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 14px;font-weight:900;font-size:20px;color:#ffe45a}
+#timer{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);padding:5px 16px;font-weight:900;font-size:20px;text-align:center}
+#timer small{display:block;font-size:10px;opacity:.8;font-weight:700;letter-spacing:.1em}
+#list{position:absolute;right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 8px);padding:8px 12px;font-size:12.5px;font-weight:700;line-height:1.5;min-width:150px;max-width:210px}
+#list b{display:block;margin-bottom:2px;letter-spacing:.06em;color:#ffe45a;font-size:11px}
+#list .d{opacity:.45;text-decoration:line-through}
+#list small{opacity:.7;font-weight:600}
+#drift{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 62px);text-align:center;font-weight:900;font-size:26px;text-shadow:0 2px 6px #000;transition:transform .1s}
+#drift small{display:block;font-size:12px;opacity:.9}
+#pop{position:absolute;left:50%;top:38%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px}
+#pop div{font-weight:900;font-size:22px;color:#ffe45a;text-shadow:0 2px 6px #000;animation:up 1.4s forwards}
+@keyframes up{from{transform:translateY(0);opacity:1}to{transform:translateY(-50px);opacity:0}}
+#joy{position:fixed;z-index:6;left:calc(env(safe-area-inset-left) + 26px);bottom:calc(env(safe-area-inset-bottom) + 26px);width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);touch-action:none}
+#joy i{position:absolute;left:41px;top:41px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.6)}
+.btn{position:fixed;z-index:7;border-radius:50%;border:3px solid rgba(255,255,255,.5);color:#fff;font:900 14px system-ui;display:flex;align-items:center;justify-content:center;text-align:center;touch-action:none;line-height:1.1;text-shadow:0 1px 3px #000}
+.btn:active,.btn.on{transform:scale(.93);filter:brightness(1.25)}
+#bDrift{right:calc(env(safe-area-inset-right) + 24px);bottom:calc(env(safe-area-inset-bottom) + 30px);width:96px;height:96px;background:rgba(220,60,30,.85);font-size:16px}
+#bTurbo{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 24px);width:70px;height:70px;background:rgba(40,120,230,.85)}
+#bHint{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 104px);width:56px;height:56px;background:rgba(230,170,30,.85);font-size:11px}
+#bShop{right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 130px);width:54px;height:54px;background:rgba(10,120,60,.9);font-size:11px;display:none}
+.ov{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(4,30,16,.55),rgba(2,12,6,.92));font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff;padding:10px}
+.ov .card{background:#0d2e1c;border:2px solid #2a8a52;border-radius:20px;padding:14px 16px;max-width:540px;width:100%;max-height:94vh;overflow:auto;box-shadow:0 10px 40px #000}
+.ov h2{margin:0 0 4px;font-size:22px;color:#ffe45a}.ov p{margin:3px 0 8px;font-size:13px;opacity:.9;line-height:1.4}
+.ov button{font:900 14px system-ui;padding:10px 16px;border-radius:12px;border:0;background:#ffd23a;color:#1c1604;margin:3px}
+.ov button.g{background:rgba(255,255,255,.15);color:#fff}
+.sh{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sh .it{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:7px 9px;font-size:12px;display:flex;flex-direction:column;gap:3px}
+.sh .it b{font-size:13px}.sh .it small{opacity:.75}
+.sh .it button{padding:6px 8px;font-size:12px;margin:0;align-self:flex-start}
+.sh .it button[disabled]{opacity:.35}
+.tabs{display:flex;gap:5px;margin:6px 0}.tabs button{padding:7px 12px;font-size:12px}.tabs button.on{background:#ffd23a;color:#1c1604}
+#rot{position:fixed;inset:0;z-index:99;background:#0b2a18;color:#fff;display:none;align-items:center;justify-content:center;text-align:center;font:700 18px system-ui;padding:30px}
+@media (orientation:portrait){#rot{display:flex}}
+#flashW{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:8;transition:opacity .25s}
+</style>
+</head>
+<body>
+<div id="rot">Gira el móvil en horizontal<br>para jugar</div>
+<script src="three.min.js"></script><script src="v3d.js"></script>
+<a href="index.html" style="position:fixed;z-index:20;left:calc(env(safe-area-inset-left) + 12px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 12px;border-radius:999px;background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;font:800 13px system-ui">‹ Apps</a>
+<div id="flashW"></div>
+<div id="hud">
+ <div id="money" class="pn">0 €</div>
+ <div id="timer" class="pn"><small>TIEMPO</small><span id="tm">2:00</span></div>
+ <div id="list" class="pn"></div>
+ <div id="drift"></div><div id="pop"></div>
+</div>
+<div id="joy"><i></i></div>
+<div class="btn" id="bDrift">DRIFT</div><div class="btn" id="bTurbo">TURBO</div><div class="btn" id="bHint">PISTA<br>5 €</div><div class="btn" id="bShop">TIENDA</div>
+<div class="ov" id="ovStart" style="display:flex"><div class="card" style="text-align:center"><h2>Camilla Drift</h2><p>Eres una camilla de hospital con ruedas: recoge a los pacientes y el material de la lista por pasillos, habitaciones y urgencias, derrapa sin chocar con las camas y huye de la enfermera jefa.</p><p style="font-size:12px">Joystick: girar y acelerar (arriba acelera, abajo frena y marcha atrás) · <b>DRIFT</b> = freno de mano · TURBO · PISTA para ver dónde está el objetivo</p><button id="startB">¡A jugar!</button><br><button class="g" id="shopB0">Tienda</button></div></div>
+<div class="ov" id="ovSum"><div class="card" style="text-align:center"><h2 id="sumT"></h2><p id="sumP"></p><button id="sumNext">Siguiente lista</button><button class="g" id="sumShop">Tienda</button></div></div>
+<div class="ov" id="ovShop"><div class="card"><h2>Tienda · <span id="shMoney"></span></h2><div class="tabs"><button id="t1" class="on">Mejoras</button><button id="t2">Vehículos</button><button id="t3">Extras</button></div><div class="sh" id="shList"></div><div style="text-align:right;margin-top:8px"><button id="shClose">Cerrar</button></div></div></div>
+<script>
+/* utilidades comunes de los mundos (se ejecutan cuando el motor ya existe) */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function carShape(it,x,z,vert,col){var L=4.4,W=2,sx=vert?W:L,sz=vert?L:W;
+ it.push(bx(sx,.7,sz,col,x,.55,z));var cx=vert?0:-.3,cz=vert?-.3:0;it.push(bx(vert?1.7:2.2,.55,vert?2.2:1.7,col,x+cx,1.15,z+cz),bx(vert?1.72:2.0,.38,vert?2.0:1.72,0x1a2a3a,x+cx,1.17,z+cz));
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(w){it.push(I(V3.cyl(.34,.34,.3,10),0x111111,x+(vert?w[0]*1.0:w[1]*1.4),.34,z+(vert?w[1]*1.4:w[0]*.95),0,0,vert?Math.PI/2:0,1,1,1))});box(x,z,sx+.2,sz+.2)}
+function parkedCar(it,x,z,vert){carShape(it,x,z,vert,pick([0xc02828,0x2848b0,0xdedede,0x1a1a1a,0x888888,0xe0a020,0x2a7a4a,0xf0f0f0,0x6a2a8a,0x2a8aa8]))}
+function windowsFront(it,x,z,w,d,h,side){for(var y=3;y<h-1;y+=3.2)for(var k=-w/2+1.5;k<w/2-1;k+=3){it.push(bx(1.6,1.5,.1,0x2a4a6a,x+k,y,z+(side||1)*(d/2+.03)))}}
+function building(it,x,z,w,d,h,col){it.push(bx(w,h,d,col,x,h/2,z),bx(w+.3,.4,d+.3,0x9a9a9a,x,h+.2,z));windowsFront(it,x,z,w,d,h,1);windowsFront(it,x,z,w,d,h,-1);box(x,z,w,d)}
+function crateBox(it,x,z,s,c){it.push(bx(s,s,s,c||0xc8a070,x,s/2,z),bx(s*1.02,s*.12,s*1.02,0x9a7a50,x,s*.55,z));box(x,z,s,s)}
+function mg(a){return V3.merge(a)}
+function mkTargets(defs,spots,secs){return defs.map(function(d,i){var q=spots[(i*3+1)%spots.length];var f=freeNear(q[0]+rnd(-2,2),q[1]+rnd(-2,2),1.2,6);return{id:d.id,n:d.n,sec:(secs&&secs[i%secs.length])||d.sec||'',x:f[0],z:f[1],geo:d.geo,sc:d.sc}})}
+function wheelsOf(list,r,w,col){return list.map(function(p){return I(V3.cyl(r,r,w,10),col||0x1a1a1a,p[0],r,p[1],0,0,Math.PI/2)})}
+function shopFront(it,x,z,w,face,col,name){/* face: 1 mira hacia +z, -1 hacia -z; fachada pegada a la pared en z */
+ it.push(bx(w,.3,3,col,x,3.9,z+face*1.5),bx(w,4.2,.3,0xe8e4dc,x,2.1,z-face*0.1),bx(w-2,3,.2,0x9ad8f0,x,1.8,z+face*.3));
+ for(var k=-w/2+2;k<w/2-1;k+=2.6){it.push(bx(1.8,.9,1.2,0xc8a070,x+k,.45,z+face*1.8),bx(1.6,.3,.9,pick([0xe03a2a,0x2a8ad8,0xf0c030,0x2aa860]),x+k,1.1,z+face*1.8));box(x+k,z+face*1.8,2,1.4)}
+ sign(name,x,5.4,z+face*1.2,Math.min(w-2,8),face>0?0:Math.PI,'#'+('000000'+col.toString(16)).slice(-6))}
+
+var SP=[];
+var CFG={id:'hospital',b:[-60,60,-38,38],light:{bg:0xe8f0f2,fog:0xeef4f6,near:70,far:240,hi:1.6,si:.5},
+ listTitle:'URGENCIAS',lines:['¡Despacio, es un hospital!','¡Mi paciente!','¡Silencio, por favor!','¡Cuidado con el suero!','¡No corra!','¡Ay, mi pie!'],npcN:30,
+ pa:{welcome:'Código azul. Se necesita una camilla en urgencias.',random:['Se ruega silencio en los pasillos del hospital','Doctor Pérez, se le espera en quirófano','Visitas: horario hasta las ocho de la tarde','Alguien ha perdido una camilla sin frenos']},
+ chaser:{look:{skin:0xf2c8a0,shirt:0xf0f4f8,pants:0x4a8ab8,hair:0x6a3a2a,cap:0xf0f4f8},scale:.74,pa:'Atención. La enfermera jefa te está buscando. En el hospital no se derrapa.',fine:'¡Regañina! -10 €',speed:7},
+ winTitle:'¡Guardia superada!',winLabel:'Bonus del hospital',failLabel:'Se acabó el turno sin terminar las urgencias.',orbit:[50,30,32,0,0],camH:2.7,camD:5.8,cargo:{x:.3,z:.9,y:.9,oz:0},cargoSc:.5,arrowY:2.4,
+ world:function(){
+  var ft=px(128,128,function(x,y){var c=((x>>5)+(y>>5))%2;var n=Math.random()*4;return c?[232+n,238+n,240+n]:[214+n,226+n,230+n]},true);floorPlane(120,76,0xffffff,ft,[30,19]);walls(5.5,0xf4f8fa,0x3a9ad8);ceiling(5.5,0xffffff);
+  var it=PI,W=0xeef4f6;
+  function wX(x,z0,z1,gaps){var a=z0;gaps.sort(function(p,q){return p-q}).forEach(function(g){if(g-2.4>a){it.push(bx(.5,5.5,g-2.4-a,W,x,2.75,(a+g-2.4)/2));box(x,(a+g-2.4)/2,.6,g-2.4-a)}a=g+2.4});if(z1>a){it.push(bx(.5,5.5,z1-a,W,x,2.75,(a+z1)/2));box(x,(a+z1)/2,.6,z1-a)}}
+  function wZ(z,x0,x1,gaps){var a=x0;gaps.sort(function(p,q){return p-q}).forEach(function(g){if(g-2.4>a){it.push(bx(g-2.4-a,5.5,.5,W,(a+g-2.4)/2,2.75,z));box((a+g-2.4)/2,z,g-2.4-a,.6)}a=g+2.4});if(x1>a){it.push(bx(x1-a,5.5,.5,W,(a+x1)/2,2.75,z));box((a+x1)/2,z,x1-a,.6)}}
+  /* pasillo central largo horizontal y salas a ambos lados */
+  wZ(-6,-60,60,[-48,-30,-12,6,24,42,54]);wZ(6,-60,60,[-48,-30,-12,6,24,42,54]);
+  [-39,-21,-3,15,33,51].forEach(function(x){wX(x,-38,-6,[]);wX(x,6,38,[])});
+  /* habitaciones con camas, cortinas, equipos */
+  var lanes=[];for(var side=-1;side<=1;side+=2)for(var r=0;r<7;r++){var cx=-48+r*18-(r>0?0:0),cz=side*22;if(r===6)cx=57;cx=-48+r*18;if(cx>56)continue;
+   var n=r%3+1;for(var k=0;k<n;k++){var bxp=cx-5+k*5;it.push(bx(2.4,.5,4.6,0xdadada,bxp,.5,cz+(side*2)),bx(2.2,.3,4.2,0x8ac8f0,bxp,.85,cz+(side*2)),bx(2.2,.15,1,0xffffff,bxp,1.05,cz+(side*2)-1.6*side));box(bxp,cz+side*2,2.6,4.8);it.push(bx(.1,2.6,.1,0x999999,bxp+1.4,1.3,cz+side*2-1),bx(.4,.6,.1,0xf0f0a0,bxp+1.4,2.5,cz+side*2-1))}
+   it.push(bx(3,1.4,.8,0xdde4e8,cx+3,.7,cz+side*8.5),bx(2.6,.15,.7,0x9ad8f0,cx+3,1.45,cz+side*8.5));box(cx+3,cz+side*8.5,3,.9);lanes.push([cx,side*10]);}
+  /* sala de espera: sillas en filas, recepción, urgencias, máquinas */
+  for(var r=0;r<3;r++)for(var c=0;c<8;c++){var x=-57+c*1.3,z=-3+r*0;if(r===0)it.push(bx(1,.5,1,0x3a8ad8,x,.3,-3+0),bx(1,.6,.2,0x3a8ad8,x,.7,-3.4))}
+  it.push(bx(8,1.1,2,0xdde4e8,40,.55,0),bx(8.2,.1,2.2,0x3a9ad8,40,1.15,0),bx(.9,1,.8,0x2a2e34,40,1.6,-.4));box(40,0,8.2,2.2);
+  for(var i=0;i<12;i++){var q=freeNear(rnd(-56,56),rnd(-36,36),2,4);if(isFree(q[0],q[1],1.3)){var t=i%3;if(t===0){it.push(bx(.9,1.4,.7,0xe8eef0,q[0],.7,q[1]),bx(.7,.4,.1,0x1a4a2a,q[0],1.2,q[1]+.4));box(q[0],q[1],1,.8)}else if(t===1){it.push(bx(.1,1.8,.1,0x888888,q[0],.9,q[1]),bx(.4,.8,.3,0xd8f0f8,q[0],1.9,q[1]));box(q[0],q[1],.5,.5)}else{plant(it,q[0],q[1]);box(q[0],q[1],1.2,1.2)}}}
+  for(var x=-56;x<=56;x+=8){SP.push([x,0])}
+  [-56,-34,-14,8,28,46].forEach(function(x){SP.push([x,-14],[x,14],[x+4,-24],[x+4,24])});
+  sign('URGENCIAS',-50,4.6,-5.7,6,0,'#d8402a');sign('RECEPCIÓN',40,4.6,-2.5,6,0,'#3a9ad8');sign('HOSPITAL CENTRAL',0,5,-37.5,12,0,'#3a9ad8');
+  /* cruz roja en el suelo */
+  patch(-30,0,3,.8,0xd83a3a,.02);patch(-30,0,.8,3,0xd83a3a,.02);
+  return{spawn:[-54,0,-Math.PI/2*-1]}},
+ targets:function(){var pat=function(c){return function(){return humanGeo(c)}};var d=[{id:'pa1',n:'Paciente: Marta',geo:pat({shirt:0x9ad8f0,pants:0x9ad8f0,hair:0x6a3a2a}),sc:1.3},{id:'pa2',n:'Paciente: Luis',geo:pat({shirt:0xa0e8b8,pants:0xa0e8b8,hair:0x1a1a1a}),sc:1.3},{id:'pa3',n:'Paciente: Rosa',geo:pat({shirt:0xf0b0c8,pants:0xf0b0c8,hair:0xc8c8c8}),sc:1.3},{id:'suero',n:'Suero',geo:function(){return mg([bx(.04,1.2,.04,0x888888,0,.6,0),I(V3.cyl(.2,.2,.5,10),0xd8f0f8,0,1.2,0),bx(.04,.8,.04,0xe8f8ff,.2,.8,0)])}},{id:'botiq',n:'Botiquín',geo:function(){return mg([bx(.7,.5,.3,0xf0f0f0,0,.3,0),bx(.4,.1,.32,0xd02020,0,.3,0),bx(.1,.4,.32,0xd02020,0,.3,0)])}},{id:'radio',n:'Radiografía',geo:function(){return mg([bx(.9,.04,.7,0x1a1a22,0,.3,0),bx(.5,.045,.4,0x9ac8d8,0,.31,0)])}},{id:'sangre',n:'Bolsa de sangre',geo:function(){return mg([bx(.4,.6,.1,0xd02030,0,.5,0),bx(.12,.2,.1,0xeeeeee,0,.9,0)])}},{id:'pastis',n:'Pastillas',geo:function(){return mg([I(V3.cyl(.18,.18,.4,10),0xf0a030,0,.2,0),I(V3.cyl(.2,.2,.08,10),0xffffff,0,.44,0)])}}];
+  var sec=['Habitación 3','Habitación 7','Habitación 11','Pasillo','Recepción','Urgencias','Habitación 5','Pasillo'];return mkTargets(d,SP,sec)},
+ vehicle:function(g,sk,P){var m1=new T.MeshStandardMaterial({color:sk.a,roughness:.5}),m2=new T.MeshStandardMaterial({color:sk.b,roughness:.4,metalness:.5});P.tint.push(m1);
+  g.add(new T.Mesh(V3.merge([bx(.9,.1,2.2,0xdadada,0,.55,0),bx(.06,.06,2.2,0xffffff,-.4,.4,0),bx(.06,.06,2.2,0xffffff,.4,.4,0),bx(.08,.4,.08,0xffffff,-.4,.3,-.9),bx(.08,.4,.08,0xffffff,.4,.3,-.9),bx(.08,.4,.08,0xffffff,-.4,.3,.9),bx(.08,.4,.08,0xffffff,.4,.3,.9)].concat(wheelsOf([[-.4,-.9],[.4,-.9],[-.4,.9],[.4,.9]],.14,.1))),m2));
+  g.add(new T.Mesh(V3.merge([bx(.85,.18,1.9,0xffffff,0,.7,0),bx(.86,.2,.9,sk.c,0,.78,.55)]),m1));g.add(new T.Mesh(V3.merge([bx(.85,.5,.1,0xffffff,0,.95,-1.0),bx(.6,.12,.4,0xffffff,0,.9,-.8)]),m1));
+  g.add(new T.Mesh(V3.merge([bx(.08,1.0,.08,0xffffff,-.38,1.05,-1.15),bx(.08,1.0,.08,0xffffff,.38,1.05,-1.15),bx(.8,.08,.1,0xffffff,0,1.55,-1.15)]),m2));P.rider=new T.Group()}};
+
+</script>
+<script src="dcore.js"></script>
+</body>
+</html>

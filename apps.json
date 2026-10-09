@@ -1,6 +1,116 @@
 {
  "apps": [
   {
+   "nombre": "Hielo Drift",
+   "desc": "Eres una silla sobre una pista de hielo donde el suelo resbala el doble: recoge lo de la lista entre vallas y patinadores y huye del entrenador.",
+   "href": "hielo.html",
+   "icono": "⛸️",
+   "color": "#2a6ad8",
+   "cat": "juegos",
+   "img": "img/hielo.webp",
+   "sub": "carreras",
+   "tags": "hielo patinaje silla pista drift resbala"
+  },
+  {
+   "nombre": "Aeropuerto Drift",
+   "desc": "Eres un carro de equipaje en un aeropuerto enorme: recoge pasaportes y maletas antes del vuelo y derrapa entre facturación, seguridad y puertas.",
+   "href": "aeropuerto.html",
+   "icono": "✈️",
+   "color": "#2a6ad8",
+   "cat": "juegos",
+   "img": "img/aeropuerto.webp",
+   "sub": "carreras",
+   "tags": "aeropuerto maletas vuelo carro drift avion"
+  },
+  {
+   "nombre": "Parking Drift",
+   "desc": "Eres un carrito en un parking subterráneo: recoge lo olvidado entre coches, pilares y barreras y esquiva al vigilante.",
+   "href": "parking.html",
+   "icono": "🅿️",
+   "color": "#e0b020",
+   "cat": "juegos",
+   "img": "img/parking.webp",
+   "sub": "carreras",
+   "tags": "parking carrito coches pilares drift vigilante"
+  },
+  {
+   "nombre": "Camilla Drift",
+   "desc": "Eres una camilla de hospital: recoge pacientes y material por pasillos y urgencias, derrapa sin chocar con las camas y huye de la enfermera jefa.",
+   "href": "hospital.html",
+   "icono": "🏥",
+   "color": "#3a9ad8",
+   "cat": "juegos",
+   "img": "img/hospital.webp",
+   "sub": "carreras",
+   "tags": "hospital camilla urgencias enfermera drift"
+  },
+  {
+   "nombre": "Cartero Drift",
+   "desc": "Eres un cartero en moto por un barrio con jardines y vallas: entrega cada carta en su buzón derrapando y huye del vecino de la escoba.",
+   "href": "cartero.html",
+   "icono": "✉️",
+   "color": "#f0c030",
+   "cat": "juegos",
+   "img": "img/cartero.webp",
+   "sub": "carreras",
+   "tags": "cartero correos moto barrio buzon drift"
+  },
+  {
+   "nombre": "Mudanza Loca",
+   "desc": "Eres una furgoneta de mudanzas dentro de un piso enorme: carga todos los muebles, derrapa por salón y dormitorios y huye del casero.",
+   "href": "mudanza.html",
+   "icono": "🚚",
+   "color": "#8a6a3a",
+   "cat": "juegos",
+   "img": "img/mudanza.webp",
+   "sub": "carreras",
+   "tags": "mudanza furgoneta muebles piso drift casero"
+  },
+  {
+   "nombre": "Pizzero Drift",
+   "desc": "Eres un repartidor en moto con pizzas: entrega cada pedido a su casa derrapando por las calles y esquiva a la policía local.",
+   "href": "pizzero.html",
+   "icono": "🍕",
+   "color": "#d8402a",
+   "cat": "juegos",
+   "img": "img/pizzero.webp",
+   "sub": "carreras",
+   "tags": "pizza reparto moto ciudad drift policia"
+  },
+  {
+   "nombre": "Patinete Escolar",
+   "desc": "Eres un patinete en el colegio a la hora del recreo: recoge lo de la lista por aulas, pasillos y patio y evita al director.",
+   "href": "cole.html",
+   "icono": "🛴",
+   "color": "#3a78c8",
+   "cat": "juegos",
+   "img": "img/cole.webp",
+   "sub": "carreras",
+   "tags": "colegio patinete recreo director drift"
+  },
+  {
+   "nombre": "Carrito de Bebé Drift",
+   "desc": "Eres un cochecito de bebé en un centro comercial enorme: consigue lo de la lista del bebé, derrapa entre tiendas y fuente y huye de seguridad.",
+   "href": "centro.html",
+   "icono": "👶",
+   "color": "#d8402a",
+   "cat": "juegos",
+   "img": "img/centro.webp",
+   "sub": "carreras",
+   "tags": "bebe carrito centro comercial tiendas drift"
+  },
+  {
+   "nombre": "Silla Drift",
+   "desc": "Eres una silla de oficina con ruedas: haz los encargos del jefe por una oficina enorme, derrapa entre mesas, impresoras y salas de reuniones y gana dinero para mejorar.",
+   "href": "oficina.html",
+   "icono": "🪑",
+   "color": "#2f6fd0",
+   "cat": "juegos",
+   "img": "img/oficina.webp",
+   "sub": "carreras",
+   "tags": "oficina silla drift jefe papeles"
+  },
+  {
    "nombre": "Súper Drift",
    "desc": "Eres un carrito en un hipermercado enorme: pasillos, frutería, carnicería, congelados, cajas y mil obstáculos. Sigue la lista de la compra, derrapa, esquiva a la gente y gana dinero para mejorar.",
    "href": "superdrift.html",

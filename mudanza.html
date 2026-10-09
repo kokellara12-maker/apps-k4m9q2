@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#8a6a3a">
+<title>Mudanza Loca</title>
+<style>
+#hud{position:fixed;inset:0;z-index:5;pointer-events:none;font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff}
+.pn{background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);border-radius:12px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#money{position:absolute;left:calc(env(safe-area-inset-left) + 78px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 14px;font-weight:900;font-size:20px;color:#ffe45a}
+#timer{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);padding:5px 16px;font-weight:900;font-size:20px;text-align:center}
+#timer small{display:block;font-size:10px;opacity:.8;font-weight:700;letter-spacing:.1em}
+#list{position:absolute;right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 8px);padding:8px 12px;font-size:12.5px;font-weight:700;line-height:1.5;min-width:150px;max-width:210px}
+#list b{display:block;margin-bottom:2px;letter-spacing:.06em;color:#ffe45a;font-size:11px}
+#list .d{opacity:.45;text-decoration:line-through}
+#list small{opacity:.7;font-weight:600}
+#drift{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 62px);text-align:center;font-weight:900;font-size:26px;text-shadow:0 2px 6px #000;transition:transform .1s}
+#drift small{display:block;font-size:12px;opacity:.9}
+#pop{position:absolute;left:50%;top:38%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px}
+#pop div{font-weight:900;font-size:22px;color:#ffe45a;text-shadow:0 2px 6px #000;animation:up 1.4s forwards}
+@keyframes up{from{transform:translateY(0);opacity:1}to{transform:translateY(-50px);opacity:0}}
+#joy{position:fixed;z-index:6;left:calc(env(safe-area-inset-left) + 26px);bottom:calc(env(safe-area-inset-bottom) + 26px);width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);touch-action:none}
+#joy i{position:absolute;left:41px;top:41px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.6)}
+.btn{position:fixed;z-index:7;border-radius:50%;border:3px solid rgba(255,255,255,.5);color:#fff;font:900 14px system-ui;display:flex;align-items:center;justify-content:center;text-align:center;touch-action:none;line-height:1.1;text-shadow:0 1px 3px #000}
+.btn:active,.btn.on{transform:scale(.93);filter:brightness(1.25)}
+#bDrift{right:calc(env(safe-area-inset-right) + 24px);bottom:calc(env(safe-area-inset-bottom) + 30px);width:96px;height:96px;background:rgba(220,60,30,.85);font-size:16px}
+#bTurbo{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 24px);width:70px;height:70px;background:rgba(40,120,230,.85)}
+#bHint{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 104px);width:56px;height:56px;background:rgba(230,170,30,.85);font-size:11px}
+#bShop{right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 130px);width:54px;height:54px;background:rgba(10,120,60,.9);font-size:11px;display:none}
+.ov{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(4,30,16,.55),rgba(2,12,6,.92));font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff;padding:10px}
+.ov .card{background:#0d2e1c;border:2px solid #2a8a52;border-radius:20px;padding:14px 16px;max-width:540px;width:100%;max-height:94vh;overflow:auto;box-shadow:0 10px 40px #000}
+.ov h2{margin:0 0 4px;font-size:22px;color:#ffe45a}.ov p{margin:3px 0 8px;font-size:13px;opacity:.9;line-height:1.4}
+.ov button{font:900 14px system-ui;padding:10px 16px;border-radius:12px;border:0;background:#ffd23a;color:#1c1604;margin:3px}
+.ov button.g{background:rgba(255,255,255,.15);color:#fff}
+.sh{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sh .it{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:7px 9px;font-size:12px;display:flex;flex-direction:column;gap:3px}
+.sh .it b{font-size:13px}.sh .it small{opacity:.75}
+.sh .it button{padding:6px 8px;font-size:12px;margin:0;align-self:flex-start}
+.sh .it button[disabled]{opacity:.35}
+.tabs{display:flex;gap:5px;margin:6px 0}.tabs button{padding:7px 12px;font-size:12px}.tabs button.on{background:#ffd23a;color:#1c1604}
+#rot{position:fixed;inset:0;z-index:99;background:#0b2a18;color:#fff;display:none;align-items:center;justify-content:center;text-align:center;font:700 18px system-ui;padding:30px}
+@media (orientation:portrait){#rot{display:flex}}
+#flashW{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:8;transition:opacity .25s}
+</style>
+</head>
+<body>
+<div id="rot">Gira el móvil en horizontal<br>para jugar</div>
+<script src="three.min.js"></script><script src="v3d.js"></script>
+<a href="index.html" style="position:fixed;z-index:20;left:calc(env(safe-area-inset-left) + 12px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 12px;border-radius:999px;background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;font:800 13px system-ui">‹ Apps</a>
+<div id="flashW"></div>
+<div id="hud">
+ <div id="money" class="pn">0 €</div>
+ <div id="timer" class="pn"><small>TIEMPO</small><span id="tm">2:00</span></div>
+ <div id="list" class="pn"></div>
+ <div id="drift"></div><div id="pop"></div>
+</div>
+<div id="joy"><i></i></div>
+<div class="btn" id="bDrift">DRIFT</div><div class="btn" id="bTurbo">TURBO</div><div class="btn" id="bHint">PISTA<br>5 €</div><div class="btn" id="bShop">TIENDA</div>
+<div class="ov" id="ovStart" style="display:flex"><div class="card" style="text-align:center"><h2>Mudanza Loca</h2><p>Eres una furgoneta de mudanzas dentro de un piso enorme: carga todos los muebles de la lista, derrapa por salón, cocina y dormitorios y huye del casero.</p><p style="font-size:12px">Joystick: girar y acelerar (arriba acelera, abajo frena y marcha atrás) · <b>DRIFT</b> = freno de mano · TURBO · PISTA para ver dónde está el objetivo</p><button id="startB">¡A jugar!</button><br><button class="g" id="shopB0">Tienda</button></div></div>
+<div class="ov" id="ovSum"><div class="card" style="text-align:center"><h2 id="sumT"></h2><p id="sumP"></p><button id="sumNext">Siguiente lista</button><button class="g" id="sumShop">Tienda</button></div></div>
+<div class="ov" id="ovShop"><div class="card"><h2>Tienda · <span id="shMoney"></span></h2><div class="tabs"><button id="t1" class="on">Mejoras</button><button id="t2">Vehículos</button><button id="t3">Extras</button></div><div class="sh" id="shList"></div><div style="text-align:right;margin-top:8px"><button id="shClose">Cerrar</button></div></div></div>
+<script>
+/* utilidades comunes de los mundos (se ejecutan cuando el motor ya existe) */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function carShape(it,x,z,vert,col){var L=4.4,W=2,sx=vert?W:L,sz=vert?L:W;
+ it.push(bx(sx,.7,sz,col,x,.55,z));var cx=vert?0:-.3,cz=vert?-.3:0;it.push(bx(vert?1.7:2.2,.55,vert?2.2:1.7,col,x+cx,1.15,z+cz),bx(vert?1.72:2.0,.38,vert?2.0:1.72,0x1a2a3a,x+cx,1.17,z+cz));
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(w){it.push(I(V3.cyl(.34,.34,.3,10),0x111111,x+(vert?w[0]*1.0:w[1]*1.4),.34,z+(vert?w[1]*1.4:w[0]*.95),0,0,vert?Math.PI/2:0,1,1,1))});box(x,z,sx+.2,sz+.2)}
+function parkedCar(it,x,z,vert){carShape(it,x,z,vert,pick([0xc02828,0x2848b0,0xdedede,0x1a1a1a,0x888888,0xe0a020,0x2a7a4a,0xf0f0f0,0x6a2a8a,0x2a8aa8]))}
+function windowsFront(it,x,z,w,d,h,side){for(var y=3;y<h-1;y+=3.2)for(var k=-w/2+1.5;k<w/2-1;k+=3){it.push(bx(1.6,1.5,.1,0x2a4a6a,x+k,y,z+(side||1)*(d/2+.03)))}}
+function building(it,x,z,w,d,h,col){it.push(bx(w,h,d,col,x,h/2,z),bx(w+.3,.4,d+.3,0x9a9a9a,x,h+.2,z));windowsFront(it,x,z,w,d,h,1);windowsFront(it,x,z,w,d,h,-1);box(x,z,w,d)}
+function crateBox(it,x,z,s,c){it.push(bx(s,s,s,c||0xc8a070,x,s/2,z),bx(s*1.02,s*.12,s*1.02,0x9a7a50,x,s*.55,z));box(x,z,s,s)}
+function mg(a){return V3.merge(a)}
+function mkTargets(defs,spots,secs){return defs.map(function(d,i){var q=spots[(i*3+1)%spots.length];var f=freeNear(q[0]+rnd(-2,2),q[1]+rnd(-2,2),1.2,6);return{id:d.id,n:d.n,sec:(secs&&secs[i%secs.length])||d.sec||'',x:f[0],z:f[1],geo:d.geo,sc:d.sc}})}
+function wheelsOf(list,r,w,col){return list.map(function(p){return I(V3.cyl(r,r,w,10),col||0x1a1a1a,p[0],r,p[1],0,0,Math.PI/2)})}
+function shopFront(it,x,z,w,face,col,name){/* face: 1 mira hacia +z, -1 hacia -z; fachada pegada a la pared en z */
+ it.push(bx(w,.3,3,col,x,3.9,z+face*1.5),bx(w,4.2,.3,0xe8e4dc,x,2.1,z-face*0.1),bx(w-2,3,.2,0x9ad8f0,x,1.8,z+face*.3));
+ for(var k=-w/2+2;k<w/2-1;k+=2.6){it.push(bx(1.8,.9,1.2,0xc8a070,x+k,.45,z+face*1.8),bx(1.6,.3,.9,pick([0xe03a2a,0x2a8ad8,0xf0c030,0x2aa860]),x+k,1.1,z+face*1.8));box(x+k,z+face*1.8,2,1.4)}
+ sign(name,x,5.4,z+face*1.2,Math.min(w-2,8),face>0?0:Math.PI,'#'+('000000'+col.toString(16)).slice(-6))}
+
+var SP=[];
+var CFG={id:'mudanza',b:[-55,55,-38,38],light:{bg:0xe8e0d0,fog:0xeee8da,near:60,far:200,hi:1.5,si:.7},
+ listTitle:'MUEBLES A CARGAR',lines:['¡Mi sofá!','¡Cuidado con la lámpara!','¡Eso es frágil!','¡Me lo vas a romper!','¡A la izquierda!','¡Qué mudanza!'],npcN:24,
+ pa:{welcome:'Camión de mudanzas en el portal. Hay que cargar todo el piso.',random:['Recuerden que el ascensor está estropeado','Se ruega no circular con furgonetas dentro del piso','Alguien ha dejado una caja frágil en medio del pasillo']},
+ chaser:{look:{skin:0xd8a070,shirt:0x6a4a2a,pants:0x3a3a3a,hair:0xc8c8c8},scale:.76,pa:'Atención, el casero ha vuelto. Que no vea los muebles rotos.',fine:'¡Fianza perdida! -10 €',speed:6.8},
+ winTitle:'¡Mudanza terminada!',winLabel:'Pago de la mudanza',failLabel:'Se acabó el alquiler del camión.',orbit:[44,26,30,0,0],camH:2.7,camD:5.6,cargo:{x:.5,z:.8,y:1.1,oz:-.4},cargoSc:.6,arrowY:3.2,
+ world:function(){
+  var wt=px(64,64,function(x,y){var c=(y>>3)%2;var n=Math.random()*8;return c?[176+n,128+n,84+n]:[164+n,116+n,74+n]},true);floorPlane(110,76,0xffffff,wt,[22,15]);walls(5.5,0xf4eee0,0xc8a070);ceiling(5.5,0xfffaf0);
+  var it=PI,W=0xeee6d6;
+  function wX(x,z0,z1,gaps){var a=z0;gaps.sort(function(p,q){return p-q}).forEach(function(g){if(g-2.2>a){it.push(bx(.5,5.5,g-2.2-a,W,x,2.75,(a+g-2.2)/2));box(x,(a+g-2.2)/2,.6,g-2.2-a)}a=g+2.2});if(z1>a){it.push(bx(.5,5.5,z1-a,W,x,2.75,(a+z1)/2));box(x,(a+z1)/2,.6,z1-a)}}
+  function wZ(z,x0,x1,gaps){var a=x0;gaps.sort(function(p,q){return p-q}).forEach(function(g){if(g-2.2>a){it.push(bx(g-2.2-a,5.5,.5,W,(a+g-2.2)/2,2.75,z));box((a+g-2.2)/2,z,g-2.2-a,.6)}a=g+2.2});if(x1>a){it.push(bx(x1-a,5.5,.5,W,(a+x1)/2,2.75,z));box((a+x1)/2,z,x1-a,.6)}}
+  /* distribución del piso: salón grande izquierda, cocina, 3 dormitorios, baños, pasillo */
+  wX(-10,-38,38,[-26,0,24]);wZ(-6,-55,-10,[-34,-20]);wZ(14,-55,-10,[-40,-26]);wX(18,-38,38,[-30,-8,10,28]);wZ(-12,18,55,[30,46]);wZ(12,18,55,[24,44]);wX(36,-38,-12,[-24]);wX(36,12,38,[24]);
+  function sofa(x,z,r){it.push(bx(r?1.4:4,.8,r?4:1.4,0xa8503a,x,.4,z),bx(r?.4:4,1.2,r?4:.4,0x8a3a2a,x+(r?-.5:0),.8,z+(r?0:-.5)));box(x,z,r?1.6:4.2,r?4.2:1.6)}
+  function bed(x,z,c){it.push(bx(3.6,.5,4.4,0x6a4a2a,x,.25,z),bx(3.4,.4,4.1,c,x,.7,z),bx(3.4,.9,.3,0x6a4a2a,x,.7,z-2.2),bx(1.4,.2,.8,0xffffff,x-.8,1,z-1.6),bx(1.4,.2,.8,0xffffff,x+.8,1,z-1.6));box(x,z,3.8,4.6)}
+  /* salón */
+  sofa(-40,20,0);sofa(-48,0,1);it.push(bx(3,.5,1.8,0x6a4a2a,-40,.3,12),bx(3,.1,1.9,0x8a6a3a,-40,.55,12));box(-40,12,3.2,2);it.push(bx(4.4,1.6,1,0x3a3a3a,-20,.8,-2),bx(3.4,1.9,.2,0x1a1a1a,-20,1.8,-1.6));box(-20,-2,4.6,1.2);
+  it.push(bx(8,2.4,1.2,0x8a6a3a,-30,1.2,-36),bx(1.8,.4,6,0x6a8aa8,-30,.25,10));box(-30,-36,8,1.4);
+  /* comedor */
+  it.push(bx(6,.2,2.8,0xa87a4a,-30,1.4,-24),bx(.3,1.4,.3,0x6a4a2a,-32.5,.7,-24),bx(.3,1.4,.3,0x6a4a2a,-27.5,.7,-24));box(-30,-24,6.2,3);for(var k=-1;k<=1;k++){it.push(bx(.8,.8,.8,0xd8c8a0,-30+k*2,.5,-26),bx(.8,.8,.8,0xd8c8a0,-30+k*2,.5,-22));}
+  /* cocina */
+  it.push(bx(14,1.4,1.6,0xdadada,2,.7,-36),bx(14,.12,1.8,0x8a8a8a,2,1.46,-36),bx(1.8,2.8,1.8,0xe8eef0,-3,1.4,-33),bx(5,1.4,3,0xc8a070,3,.7,-28));box(2,-36,14,1.8);box(-3,-33,1.8,1.8);box(3,-28,5,3);it.push(bx(.8,.04,.8,0x1a1a1a,6,1.52,-36),bx(.8,.04,.8,0x1a1a1a,4,1.52,-36));
+  /* dormitorios */
+  bed(-40,-32+0,0x6a8ad8);bed(26,-30,0xd86a8a);bed(26,30,0x8ad86a);bed(48,20,0xd8c06a);bed(46,-26,0x6ad8c0);
+  [[32,-36],[40,36],[50,30],[8,34],[-52,36],[52,-36]].forEach(function(p){it.push(bx(3,3,1.2,0xa87a4a,p[0],1.5,p[1]));box(p[0],p[1],3.2,1.4)});
+  /* baños */
+  it.push(bx(1.6,.6,2.4,0xffffff,-48,.3,-30),bx(.8,.6,.8,0xf0f0f0,-52,.3,-26),bx(1,1,.4,0xe8e8e8,-50,.9,-20));box(-48,-30,1.8,2.6);box(-52,-26,1,1);
+  /* cajas apiladas, lámparas, plantas, alfombras */
+  for(var i=0;i<30;i++){var q=freeNear(rnd(-52,52),rnd(-35,35),1.6,4);if(isFree(q[0],q[1],1.4)){var s=rnd(.9,1.4);it.push(bx(s,s,s,0xc8a070,q[0],s/2,q[1]),bx(s*.9,s*.7,s*.9,0xb89060,q[0]+.1,s+s*.35,q[1]));box(q[0],q[1],s+.1,s+.1)}}
+  [[-14,-30],[-14,30],[14,0],[22,0],[-26,30],[48,0]].forEach(function(p){plant(it,p[0],p[1]);box(p[0],p[1],1.2,1.2)});
+  [[-34,-8],[-20,10],[0,20],[0,-14],[40,4],[30,-14],[-46,-8]].forEach(function(p){it.push(bx(.15,2.8,.15,0x4a4a4a,p[0],1.4,p[1]),I(V3.cone(.5,.7,10),0xf0e0b0,p[0],3,p[1]));box(p[0],p[1],.6,.6);SP.push([p[0]+2,p[1]])});
+  for(var i=0;i<10;i++)SP.push([rnd(-50,50),rnd(-34,34)]);
+  sign('PISO 3º B',0,4.8,-37.5,8,0,'#8a6a3a');
+  return{spawn:[48,-6,-Math.PI/2]}},
+ targets:function(){var d=[{id:'sofa',n:'Sofá',geo:function(){return mg([bx(1.6,.5,.8,0xa8503a,0,.35,0),bx(1.6,.7,.2,0x8a3a2a,0,.7,-.3),bx(.2,.55,.8,0x8a3a2a,-.8,.5,0),bx(.2,.55,.8,0x8a3a2a,.8,.5,0)])}},{id:'nevera',n:'Nevera',geo:function(){return mg([bx(.7,1.6,.7,0xe8eef0,0,.8,0),bx(.04,.9,.05,0x888888,.28,1.0,.36)])},sc:1.4},{id:'lamp',n:'Lámpara',geo:function(){return mg([I(V3.cyl(.04,.06,1.2,6),0x444444,0,.6,0),I(V3.cone(.32,.4,10),0xf0e0b0,0,1.3,0)])}},{id:'tele',n:'Televisión',geo:function(){return mg([bx(1.1,.7,.1,0x1a1a1a,0,.6,0),bx(1,.6,.11,0x2a4a6a,0,.6,0),bx(.4,.1,.3,0x333333,0,.2,0)])}},{id:'frag',n:'Caja frágil',geo:function(){return mg([bx(.7,.6,.7,0xc8a070,0,.3,0),bx(.72,.1,.72,0xd83a3a,0,.58,0),bx(.3,.3,.02,0xffffff,0,.3,.36)])}},{id:'silla',n:'Silla',geo:function(){return mg([bx(.6,.1,.6,0x8a5a2a,0,.5,0),bx(.6,.7,.1,0x8a5a2a,0,.9,-.28),bx(.08,.5,.08,0x6a4a2a,-.26,.25,-.26),bx(.08,.5,.08,0x6a4a2a,.26,.25,-.26),bx(.08,.5,.08,0x6a4a2a,-.26,.25,.26),bx(.08,.5,.08,0x6a4a2a,.26,.25,.26)])}},{id:'cuadro',n:'Cuadro',geo:function(){return mg([bx(.9,.7,.08,0x6a4a2a,0,.6,0),bx(.8,.6,.09,0x6ab0d8,0,.6,0),bx(.4,.2,.1,0xf0c030,0,.5,0)])}},{id:'plant',n:'Planta grande',geo:function(){return mg([I(V3.cyl(.3,.22,.5,8),0xa8683a,0,.25,0),I(V3.sph(.5,7,6),0x2a7a2a,0,.9,0),I(V3.sph(.35,7,6),0x3a8a3a,.3,1.3,.1)])}}];
+  var sec=['Salón','Cocina','Dormitorio','Dormitorio','Pasillo','Comedor','Salón','Baño'];return mkTargets(d,SP,sec)},
+ vehicle:function(g,sk,P){var m1=new T.MeshStandardMaterial({color:sk.a,roughness:.4,metalness:.3}),m2=new T.MeshStandardMaterial({color:sk.b,roughness:.5});P.tint.push(m1);
+  g.add(new T.Mesh(V3.merge([bx(1.6,1.7,1.9,0xffffff,0,1.2,-.6),bx(1.6,.9,.8,0xffffff,0,.8,.9),bx(1.5,.6,.1,0x9ad8f0,0,1.55,.98,0),bx(1.62,.1,2.0,0x2a2e34,0,.42,-.4)].concat(wheelsOf([[-.8,.9],[.8,.9],[-.8,-1.1],[.8,-1.1]],.3,.2))),m1));
+  g.add(new T.Mesh(V3.merge([bx(1.64,.14,1.94,sk.c,0,2.08,-.6),bx(1.5,.3,.05,sk.b,0,1.2,-1.58),bx(.3,.3,.08,0xffe080,-.6,.7,1.34),bx(.3,.3,.08,0xffe080,.6,.7,1.34)]),m2));P.rider=new T.Group()}};
+
+</script>
+<script src="dcore.js"></script>
+</body>
+</html>

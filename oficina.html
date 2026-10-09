@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2f6fd0">
+<title>Silla Drift</title>
+<style>
+#hud{position:fixed;inset:0;z-index:5;pointer-events:none;font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff}
+.pn{background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);border-radius:12px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#money{position:absolute;left:calc(env(safe-area-inset-left) + 78px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 14px;font-weight:900;font-size:20px;color:#ffe45a}
+#timer{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);padding:5px 16px;font-weight:900;font-size:20px;text-align:center}
+#timer small{display:block;font-size:10px;opacity:.8;font-weight:700;letter-spacing:.1em}
+#list{position:absolute;right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 8px);padding:8px 12px;font-size:12.5px;font-weight:700;line-height:1.5;min-width:150px;max-width:210px}
+#list b{display:block;margin-bottom:2px;letter-spacing:.06em;color:#ffe45a;font-size:11px}
+#list .d{opacity:.45;text-decoration:line-through}
+#list small{opacity:.7;font-weight:600}
+#drift{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 62px);text-align:center;font-weight:900;font-size:26px;text-shadow:0 2px 6px #000;transition:transform .1s}
+#drift small{display:block;font-size:12px;opacity:.9}
+#pop{position:absolute;left:50%;top:38%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px}
+#pop div{font-weight:900;font-size:22px;color:#ffe45a;text-shadow:0 2px 6px #000;animation:up 1.4s forwards}
+@keyframes up{from{transform:translateY(0);opacity:1}to{transform:translateY(-50px);opacity:0}}
+#joy{position:fixed;z-index:6;left:calc(env(safe-area-inset-left) + 26px);bottom:calc(env(safe-area-inset-bottom) + 26px);width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);touch-action:none}
+#joy i{position:absolute;left:41px;top:41px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.6)}
+.btn{position:fixed;z-index:7;border-radius:50%;border:3px solid rgba(255,255,255,.5);color:#fff;font:900 14px system-ui;display:flex;align-items:center;justify-content:center;text-align:center;touch-action:none;line-height:1.1;text-shadow:0 1px 3px #000}
+.btn:active,.btn.on{transform:scale(.93);filter:brightness(1.25)}
+#bDrift{right:calc(env(safe-area-inset-right) + 24px);bottom:calc(env(safe-area-inset-bottom) + 30px);width:96px;height:96px;background:rgba(220,60,30,.85);font-size:16px}
+#bTurbo{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 24px);width:70px;height:70px;background:rgba(40,120,230,.85)}
+#bHint{right:calc(env(safe-area-inset-right) + 134px);bottom:calc(env(safe-area-inset-bottom) + 104px);width:56px;height:56px;background:rgba(230,170,30,.85);font-size:11px}
+#bShop{right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 130px);width:54px;height:54px;background:rgba(10,120,60,.9);font-size:11px;display:none}
+.ov{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(4,30,16,.55),rgba(2,12,6,.92));font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:#fff;padding:10px}
+.ov .card{background:#0d2e1c;border:2px solid #2a8a52;border-radius:20px;padding:14px 16px;max-width:540px;width:100%;max-height:94vh;overflow:auto;box-shadow:0 10px 40px #000}
+.ov h2{margin:0 0 4px;font-size:22px;color:#ffe45a}.ov p{margin:3px 0 8px;font-size:13px;opacity:.9;line-height:1.4}
+.ov button{font:900 14px system-ui;padding:10px 16px;border-radius:12px;border:0;background:#ffd23a;color:#1c1604;margin:3px}
+.ov button.g{background:rgba(255,255,255,.15);color:#fff}
+.sh{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sh .it{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:7px 9px;font-size:12px;display:flex;flex-direction:column;gap:3px}
+.sh .it b{font-size:13px}.sh .it small{opacity:.75}
+.sh .it button{padding:6px 8px;font-size:12px;margin:0;align-self:flex-start}
+.sh .it button[disabled]{opacity:.35}
+.tabs{display:flex;gap:5px;margin:6px 0}.tabs button{padding:7px 12px;font-size:12px}.tabs button.on{background:#ffd23a;color:#1c1604}
+#rot{position:fixed;inset:0;z-index:99;background:#0b2a18;color:#fff;display:none;align-items:center;justify-content:center;text-align:center;font:700 18px system-ui;padding:30px}
+@media (orientation:portrait){#rot{display:flex}}
+#flashW{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:8;transition:opacity .25s}
+</style>
+</head>
+<body>
+<div id="rot">Gira el móvil en horizontal<br>para jugar</div>
+<script src="three.min.js"></script><script src="v3d.js"></script>
+<a href="index.html" style="position:fixed;z-index:20;left:calc(env(safe-area-inset-left) + 12px);top:calc(env(safe-area-inset-top) + 8px);padding:6px 12px;border-radius:999px;background:rgba(8,40,22,.7);border:2px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;font:800 13px system-ui">‹ Apps</a>
+<div id="flashW"></div>
+<div id="hud">
+ <div id="money" class="pn">0 €</div>
+ <div id="timer" class="pn"><small>TIEMPO</small><span id="tm">2:00</span></div>
+ <div id="list" class="pn"></div>
+ <div id="drift"></div><div id="pop"></div>
+</div>
+<div id="joy"><i></i></div>
+<div class="btn" id="bDrift">DRIFT</div><div class="btn" id="bTurbo">TURBO</div><div class="btn" id="bHint">PISTA<br>5 €</div><div class="btn" id="bShop">TIENDA</div>
+<div class="ov" id="ovStart" style="display:flex"><div class="card" style="text-align:center"><h2>Silla Drift</h2><p>Eres una silla de oficina con ruedas en una oficina enorme: haz los encargos del jefe, derrapa entre mesas, impresoras y salas de reuniones y gana dinero para mejorar tu silla.</p><p style="font-size:12px">Joystick: girar y acelerar (arriba acelera, abajo frena y marcha atrás) · <b>DRIFT</b> = freno de mano · TURBO · PISTA para ver dónde está el objetivo</p><button id="startB">¡A jugar!</button><br><button class="g" id="shopB0">Tienda</button></div></div>
+<div class="ov" id="ovSum"><div class="card" style="text-align:center"><h2 id="sumT"></h2><p id="sumP"></p><button id="sumNext">Siguiente lista</button><button class="g" id="sumShop">Tienda</button></div></div>
+<div class="ov" id="ovShop"><div class="card"><h2>Tienda · <span id="shMoney"></span></h2><div class="tabs"><button id="t1" class="on">Mejoras</button><button id="t2">Vehículos</button><button id="t3">Extras</button></div><div class="sh" id="shList"></div><div style="text-align:right;margin-top:8px"><button id="shClose">Cerrar</button></div></div></div>
+<script>
+/* utilidades comunes de los mundos (se ejecutan cuando el motor ya existe) */
+function rnd(a,b){return a+Math.random()*(b-a)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function carShape(it,x,z,vert,col){var L=4.4,W=2,sx=vert?W:L,sz=vert?L:W;
+ it.push(bx(sx,.7,sz,col,x,.55,z));var cx=vert?0:-.3,cz=vert?-.3:0;it.push(bx(vert?1.7:2.2,.55,vert?2.2:1.7,col,x+cx,1.15,z+cz),bx(vert?1.72:2.0,.38,vert?2.0:1.72,0x1a2a3a,x+cx,1.17,z+cz));
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(w){it.push(I(V3.cyl(.34,.34,.3,10),0x111111,x+(vert?w[0]*1.0:w[1]*1.4),.34,z+(vert?w[1]*1.4:w[0]*.95),0,0,vert?Math.PI/2:0,1,1,1))});box(x,z,sx+.2,sz+.2)}
+function parkedCar(it,x,z,vert){carShape(it,x,z,vert,pick([0xc02828,0x2848b0,0xdedede,0x1a1a1a,0x888888,0xe0a020,0x2a7a4a,0xf0f0f0,0x6a2a8a,0x2a8aa8]))}
+function windowsFront(it,x,z,w,d,h,side){for(var y=3;y<h-1;y+=3.2)for(var k=-w/2+1.5;k<w/2-1;k+=3){it.push(bx(1.6,1.5,.1,0x2a4a6a,x+k,y,z+(side||1)*(d/2+.03)))}}
+function building(it,x,z,w,d,h,col){it.push(bx(w,h,d,col,x,h/2,z),bx(w+.3,.4,d+.3,0x9a9a9a,x,h+.2,z));windowsFront(it,x,z,w,d,h,1);windowsFront(it,x,z,w,d,h,-1);box(x,z,w,d)}
+function crateBox(it,x,z,s,c){it.push(bx(s,s,s,c||0xc8a070,x,s/2,z),bx(s*1.02,s*.12,s*1.02,0x9a7a50,x,s*.55,z));box(x,z,s,s)}
+
+var CFG={id:'oficina',b:[-50,50,-35,35],light:{bg:0xdfe6ea,fog:0xe6ebee,near:60,far:200,hi:1.5,si:.7},
+ listTitle:'ENCARGOS DEL JEFE',lines:['¡Mi informe!','¡Estoy en una llamada!','¡Cuidado con la impresora!','¡Eso no es ergonómico!','¡Mi café!','¡Reunión a las 5!'],
+ pa:{welcome:'Buenos días a todos. Hoy hay informes pendientes.',random:['Se ruega no circular en silla de oficina por los pasillos','Reunión de equipo en cinco minutos','Alguien ha dejado la impresora atascada otra vez','Se busca al dueño de una silla sin frenos']},
+ chaser:{look:{skin:0xf2c8a0,shirt:0x1a1a22,pants:0x1a1a22,hair:0x8a8a8a},scale:.74,pa:'Atención, el jefe viene a buscarte. Tienes una reunión pendiente.',fine:'¡Despido parcial! -10 €',speed:7},
+ winTitle:'¡Jornada completada!',winLabel:'Bonus del jefe',failLabel:'Te quedaste sin tiempo y sin café.',orbit:[40,24,28,0,0],camH:2.6,camD:5,cargo:{x:.25,z:.2,y:.95},cargoSc:.45,arrowY:2.6,
+ world:function(){
+  var ct=px(64,64,function(x,y){var n=Math.random()*14;return[96+n,106+n,122+n]},true);floorPlane(100,70,0xffffff,ct,[40,28]);walls(6,0xeceff1,0x2f6fd0);ceiling(6);
+  /* ventanas */
+  var wi=[];for(var x=-44;x<=44;x+=8)wi.push(bx(5,2.4,.1,0x9ad8f0,x,3.4,-35.05));mk(wi,new T.MeshBasicMaterial({vertexColors:true}));
+  var it=PI;var lanes=[];
+  /* cubículos en bloques de 4 mesas con mamparas */
+  for(var cx=-38;cx<=8;cx+=17)for(var cz=-26;cz<=8;cz+=17){var rot=Math.random()<.5;for(var k=0;k<4;k++){var dx=(k%2?5.4:-0.2),dz=(k<2?-2.6:2.6);var x=cx+dx,z=cz+dz;
+    it.push(bx(5,.12,2.4,0xb88a5a,x,.95,z),bx(.12,.9,2.2,0x6a5a4a,x-2.3,.5,z),bx(.12,.9,2.2,0x6a5a4a,x+2.3,.5,z),bx(1.5,.9,.1,0x2a2a2e,x,1.45,z-.7),bx(.5,.35,.1,0x2a2a2e,x,1.1,z-.7),bx(.5,.04,.35,0xdddddd,x+1.2,1.03,z+.1),bx(5.2,1.5,.12,0x7a8aa0,x,.75,z-1.35));box(x,z,5.2,2.8);
+    it.push(I(V3.cyl(.2,.2,.9,8),0x333333,x-1.2,.45,z+1.2))}
+   lanes.push([cx+2.5,cz]);}
+  /* salas de reuniones con cristal */
+  [[34,-22],[34,-4]].forEach(function(p){it.push(bx(12,.25,8,0x3a4a5a,p[0],.12,p[1]),bx(5,.15,2.4,0x6a4a2a,p[0],1.0,p[1]),bx(.2,3,8,0xffffff,p[0]-6,1.5,p[1]));for(var k=-2;k<=2;k++){it.push(bx(.9,.9,.9,0x2a2a2e,p[0]+k*1.1,.5,p[1]-2.2),bx(.9,.9,.9,0x2a2a2e,p[0]+k*1.1,.5,p[1]+2.2))}box(p[0],p[1],5.4,2.8)});
+  var gl=[bx(.1,3,8,0xffffff,28,1.8,-22),bx(.1,3,8,0xffffff,28,1.8,-4),bx(12,3,.1,0xffffff,34,1.8,-26),bx(12,3,.1,0xffffff,34,1.8,-18),bx(12,3,.1,0xffffff,34,1.8,0)];scene.add(new T.Mesh(V3.merge(gl),glassM));box(28,-22,.4,8.2);box(28,-4,.4,8.2);
+  /* despacho del jefe */
+  it.push(bx(14,.3,10,0x5a3a2a,38,.15,26),bx(6,1,2.4,0x3a2a1a,38,.5,26),bx(2,1.4,.8,0x1a1a1a,38,1.1,25),bx(2,.4,1.4,0xc8a050,34,.2,30),bx(1.4,.5,1.4,0x1a1a1a,38,.9,23.5));box(38,26,6,2.6);
+  /* fotocopiadoras, dispensadores, archivadores, plantas, cafetera */
+  [[20,22],[44,-30],[-46,-30],[-46,26],[14,-4]].forEach(function(p){it.push(bx(2,1.3,1.4,0xdadada,p[0],.65,p[1]),bx(1.6,.1,1.1,0x2a8ad8,p[0],1.35,p[1]));box(p[0],p[1],2.2,1.6);lanes.push([p[0]+3,p[1]])});
+  for(var i=0;i<14;i++){var x=-46+i*3.1;it.push(bx(1.4,2.2,.9,0x9aa0a8,x,1.1,-34),bx(1.2,.08,.8,0x6a7078,x,2.25,-34));box(x,-34,1.5,1)}
+  [[10,20],[-20,18],[-8,4],[26,12],[-30,30],[46,10],[-46,-4],[2,-30]].forEach(function(p){plant(it,p[0],p[1]);box(p[0],p[1],1.2,1.2)});
+  [[-26,26],[-10,26],[8,10]].forEach(function(p){it.push(bx(2.2,1.2,.9,0xe8eef0,p[0],.6,p[1]),bx(2.4,.1,1,0x555555,p[0],1.25,p[1]),I(V3.cyl(.3,.3,.8,10),0x2a8ad8,p[0]+.7,1.7,p[1]),I(V3.cyl(.2,.2,.3,10),0xffffff,p[0]-.5,1.4,p[1]));box(p[0],p[1],2.4,1.1);lanes.push([p[0],p[1]+3])});
+  /* cajas, carros de papel, papeleras, flechas de salida */
+  for(var i=0;i<16;i++){var q=freeNear(rnd(-46,46),rnd(-30,30),1.5,3);if(isFree(q[0],q[1],1.4)){it.push(bx(1.2,1.0,1.2,0xc8a070,q[0],.5,q[1]),bx(1.0,.8,1.0,0xb89060,q[0],1.4,q[1]));box(q[0],q[1],1.3,1.3)}}
+  sign('OFICINA CENTRAL',0,5.2,-34.4,12,0,'#2f6fd0');sign('SALA DE REUNIONES',34,4.4,-26.4,8,0,'#555');
+  WORLD_SPOTS=lanes;return{spawn:[-4,30,Math.PI]}},
+ targets:function(){var gs={folios:function(){return V3.merge([0,1,2].map(function(i){return bx(.7,.08,.5,0xffffff,0,.06+i*.08,0)}))},cafe:function(){return V3.merge([I(V3.cyl(.2,.16,.4,10),0xf0f0f0,0,.2,0),I(V3.cyl(.17,.17,.02,10),0x4a2a10,0,.38,0),bx(.12,.2,.05,0xf0f0f0,.28,.22,0)])},grapa:function(){return V3.merge([bx(.7,.12,.2,0xd83a3a,0,.08,0),bx(.6,.06,.18,0x888888,0,.18,0)])},carpeta:function(){return V3.merge([bx(.55,.7,.1,0x2a8ad8,0,.4,0),bx(.4,.1,.12,0xffffff,0,.62,0)])},usb:function(){return V3.merge([bx(.22,.5,.1,0x2a2e34,0,.25,0),bx(.16,.2,.08,0xcccccc,0,.6,0)])},calc:function(){return V3.merge([bx(.45,.65,.1,0x3a3a3e,0,.34,0),bx(.36,.18,.11,0x9ad8a0,0,.55,0)])},informe:function(){return V3.merge([bx(.6,.7,.14,0xffffff,0,.4,0),bx(.6,.12,.15,0xd83a3a,0,.72,0)])},planta:function(){return V3.merge([I(V3.cyl(.2,.15,.3,8),0xa8683a,0,.15,0),I(V3.sph(.3,6,5),0x2a7a2a,0,.55,0)])}};
+  var names={folios:'Folios',cafe:'Café',grapa:'Grapadora',carpeta:'Carpeta',usb:'Memoria USB',calc:'Calculadora',informe:'Informe urgente',planta:'Planta de mesa'},secs=['Zona norte','Zona sur','Mesa 3','Mesa 7','Cerca de la impresora','Cocina','Pasillo central','Mesa del fondo'];
+  return Object.keys(gs).map(function(k,i){var q=WORLD_SPOTS[(i*3+1)%WORLD_SPOTS.length];var f=freeNear(q[0]+rnd(-3,3),q[1]+rnd(-3,3),1.2,6);return{id:k,n:names[k],sec:secs[i%secs.length],x:f[0],z:f[1],geo:gs[k]}})},
+ vehicle:function(g,sk,P){var m1=new T.MeshStandardMaterial({color:sk.a,roughness:.5}),m2=new T.MeshStandardMaterial({color:sk.b,roughness:.4,metalness:.4}),mc=new T.MeshStandardMaterial({color:0xcccccc,roughness:.3,metalness:.8});P.tint.push(m1);
+  var base=[];for(var k=0;k<5;k++){var a=k/5*6.283;base.push(I(V3.cyl(.05,.07,.8,6),0xffffff,Math.cos(a)*.4,.26,Math.sin(a)*.4,Math.sin(a)*1.2,0,-Math.cos(a)*1.2),I(V3.cyl(.09,.09,.08,8),0x222222,Math.cos(a)*.72,.1,Math.sin(a)*.72,0,0,Math.PI/2))}base.push(I(V3.cyl(.08,.08,.5,8),0xffffff,0,.55,0));
+  g.add(new T.Mesh(V3.merge(base),mc));var seat=new T.Mesh(V3.merge([bx(.95,.18,.9,0xffffff,0,.88,0),bx(.9,.7,.14,0xffffff,0,1.3,-.46),bx(.1,.1,.6,0xffffff,-.5,1.08,0),bx(.1,.1,.6,0xffffff,.5,1.08,0)]),m1);seat.castShadow=true;g.add(seat);P.rider=new T.Group()}};
+var WORLD_SPOTS=[];
+
+</script>
+<script src="dcore.js"></script>
+</body>
+</html>
