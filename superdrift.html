@@ -58,7 +58,7 @@
 </div>
 <div id="joy"><i></i></div>
 <div class="btn" id="bDrift">DRIFT</div><div class="btn" id="bTurbo">TURBO</div><div class="btn" id="bHint">PISTA<br>5 €</div><div class="btn" id="bShop">TIENDA</div>
-<div class="ov" id="ovStart" style="display:flex"><div class="card" style="text-align:center"><h2>Súper Drift</h2><p>Eres el carrito (vista en primera persona): sigue la lista de la compra por el súper, <b>derrapa con el carro</b> por los pasillos, esquiva a la gente y gana dinero con cada drift. Gasta el dinero en la tienda: mejoras, turbo y carros nuevos.</p><p style="font-size:12px">Joystick: girar y acelerar (acelera solo) · <b>DRIFT</b> = freno de mano · TURBO · PISTA para ver dónde está el producto</p><button id="startB">¡A comprar!</button><br><button class="g" id="shopB0">Tienda</button></div></div>
+<div class="ov" id="ovStart" style="display:flex"><div class="card" style="text-align:center"><h2>Súper Drift</h2><p>Eres un carrito de supermercado: sigue la lista de la compra por el súper, <b>derrapa con el carro</b> por los pasillos, esquiva a la gente y gana dinero con cada drift. Gasta el dinero en la tienda: mejoras, turbo y carros nuevos.</p><p style="font-size:12px">Joystick: girar y acelerar (acelera solo) · <b>DRIFT</b> = freno de mano · TURBO · PISTA para ver dónde está el producto</p><button id="startB">¡A comprar!</button><br><button class="g" id="shopB0">Tienda</button></div></div>
 <div class="ov" id="ovSum"><div class="card" style="text-align:center"><h2 id="sumT"></h2><p id="sumP"></p><button id="sumNext">Siguiente lista</button><button class="g" id="sumShop">Tienda</button></div></div>
 <div class="ov" id="ovShop"><div class="card"><h2>Tienda · <span id="shMoney"></span></h2><div class="tabs"><button id="t1" class="on">Mejoras</button><button id="t2">Carros</button><button id="t3">Extras</button></div><div class="sh" id="shList"></div><div style="text-align:right;margin-top:8px"><button id="shClose">Cerrar</button></div></div></div>
 <script>
@@ -270,7 +270,7 @@ function endRun(ok){if(ST!=='play')return;ST='sum';var base=ok?30+L.items.length
  $('sumT').textContent=ok?'¡Lista completada!':'Se acabó el tiempo';$('sumP').innerHTML=(ok?'Premio por la compra: <b>+'+base+' €</b><br>':'No has terminado la lista.<br>')+'Dinero ganado derrapando: <b>'+Math.floor(L.earned)+' €</b><br>Gente embestida: '+L.hits+'<br>Dinero total: <b>'+Math.floor(S.money)+' €</b>';$('sumNext').textContent=ok?'Siguiente lista':'Reintentar';$('ovSum').style.display='flex';$('bShop').style.display='none';guardOff();if(ok){snd('win',.7,1);dingdong()}}
 $('sumNext').onclick=function(){$('ovSum').style.display='none';startRun()};$('sumShop').onclick=function(){$('ovSum').style.display='none';shopFrom='sum';ST='sumShop';$('ovShop').style.display='flex';shopRender()};
 /* ---------------- bucle principal ---------------- */
-var camYaw=Math.PI,pend=0,combo=1,dTimer=0,noDrift=0,camX=24,camZ=30,camShake=0,nearT=0,paT=30,skT=0,skI=0;
+var camX=24,camZ=30,pend=0,combo=1,dTimer=0,noDrift=0,camX=24,camZ=30,camShake=0,nearT=0,paT=30,skT=0,skI=0;
 buildCart();uiMoney();
 var skids=[];(function(){for(var i=0;i<160;i++){var m=new T.Mesh(new T.PlaneGeometry(.18,.5),new T.MeshBasicMaterial({color:0x1a1a1a,transparent:true,opacity:0,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.y=.02;scene.add(m);skids.push({m:m,t:9})}})();
 function circleBox(c,r){var cx=clamp(car.x,c.x0,c.x1),cz=clamp(car.z,c.z0,c.z1),dx=car.x-cx,dz=car.z-cz,d=Math.hypot(dx,dz);
@@ -338,15 +338,13 @@ V3.on(function(dt,t){
  if(SKINS[S.skin].rainbow&&cartParts.basket){cartParts.basket.material.color.setHSL((t*.4)%1,.9,.55);cartParts.frame.material.color.setHSL((t*.4+.5)%1,.9,.5)}
  sun.position.set(car.x+10,26,car.z+8);sun.target.position.set(car.x,0,car.z);
  /* cámara */
- if(ST==='play'||ST==='paused'||ST==='sum'||ST==='sumShop'){var fx2=Math.sin(car.h),fz2=Math.cos(car.h);var sp2=Math.hypot(car.vx,car.vz);
-  /* primera persona: eres el carrito; la vista se desvía un poco hacia donde te mueves al derrapar */
-  var vang=sp2>2?Math.atan2(car.vx,car.vz):car.h;var dh=((vang-car.h+Math.PI*3)%(Math.PI*2))-Math.PI;var look=car.h+dh*.35*clamp(sp2/8,0,1);
-  camYaw+=(((look-camYaw+Math.PI*3)%(Math.PI*2))-Math.PI)*Math.min(1,dt*(ST==='play'?10:3));
-  var bob=Math.sin(t*clamp(sp2,0,14)*1.6)*.025*clamp(sp2/10,0,1);
-  cam.position.set(car.x-Math.sin(car.h)*.35+(Math.random()-.5)*camShake*.4,1.38+bob+(Math.random()-.5)*camShake*.4,car.z-Math.cos(car.h)*.35);camShake=Math.max(0,camShake-dt*2);
-  cam.rotation.set(-.12,0,0);cam.rotation.order='YXZ';cam.rotation.y=camYaw+Math.PI;cam.rotation.z=-car.steer*clamp(sp2/14,0,1)*.1+dh*.12*clamp(sp2/8,0,1);
-  cam.fov+=((78+clamp(sp2*.8,0,14)+(car.boost>0?14:0))-cam.fov)*Math.min(1,dt*4);cam.updateProjectionMatrix();cartParts.rider.visible=false}
- else{var a=t*.12;cartParts.rider.visible=true;cam.rotation.order='XYZ';cam.rotation.set(0,0,0);cam.position.set(Math.cos(a)*24,18,Math.sin(a)*14+4);cam.lookAt(0,1,2);npcStep(dt)}
+ if(ST==='play'||ST==='paused'||ST==='sum'||ST==='sumShop'){var fx2=Math.sin(car.h),fz2=Math.cos(car.h);var sp2=Math.hypot(car.vx,car.vz);var mvx=sp2>1?car.vx/sp2:fx2,mvz=sp2>1?car.vz/sp2:fz2;
+  var dx=fx2*.75+mvx*.25,dz=fz2*.75+mvz*.25,dl=Math.hypot(dx,dz)||1;dx/=dl;dz/=dl;
+  var tx=car.x-dx*(7.5+sp2*.12),tz=car.z-dz*(7.5+sp2*.12);tx=clamp(tx,X0+1.5,X1-1.5);tz=clamp(tz,Z0+1.5,Z1-1.5);
+  var k=1-Math.exp(-dt*(ST==='play'?5:2));camX+=(tx-camX)*k;camZ+=(tz-camZ)*k;
+  cam.rotation.order='XYZ';cam.position.set(camX+(Math.random()-.5)*camShake,4.4+(Math.random()-.5)*camShake+clamp(sp2*.04,0,.6),camZ+(Math.random()-.5)*camShake);camShake=Math.max(0,camShake-dt*2);
+  cam.lookAt(car.x+dx*3,.9,car.z+dz*3);cam.fov+=((68+clamp(sp2*.7,0,12)+(car.boost>0?10:0))-cam.fov)*Math.min(1,dt*4);cam.updateProjectionMatrix();cartParts.rider.visible=false}
+ else{var a=t*.12;cam.rotation.order='XYZ';cam.rotation.set(0,0,0);cam.position.set(Math.cos(a)*24,18,Math.sin(a)*14+4);cam.lookAt(0,1,2);npcStep(dt)}
 });
 $('bShop').style.display='none';
 </script>
