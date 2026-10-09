@@ -2,14 +2,14 @@
  "apps": [
   {
    "nombre": "Súper Drift",
-   "desc": "Conduce un carro de supermercado en 3D: sigue la lista de la compra, derrapa por los pasillos, esquiva a la gente y gana dinero con cada drift para comprar mejoras, turbo y carros nuevos.",
+   "desc": "Eres un carrito de supermercado en primera persona: sigue la lista de la compra, derrapa por los pasillos, esquiva a la gente y gana dinero con cada drift para comprar mejoras y carros nuevos.",
    "href": "superdrift.html",
    "icono": "🛒",
    "color": "#0e8a48",
    "cat": "juegos",
    "img": "img/superdrift.webp",
    "sub": "carreras",
-   "tags": "supermercado carro drift compra lista mercadona carrito derrape"
+   "tags": "supermercado carro drift compra lista mercadona carrito derrape primera persona"
   },
   {
    "nombre": "99 Noches en el Bosque",
