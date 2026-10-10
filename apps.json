@@ -2,14 +2,14 @@
  "apps": [
   {
    "nombre": "Parkour",
-   "desc": "Corre, salta, trepa, desliza, columpiate y haz mortales en 11 mapas: parque, cielo, ciudad, casa gigante, fábrica, puerto, nieve, bosque, neón, centro comercial y uno aleatorio. Fantasma, monedas, retos diarios y modo foto.",
+   "desc": "Corre, salta, trepa, desliza, columpiate y haz mortales en 11 mapas más tu propio mapa. Raíles, postes, tirolinas, fantasma, repetición, persecución, editor, monedas, retos diarios y modo foto.",
    "href": "parkour.html",
    "icono": "🏃",
    "color": "#e8793a",
    "cat": "juegos",
    "img": "img/parkour.webp",
    "sub": "accion",
-   "tags": "parkour correr saltar mortales backflip trepar ciudad casa miniatura fantasma retos monedas tirolina columpio"
+   "tags": "parkour correr saltar mortales backflip trepar ciudad casa miniatura fantasma retos monedas tirolina columpio railes postes persecucion editor repeticion"
   },
   {
    "nombre": "Simulador de Trading",
