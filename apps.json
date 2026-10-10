@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Parkour",
+   "desc": "Corre, salta, trepa, desliza y haz mortales en 4 mapas: un parque de entrenamiento, torres flotando en el cielo, azoteas de una ciudad y una casa gigante en la que eres diminuto.",
+   "href": "parkour.html",
+   "icono": "🏃",
+   "color": "#e8793a",
+   "cat": "juegos",
+   "img": "img/parkour.webp",
+   "sub": "accion",
+   "tags": "parkour correr saltar mortales backflip trepar ciudad casa miniatura"
+  },
+  {
    "nombre": "Simulador de Trading",
    "desc": "Opera cripto, oro, bolsa y divisas con 10.000 USDT ficticios: velas, RSI/MACD, futuros con apalancamiento y liquidación, órdenes límite y stop, libro de órdenes, noticias y opción de precios reales.",
    "href": "trading.html",
