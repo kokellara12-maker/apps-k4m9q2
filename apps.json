@@ -2,14 +2,14 @@
  "apps": [
   {
    "nombre": "Casa 3D",
-   "desc": "Recorre en 3D una casa de varias plantas con terraza, escalera de madera, dormitorios, estudio de música y jardín con escalera de caracol. Sin gente y todo ordenado. Con vista de maqueta.",
+   "desc": "Recorre en 3D la casa del vídeo: patio de entrada, pasillo con escalera, salón y terraza, dormitorio de arriba, pasillo rosa con cuartos, galería de cristal con escalera de caracol, sótano-estudio y jardín. Sin gente, todo ordenado.",
    "href": "micasa3d.html",
    "icono": "🏠",
    "color": "#c8a070",
    "cat": "explorar",
    "img": "img/micasa3d.webp",
    "sub": "mundo",
-   "tags": "casa 3d recorrer maqueta hogar plantas terraza jardin"
+   "tags": "casa 3d recorrer maqueta hogar plantas terraza jardin escalera"
   },
   {
    "nombre": "Hielo Drift",
