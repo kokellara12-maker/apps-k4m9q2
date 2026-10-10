@@ -38,10 +38,28 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0e1420;font-family:"A
 .bt.g{background:rgba(255,255,255,.12);box-shadow:none}
 #fade{position:fixed;inset:0;background:#000;opacity:0;z-index:15;pointer-events:none;transition:opacity .25s}
 .ctl{width:100%;max-width:380px;font-size:13.5px;line-height:1.5;color:#cfd8ea}.ctl div{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1);display:flex;gap:10px}.ctl b{min-width:96px;color:#fff}
+
+#rot{position:fixed;inset:0;z-index:60;background:#0e1420;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;font-weight:800;font-size:20px;gap:14px}
+#rot i{display:block;width:70px;height:110px;border:5px solid #fff;border-radius:14px;animation:rt 2.4s ease-in-out infinite}
+@keyframes rt{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+@media (orientation:portrait){#rot{display:flex}}
+@media (orientation:landscape){
+ #joy{left:calc(env(safe-area-inset-left) + 44px);bottom:calc(env(safe-area-inset-bottom) + 26px);width:122px;height:122px}#joy i{left:37px;top:37px}
+ #bJ{width:80px;height:80px;right:calc(env(safe-area-inset-right) + 26px);bottom:calc(env(safe-area-inset-bottom) + 22px)}
+ #bS{width:62px;height:62px;right:calc(env(safe-area-inset-right) + 118px);bottom:calc(env(safe-area-inset-bottom) + 22px)}
+ #bB{width:56px;height:56px;right:calc(env(safe-area-inset-right) + 30px);bottom:calc(env(safe-area-inset-bottom) + 116px)}
+ #bL{width:56px;height:56px;right:calc(env(safe-area-inset-right) + 98px);bottom:calc(env(safe-area-inset-bottom) + 100px)}
+ #bF{width:56px;height:56px;right:calc(env(safe-area-inset-right) + 168px);bottom:calc(env(safe-area-inset-bottom) + 82px)}
+ #tm b{font-size:22px}
+ .scr{flex-direction:row;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:0 14px;padding-top:calc(env(safe-area-inset-top) + 12px)}
+ .scr h1,.scr p.s,.scr>div.ctl{flex:0 0 100%;max-width:none;text-align:center}.scr h1{font-size:28px;margin:0}.scr p.s{margin:2px 0 10px;max-width:none}
+ .card{width:calc(50% - 20px);max-width:330px;flex:0 0 auto}.card .im{height:72px}
+ .ctl{columns:2;column-gap:24px;max-width:700px!important;margin:0 auto}.ctl div{break-inside:avoid}
+}
 </style>
 </head>
 <body>
-<div id="fade"></div>
+<div id="rot"><i></i>Gira el móvil en horizontal para jugar</div><div id="fade"></div>
 <div id="hud"><div id="tl"><a class="chip" href="index.html" id="bk">‹ Apps</a><button class="chip" id="pauseB">Pausa</button></div><div id="tm"><b id="tmr">0:00.0</b><small id="mapn"></small></div><div id="tr"><div id="sc">0<small>ESTILO</small></div><div id="combo"></div></div><div id="msg"></div></div>
 <div id="joy"><i></i></div>
 <div class="btn" id="bJ">SALTAR</div><div class="btn" id="bS">DESLIZAR</div><div class="btn" id="bB"><span><small>MORTAL</small><br>ATRÁS</span></div><div class="btn" id="bL"><span><small>MORTAL</small><br>LADO</span></div><div class="btn" id="bF"><span><small>MORTAL</small><br>FRENTE</span></div>
@@ -416,7 +434,7 @@ function updCam(dt){if(window.__free)return;var d=inDir();var k1=1-Math.exp(-20*
  var dx=-Math.sin(CAM.yaw)*cp,dy=sp,dz=-Math.cos(CAM.yaw)*cp;
  var tt=rayDist(CAM.tx,CAM.ty,CAM.tz,dx,dy,dz,dist);tt=Math.max(.8,tt-.15);CAM.cur=CAM.cur===undefined?tt:CAM.cur+(tt-CAM.cur)*(tt<CAM.cur?1:1-Math.exp(-3*dt));
  cam.position.set(CAM.tx+dx*CAM.cur,CAM.ty+dy*CAM.cur,CAM.tz+dz*CAM.cur);
- var fv=62+Math.min(9,P.spd*1.1);if(Math.abs(cam.fov-fv)>.05){cam.fov+=(fv-cam.fov)*(1-Math.exp(-4*dt));cam.updateProjectionMatrix()}
+ var fv=(innerWidth>innerHeight?52:62)+Math.min(9,P.spd*1.1);if(Math.abs(cam.fov-fv)>.05){cam.fov+=(fv-cam.fov)*(1-Math.exp(-4*dt));cam.updateProjectionMatrix()}
  cam.lookAt(CAM.tx,CAM.ty+.12,CAM.tz);
  var sd=sunL.userData.dir||new T.Vector3(.4,.7,.3);sunL.position.set(P.x+sd.x*70,P.y+sd.y*70,P.z+sd.z*70);sunL.target.position.set(P.x,P.y,P.z);sunL.target.updateMatrixWorld();sky.position.copy(cam.position)}
 /* ---- eventos del mapa ---- */
