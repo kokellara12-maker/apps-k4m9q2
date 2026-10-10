@@ -1,6 +1,39 @@
 {
  "apps": [
   {
+   "nombre": "4 en Raya",
+   "desc": "Dos jugadores cara a cara en el mismo móvil: suelta fichas y junta cuatro en línea. Se alternan los turnos y hay marcador; también contra el móvil.",
+   "href": "cuatroenraya.html",
+   "icono": "🔴",
+   "color": "#2f6ae0",
+   "cat": "juegos",
+   "img": "img/cuatroenraya.webp",
+   "sub": "puzzle",
+   "tags": "cuatro en raya conecta 4 dos jugadores multijugador"
+  },
+  {
+   "nombre": "Duelo de Tanques",
+   "desc": "Dos jugadores en el mismo móvil, uno abajo y otro arriba. Cada uno con su palanca y su botón de fuego, balas que rebotan y muros distintos cada ronda. Primero a 5.",
+   "href": "tanques.html",
+   "icono": "💥",
+   "color": "#6a8a3a",
+   "cat": "juegos",
+   "img": "img/tanques.webp",
+   "sub": "accion",
+   "tags": "tanques duelo dos jugadores multijugador batalla"
+  },
+  {
+   "nombre": "Air Hockey",
+   "desc": "Dos jugadores en el mismo móvil, uno a cada lado de la pista: arrastra tu pala, mete gol y llega a 7. También puedes jugar contra el móvil.",
+   "href": "hockey.html",
+   "icono": "🏒",
+   "color": "#2a6ad8",
+   "cat": "juegos",
+   "img": "img/hockey.webp",
+   "sub": "deportes",
+   "tags": "hockey air mesa dos jugadores multijugador"
+  },
+  {
    "nombre": "Hielo Drift",
    "desc": "Eres una silla sobre una pista de hielo donde el suelo resbala el doble: recoge lo de la lista entre vallas y patinadores y huye del entrenador.",
    "href": "hielo.html",
