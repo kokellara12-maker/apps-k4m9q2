@@ -491,7 +491,21 @@ function animate(dt,t){
  var yoff=-P.stepOff;CH.root.position.set(P.x,P.y+yoff,P.z);scarfUpdate(dt,t,CH,P.fy,P.vx,P.vy,P.vz);
  var fyv=P.fy;if(m==='hang'||m==='mantle'||m==='wclimb')fyv=P.fy;CH.root.rotation.y=fyv;
  /* en la pared, el cuerpo se arrima */
- if(m==='hang')CH.root.position.set(P.x-P.wn.nx*.02,P.y,P.z-P.wn.nz*.02)}
+ if(m==='hang')CH.root.position.set(P.x-P.wn.nx*.02,P.y,P.z-P.wn.nz*.02);
+ if(m==='free'&&P.ground&&!P.flip&&!P.crouch)footIK(CH)}
+/* pies que se adaptan al suelo: IK de dos huesos en el plano de cada pierna, solo con el pie apoyado */
+var _fv=new T.Vector3();
+function footIK(ch){ch.root.updateMatrixWorld(true);var cur=ch.cur,legs=[[ch.J.lL,'hl','kl','al'],[ch.J.lR,'hr','kr','ar']],L1=.44,L2=.43;
+ for(var i=0;i<2;i++){var lg=legs[i][0];lg.an.getWorldPosition(_fv);var hy=_fv.y-.09-P.y;if(hy>.26)continue;
+  var g=surfaceAt(_fv.x,_fv.z,P.y-.5,P.y+.4);if(g===null)continue;var d=g-P.y;if(Math.abs(d)<.015)continue;
+  var w=clamp((.26-hy)/.16,0,1);d=clamp(d,-.3,.32)*w;
+  var h=cur[legs[i][1]],k=cur[legs[i][2]];
+  var zt=-L1*Math.sin(h)-L2*Math.sin(h+k),yt=-L1*Math.cos(h)-L2*Math.cos(h+k)+d;
+  var r=Math.sqrt(zt*zt+yt*yt),rm=L1+L2-.01;if(r>rm){zt*=rm/r;yt*=rm/r;r=rm}if(r<.2){continue}
+  var ca=clamp((L1*L1+L2*L2-r*r)/(2*L1*L2),-1,1),nk=Math.PI-Math.acos(ca);
+  var th=Math.atan2(-zt,-yt),nh=th-Math.atan2(L2*Math.sin(nk),L1+L2*Math.cos(nk));
+  lg.hp.rotation.x=nh;lg.kn.rotation.x=nk;lg.an.rotation.x=cur[legs[i][3]]-((nh+nk)-(h+k))}}
+
 var sct=0;
 function scarfUpdate(dt,t,ch,fy,vx,vy,vz){var sc=ch.scarf;if(!sc)return;var vf=vx*Math.sin(fy)+vz*Math.cos(fy);var base=clamp(vf*.11-vy*.02,-.3,1.35);for(var i=0;i<sc.length;i++){var w=Math.sin(t*(11+i*2)+i*1.3)*.16*Math.min(1,Math.abs(vf)/5);var tg=base*(.7+i*.12)+w;sc[i].rotation.x+=(tg-sc[i].rotation.x)*Math.min(1,dt*14)}}
 var rayN=new T.Vector3();
