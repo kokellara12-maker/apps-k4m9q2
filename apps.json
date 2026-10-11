@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Barrio Kick",
+   "desc": "Fútbol de calle 3 contra 3 con muros, porterías pequeñas, trucos y tiro especial. Partido rápido, torneo de 4 rivales y reto de estilo con malabares. Juego original.",
+   "href": "futcalle.html",
+   "icono": "⚽",
+   "color": "#e8892a",
+   "cat": "juegos",
+   "img": "img/futcalle.webp",
+   "sub": "deportes",
+   "tags": "futbol calle barrio 3 contra 3 trucos regate torneo freestyle malabares tiro"
+  },
+  {
    "nombre": "Parkour",
    "desc": "Corre, salta, trepa, desliza, columpiate y haz mortales en 11 mapas más tu propio mapa. Raíles, postes, tirolinas, fantasma, repetición, persecución, editor, monedas, retos diarios y modo foto.",
    "href": "parkour.html",
