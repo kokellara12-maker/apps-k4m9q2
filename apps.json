@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Mar Abierto",
+   "desc": "Lancha en un océano enorme con olas: navega libre buscando 12 cofres entre las islas, o compite en la regata de boyas contra el reloj. Turbo, derrapes y saltos sobre las olas.",
+   "href": "barco.html",
+   "icono": "🚤",
+   "color": "#1a8ac8",
+   "cat": "juegos",
+   "img": "img/barco.webp",
+   "sub": "conducción",
+   "tags": "barco lancha mar oceano islas tesoros cofres regata olas turbo velocidad"
+  },
+  {
    "nombre": "Barrio Kick",
    "desc": "Fútbol de calle 3 contra 3 con muros, porterías pequeñas, trucos y tiro especial. Partido rápido, torneo de 4 rivales y reto de estilo con malabares. Juego original.",
    "href": "futcalle.html",
