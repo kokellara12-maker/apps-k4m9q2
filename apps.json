@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Construye y Navega",
+   "desc": "Monta tu barca bloque a bloque (madera, metal, flotadores, motores, cañones, velas, escudos) y suéltala por el río hasta el tesoro: 6 etapas con rocas, barricadas, torres enemigas, remolinos y tormenta. Gana oro y mejórala.",
+   "href": "tesoro.html",
+   "icono": "⛵",
+   "color": "#1a8ac8",
+   "cat": "juegos",
+   "img": "img/tesoro.webp",
+   "sub": "aventura",
+   "tags": "barco construir bloques tesoro rio navegar cañones motor velas build a boat"
+  },
+  {
    "nombre": "Mar Abierto",
    "desc": "Lancha en un océano enorme con olas: navega libre buscando 12 cofres entre las islas, o compite en la regata de boyas contra el reloj. Turbo, derrapes y saltos sobre las olas.",
    "href": "barco.html",
