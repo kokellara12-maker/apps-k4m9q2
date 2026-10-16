@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Afinado",
+   "desc": "Cinco rondas para poner a prueba tus sentidos: iguala una frecuencia de sonido de memoria, para el reloj en el segundo exacto o reproduce la proporción de una forma. Puntuación sobre 10, ranking y retos por enlace.",
+   "href": "afinado.html",
+   "icono": "🎧",
+   "color": "#27d8b8",
+   "cat": "juegos",
+   "img": "img/afinado.webp",
+   "sub": "arcade",
+   "tags": "afinado oido frecuencia sonido tono tiempo forma memoria precision reto dialed"
+  },
+  {
    "nombre": "Construye y Navega",
    "desc": "Monta tu barca bloque a bloque (madera, metal, flotadores, motores, cañones, velas, escudos) y suéltala por el río hasta el tesoro: 6 etapas con rocas, barricadas, torres enemigas, remolinos y tormenta. Gana oro y mejórala.",
    "href": "tesoro.html",
