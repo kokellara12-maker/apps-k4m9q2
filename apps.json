@@ -2,7 +2,7 @@
  "apps": [
   {
    "nombre": "Voltio City",
-   "desc": "Ciudad abierta gigante en 3D con vehículos eléctricos: patinetes (25 a 90 km/h), bicis, motos (hasta 200 km/h) y coches. Caballitos, saltos, derrapes, rampas, peatones, tráfico con semáforos, policía con helicóptero y controles, día/noche/lluvia, garaje con colores y mejoras. Multijugador: carrera y policía y ladrón con un amigo.",
+   "desc": "Ciudad abierta gigante en 3D con 12 vehículos eléctricos, todos desbloqueados y gratis: patinetes (25 a 90 km/h), bicis, motos (hasta 200 km/h) y coches. Caballitos, saltos, derrapes, rampas, peatones, tráfico con semáforos, policía con helicóptero, día/noche/lluvia, colores y mejoras. Multijugador: carrera y policía y ladrón.",
    "href": "voltio.html",
    "icono": "⚡",
    "color": "#1ab8e8",
