@@ -2,14 +2,14 @@
  "apps": [
   {
    "nombre": "Voltio City",
-   "desc": "Ciudad abierta gigante en 3D con vehículos eléctricos: 4 patinetes (25 a 90 km/h), bicis, motos (hasta 200 km/h) y coches. Caballitos, voltereta, rampas, peatones, tráfico, policía con estrellas, dinero, garaje con colores, neón y mejoras. Multijugador con un amigo desde otro móvil.",
+   "desc": "Ciudad abierta gigante en 3D con vehículos eléctricos: patinetes (25 a 90 km/h), bicis, motos (hasta 200 km/h) y coches. Caballitos, saltos, derrapes, rampas, peatones, tráfico con semáforos, policía con helicóptero y controles, día/noche/lluvia, garaje con colores y mejoras. Multijugador: carrera y policía y ladrón con un amigo.",
    "href": "voltio.html",
    "icono": "⚡",
    "color": "#1ab8e8",
    "cat": "juegos",
    "img": "img/voltio.webp",
    "sub": "conducción",
-   "tags": "patinete electrico moto coche bici ciudad abierta policia caballito dinero garaje 3d multijugador amigo online"
+   "tags": "patinete electrico moto coche bici ciudad abierta policia caballito dinero garaje 3d multijugador amigo online semaforos helicoptero lluvia derrape"
   },
   {
    "nombre": "Benalmádena REAL",
