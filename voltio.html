@@ -15,7 +15,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0a1a2a;color:#fff;fon
 #stars.on{animation:fl .5s infinite alternate}
 @keyframes fl{to{opacity:.35}}
 #mm{position:fixed;right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 8px);z-index:30;width:104px;height:104px;border-radius:50%;background:rgba(8,24,40,.6);border:1.5px solid rgba(255,255,255,.45)}
-#toast{position:fixed;left:50%;transform:translateX(-50%);top:30%;z-index:35;text-align:center;font:900 italic min(9vw,40px) system-ui;color:#fff;text-shadow:0 3px 0 #0a3a6a,0 0 24px rgba(90,200,255,.7);opacity:0;pointer-events:none;white-space:nowrap}
+#toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 96px);z-index:35;text-align:center;font:900 italic min(4vw,15px) system-ui;color:#fff;text-shadow:0 2px 3px #000,0 0 8px rgba(0,0,0,.6);opacity:0;pointer-events:none;white-space:nowrap}
 #toast.pop{animation:pp 1.9s ease-out forwards}
 @keyframes pp{0%{opacity:0;transform:translateX(-50%) scale(.6)}10%{opacity:1;transform:translateX(-50%) scale(1.1)}20%{transform:translateX(-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
 #toast small{display:block;font-size:.4em;font-style:normal;letter-spacing:.14em;color:#ffe27a}
@@ -992,7 +992,7 @@ var lastZ='',zT=0,wasAir=false,ax=0,az=0,topS=0;
 function upZone(dt){var ci=Math.floor((V.x+8)/P),cj=Math.floor((V.z+8)/P);var nm=W.zoneName(ci,cj);var key=nm+W.zoneOf(ci,cj);
  var inTun=false;city.near(V.x,V.z,function(c){if(c.tunnel&&Math.abs(V.z-c.j*P)<8.5)inTun=true});W.inTunnel=inTun;
  if(key!==lastZ){lastZ=key;zT=4;zn.innerHTML=nm.toUpperCase()+'<small>'+({down:'ZONA CENTRO',mid:'ZONA URBANA',sub:'RESIDENCIAL',park:'PARQUE',plaza:'PLAZA',skate:'SKATE PARK · RAMPAS',hill:'RELIEVE · COLINAS',beach:'PLAYA',sea:'MAR'})[W.zoneOf(ci,cj)]+'</small>'}
- if(inTun&&!W.wasTun)W.toast('TÚNEL');W.wasTun=inTun;
+ W.wasTun=inTun;
  zT-=dt;zn.style.display=zT>0?'block':'none';
  var s=Math.abs(V.v)*3.6;if(s>topS){topS=s;if(s>(REC.top||0)+1){REC.top=s;REC._d=1}}
  if(V.air&&!wasAir){ax=V.x;az=V.z}
