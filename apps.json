@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Benalmádena REAL",
+   "desc": "El patinete por la Benalmádena de verdad: calles, edificios, playas y puerto reales de OpenStreetMap. La 1ª vez baja el mapa (internet); luego va sin conexión. 3D",
+   "href": "benalmadena_real.html",
+   "icono": "🗺️",
+   "color": "#00b8d4",
+   "cat": "juegos",
+   "sub": "roblox",
+   "tags": "benalmadena real mapa openstreetmap patinete gta",
+   "img": "img/benalmadena_real.webp"
+  },
+  {
    "nombre": "Afinado",
    "desc": "Cinco rondas para poner a prueba tus sentidos: iguala una frecuencia de sonido de memoria, para el reloj en el segundo exacto o reproduce la proporción de una forma. Puntuación sobre 10, ranking y retos por enlace.",
    "href": "afinado.html",
