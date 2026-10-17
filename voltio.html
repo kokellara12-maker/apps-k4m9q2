@@ -645,4 +645,89 @@ W.dbg={G:G,V:V,IN:IN,city:city,SAVE:SAVE,step:W.step,render:render};
 G.mode='title';W.setHud(false);G.fresh=true;
 })();
 </script>
+<script>
+(function(){
+'use strict';
+var W=window.__VC,T=W.T,scene=W.scene,$=W.$,V=W.V,G=W.G,VEH=W.VEH,SAVE=W.SAVE,city=W.city,sfx=W.sfx;
+var NET={on:false,role:null,pc:null,dc:null,name:'',rname:'Amigo',R:null,rm:null,rh:null,rid:-1,rsig:'',wp:null,wpm:null,lastSend:0,score:[0,0],last:null,rv:{x:0,z:0},chan:null,es:null};
+W.NET=NET;
+var ICE={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
+/* ---------- UI ---------- */
+var css=document.createElement('style');css.textContent='#mp{position:fixed;inset:0;z-index:80;background:rgba(2,10,20,.9);display:none;align-items:center;justify-content:center}#mp.on{display:flex}#mp .c{width:min(90vw,420px);max-height:92vh;overflow-y:auto;text-align:center;touch-action:pan-y}#mp h2{margin:0 0 6px;font:900 italic 28px system-ui}#mp p{margin:6px 0 10px;font:600 12.5px/1.45 system-ui;color:#cfe8f8}#mp textarea{width:100%;box-sizing:border-box;height:78px;border-radius:10px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font:11px monospace;padding:8px;-webkit-user-select:text;user-select:text;resize:none}#mp input{width:100%;box-sizing:border-box;padding:11px;border-radius:10px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font:700 15px system-ui;text-align:center;margin-bottom:8px;-webkit-user-select:text;user-select:text}#mp .st{font:800 12px system-ui;letter-spacing:.1em;color:#7aff9a;margin:8px 0;text-transform:uppercase}#mpn{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 66px);z-index:31;font:800 12px system-ui;letter-spacing:.08em;padding:5px 12px;border-radius:999px;background:rgba(8,24,40,.65);border:1.5px solid rgba(122,255,154,.7);display:none}';document.head.appendChild(css);
+var mp=document.createElement('div');mp.id='mp';mp.innerHTML='<div class="c" id="mpc"></div>';document.body.appendChild(mp);
+var tag=document.createElement('div');tag.id='mpn';document.body.appendChild(tag);
+var nl=document.createElement('div');nl.style.cssText='position:fixed;z-index:29;pointer-events:none;font:800 12px system-ui;color:#fff;text-shadow:0 1px 4px #000;transform:translate(-50%,-100%);display:none;white-space:nowrap';document.body.appendChild(nl);
+function q(h){$('mpc').innerHTML=h}
+function btn(t,id,cls){return '<button class="b '+(cls||'')+'" id="'+id+'">'+t+'</button>'}
+function b64(s){return btoa(unescape(encodeURIComponent(s)))}function unb64(s){return decodeURIComponent(escape(atob(s)))}
+function myName(){var n=(localStorage.getItem('vc_name')||'').trim();return n||'Jugador'}
+function openMP(){var nm=myName();mp.classList.add('on');q('<h2>MULTIJUGADOR</h2><p>Juega con un amigo en la misma ciudad, cada uno desde su móvil. Uno crea la sala y le manda el enlace al otro. Hace falta internet.</p><input id="mpname" maxlength="12" placeholder="Tu nombre" value="'+nm+'">'+btn('CREAR SALA','mpc1','o')+btn('TENGO UNA RESPUESTA / UN CÓDIGO','mpj','')+btn('CERRAR','mpx','s'));
+ $('mpname').oninput=function(){try{localStorage.setItem('vc_name',this.value)}catch(e){}};$('mpc1').onclick=function(){host()};$('mpj').onclick=function(){joinManual()};$('mpx').onclick=function(){mp.classList.remove('on')}}
+W.openMP=openMP;
+/* ---------- conexión ---------- */
+function mkPC(){var pc=new RTCPeerConnection(ICE);pc.oniceconnectionstatechange=function(){var s=pc.iceConnectionState;if(s==='failed'||s==='disconnected'||s==='closed'){if(NET.on)lost()}};return pc}
+function gather(pc){return new Promise(function(ok){if(pc.iceGatheringState==='complete'){ok();return}var done=false;function f(){if(done)return;done=true;ok()}pc.onicegatheringstatechange=function(){if(pc.iceGatheringState==='complete')f()};setTimeout(f,3500)})}
+function setupDC(dc){NET.dc=dc;dc.onopen=function(){NET.on=true;mp.classList.remove('on');connected()};dc.onclose=function(){if(NET.on)lost()};dc.onmessage=function(e){try{onMsg(JSON.parse(e.data))}catch(x){}}}
+function connected(){tag.style.display='block';tag.textContent='● EN LÍNEA';send({t:'hi',n:myName()});sfx('ok',.5);W.toast('¡CONECTADO!','JUGANDO CON '+NET.rname.toUpperCase());if(NET.role==='host'){newWP()}if(W.G.mode==='title')$('t1').click();if(NET.role==='guest'){W.resetV(30,-3.8,Math.PI/2)}}
+function lost(){NET.on=false;tag.style.display='none';hideR();NET.wp=null;clrWP();W.toast('AMIGO DESCONECTADO')}
+function hideR(){if(NET.rh)NET.rh.visible=false;nl.style.display='none'}
+function host(){mp.classList.add('on');q('<h2>CREANDO SALA…</h2><p>Un momento.</p>');
+ var pc=NET.pc=mkPC();NET.role='host';NET.chan='vc'+Math.random().toString(36).slice(2,10);var dc=pc.createDataChannel('g',{ordered:false,maxRetransmits:0});setupDC(dc);
+ pc.createOffer().then(function(o){return pc.setLocalDescription(o)}).then(function(){return gather(pc)}).then(function(){var code=b64(JSON.stringify({s:pc.localDescription.sdp,c:NET.chan,n:myName()}));var url=location.href.split('#')[0].split('?')[0]+'#j='+code;NET.url=url;
+  q('<h2>SALA CREADA</h2><p>1) Manda este enlace a tu amigo (WhatsApp, etc.).<br>2) Cuando lo abra, le saldrá un código de respuesta: pégalo aquí abajo y pulsa CONECTAR.</p>'+btn('COMPARTIR ENLACE','mps','o')+btn('COPIAR ENLACE','mpcp','')+'<p>Código de respuesta de tu amigo:</p><textarea id="mpans" placeholder="Pega aquí el código"></textarea>'+btn('CONECTAR','mpgo','g')+'<div class="st" id="mpst">Esperando a tu amigo…</div>'+btn('CANCELAR','mpx','s'));
+  $('mps').onclick=function(){share(url,'Únete a mi sala de Voltio City')};$('mpcp').onclick=function(){copy(url,this)};$('mpgo').onclick=function(){var v=$('mpans').value.trim();if(!v)return;try{applyAnswer(v)}catch(e){$('mpst').textContent='Código no válido'}};$('mpx').onclick=function(){cancel()};
+  autoListen()}).catch(function(e){q('<h2>ERROR</h2><p>No se pudo crear la sala ('+e.message+').</p>'+btn('CERRAR','mpx','s'));$('mpx').onclick=function(){mp.classList.remove('on')}})}
+function applyAnswer(code){var o=JSON.parse(unb64(code));NET.rname=o.n||'Amigo';return NET.pc.setRemoteDescription({type:'answer',sdp:o.s})}
+function autoListen(){/* mejor esfuerzo: el amigo puede devolver la respuesta por un canal público; si falla, queda el código manual */try{var es=new EventSource('https://ntfy.sh/'+NET.chan+'/sse');NET.es=es;es.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.message&&NET.pc&&NET.pc.signalingState==='have-local-offer'){applyAnswer(m.message);es.close()}}catch(x){}}}catch(e){}}
+function cancel(){mp.classList.remove('on');try{NET.pc&&NET.pc.close()}catch(e){}if(NET.es)try{NET.es.close()}catch(e){}NET.pc=null;NET.on=false}
+function share(url,title){if(navigator.share){navigator.share({title:'Voltio City',text:title,url:url}).catch(function(){})}else copy(url)}
+function copy(t,b){var done=function(){if(b){var o=b.textContent;b.textContent='¡COPIADO!';setTimeout(function(){b.textContent=o},1400)}};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb();function fb(){var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(ta)}}
+/* amigo: abre el enlace */
+function joinFromHash(){var m=location.hash.match(/#j=(.+)$/);if(!m)return;var o;try{o=JSON.parse(unb64(m[1]))}catch(e){return}history.replaceState(null,'',location.pathname);mp.classList.add('on');q('<h2>UNIÉNDOTE…</h2><p>Un momento.</p>');
+ NET.role='guest';NET.rname=o.n||'Amigo';var pc=NET.pc=mkPC();pc.ondatachannel=function(e){setupDC(e.channel)};
+ pc.setRemoteDescription({type:'offer',sdp:o.s}).then(function(){return pc.createAnswer()}).then(function(a){return pc.setLocalDescription(a)}).then(function(){return gather(pc)}).then(function(){var code=b64(JSON.stringify({s:pc.localDescription.sdp,n:myName()}));
+  try{fetch('https://ntfy.sh/'+o.c,{method:'POST',body:code}).catch(function(){})}catch(e){}
+  q('<h2>CASI LISTO</h2><p>Manda este código a tu amigo (por WhatsApp) y pídele que lo pegue en su móvil. En cuanto lo haga, entráis juntos.</p><input id="mpname" maxlength="12" placeholder="Tu nombre" value="'+myName()+'">'+btn('COMPARTIR CÓDIGO','mps','o')+btn('COPIAR CÓDIGO','mpcp','')+'<textarea readonly id="mpcode">'+code+'</textarea><div class="st">Esperando a tu amigo…</div>'+btn('CANCELAR','mpx','s'));
+  $('mps').onclick=function(){share(code,'Mi código de Voltio City')};$('mpcp').onclick=function(){copy(code,this)};$('mpx').onclick=function(){cancel()}}).catch(function(e){q('<h2>ERROR</h2><p>El enlace no es válido o ha caducado.</p>'+btn('CERRAR','mpx','s'));$('mpx').onclick=function(){mp.classList.remove('on')}})}
+function joinManual(){q('<h2>PEGAR CÓDIGO</h2><p>Si tu amigo te ha mandado un enlace, ábrelo directamente. Si eres el que creó la sala, pega aquí el código de respuesta de tu amigo.</p><textarea id="mpans" placeholder="Pega aquí el código"></textarea>'+btn('CONECTAR','mpgo','g')+'<div class="st" id="mpst"></div>'+btn('ATRÁS','mpb','s'));
+ $('mpb').onclick=openMP;$('mpgo').onclick=function(){var v=$('mpans').value.trim();if(!v)return;if(NET.pc&&NET.role==='host'){try{applyAnswer(v);$('mpst').textContent='Conectando…'}catch(e){$('mpst').textContent='Código no válido'}}else{try{var o=JSON.parse(unb64(v.split('#j=').pop()));location.hash='j='+v.split('#j=').pop();location.reload()}catch(e){$('mpst').textContent='Primero crea una sala, o abre el enlace de tu amigo'}}}}
+/* ---------- mensajes ---------- */
+function send(o){if(NET.dc&&NET.dc.readyState==='open')try{NET.dc.send(JSON.stringify(o))}catch(e){}}
+function onMsg(m){if(m.t==='hi'){NET.rname=m.n||'Amigo';tag.textContent='● '+NET.rname.toUpperCase()}
+ else if(m.t==='s'){NET.R=m;NET.rn=performance.now()}
+ else if(m.t==='w'){setWP(m.x,m.z)}
+ else if(m.t==='win'){NET.score[1]++;W.toast(NET.rname.toUpperCase()+' LLEGÓ PRIMERO','TÚ '+NET.score[0]+' · ÉL '+NET.score[1]);if(NET.role==='host')newWP()}
+ else if(m.t==='bump'){}}
+/* ---------- baliza (carrera) ---------- */
+var wpm=null;function clrWP(){if(wpm){scene.remove(wpm);wpm=null}}
+function setWP(x,z){clrWP();NET.wp={x:x,z:z};var g=new T.Group();var b=new T.Mesh(new T.CylinderGeometry(1.2,1.2,160,12,1,true),new T.MeshBasicMaterial({color:0x40e0ff,transparent:true,opacity:.35,side:T.DoubleSide,depthWrite:false}));b.position.y=80;g.add(b);var r=new T.Mesh(new T.TorusGeometry(5,.35,8,28),new T.MeshBasicMaterial({color:0x40e0ff}));r.rotation.x=Math.PI/2;r.position.y=1.2;g.add(r);g.position.set(x,0,z);scene.add(g);wpm=g}
+function newWP(){var a=Math.random()*6.283,d=250+Math.random()*350;var cx=(V.x+(NET.R?NET.R.x:V.x))/2,cz=(V.z+(NET.R?NET.R.z:V.z))/2;var x=Math.round((cx+Math.cos(a)*d)/W.P)*W.P+3.8,z=Math.round((cz+Math.sin(a)*d)/W.P)*W.P+3.8;setWP(x,z);send({t:'w',x:x,z:z});W.toast('¡CARRERA!','LLEGA PRIMERO A LA BALIZA')}
+/* ---------- coche remoto ---------- */
+function buildRemote(m){NET.rid=m.id;NET.rsig=m.sig;if(NET.rh)scene.remove(NET.rh);var h=new T.Group();var c=m.c;var mv=W.mkVeh(VEH[m.id],{body:c[0],acc:c[1],neon:c[2],neonOn:c[3],rider:c[4]});mv.g.position.set(0,-.6,mv.ty==='car'?0:VEH[m.id].L/2);h.add(mv.g);h.rotation.order='YXZ';scene.add(h);NET.rh=h;NET.rm=mv}
+var minimap=null;
+function upd(dt){if(!NET.on)return;var now=performance.now();
+ if(now-NET.lastSend>66&&(G.mode==='play'||G.mode==='wasted'||G.mode==='busted'||G.mode==='pause')){NET.lastSend=now;var c=W.colOf(V.id);send({t:'s',id:V.id,sig:V.id+'|'+[c.body,c.acc,c.neon,c.neonOn?1:0,c.rider].join(','),c:[c.body,c.acc,c.neon,c.neonOn,c.rider],x:+V.x.toFixed(2),y:+V.y.toFixed(2),z:+V.z.toFixed(2),h:+V.h.toFixed(3),v:+V.v.toFixed(2),wp:+V.wp.toFixed(3),roll:+V.roll.toFixed(3),st:+V.steer.toFixed(3),air:V.air?1:0,ax:+V.airX.toFixed(2),ay:+V.airY.toFixed(2),az:+V.airZ.toFixed(2),dn:V.down>0?1:0})}
+ var m=NET.R;if(!m){return}if(m.id!==NET.rid||m.sig!==NET.rsig)buildRemote(m);var h=NET.rh,mv=NET.rm,def=VEH[m.id];h.visible=true;
+ /* interpolación */ var k=Math.min(1,dt*12);if(NET.rx===undefined){NET.rx=m.x;NET.ry=m.y;NET.rz=m.z;NET.rh_=m.h}NET.rvx=(m.x-NET.rx)/Math.max(dt,.001)*0;var px=NET.rx,pz=NET.rz;NET.rx+=(m.x-NET.rx)*k;NET.ry+=(m.y-NET.ry)*k;NET.rz+=(m.z-NET.rz)*k;var dh=W.angd(NET.rh_,m.h);NET.rh_+=dh*k;NET.rv={x:(NET.rx-px)/Math.max(dt,.001),z:(NET.rz-pz)/Math.max(dt,.001)};
+ h.position.set(NET.rx,NET.ry+.6,NET.rz);h.rotation.set(m.air?-m.ax:0,NET.rh_+(m.air?m.ay:0),m.air?m.az:0);mv.lean.rotation.z=m.roll;
+ if(def.ty!=='car'){var L=def.L;mv.pit.rotation.x=-m.wp;mv.pit.position.set(0,def.wr+(L/2)*Math.sin(m.wp),-L+(L/2)*Math.cos(m.wp));if(mv.fork)mv.fork.rotation.y=-m.st*.9;if(mv.rider){mv.rider.g.rotation.z=m.dn?1.45:0}}else{mv.steerParts.forEach(function(p){if(p.rotation)p.rotation.y=-m.st*.9})}
+ mv.wheels.forEach(function(w){w.spin.rotation.x+=m.v*dt/w.r});mv.neonG.visible=!!m.c[3];
+ /* etiqueta */ var p=new T.Vector3(NET.rx,NET.ry+(def.ty==='car'?2.3:2.6),NET.rz).project(W.cam);if(p.z<1&&G.mode==='play'){nl.style.display='block';nl.style.left=((p.x*.5+.5)*innerWidth)+'px';nl.style.top=((-p.y*.5+.5)*innerHeight)+'px';nl.textContent=NET.rname}else nl.style.display='none';
+ /* choque entre jugadores */ if(G.mode==='play'){var dx=V.x-NET.rx,dz=V.z-NET.rz,dd=Math.hypot(dx,dz),rr=V.r+(def.ty==='car'?1.1:.5);if(dd<rr&&dd>1e-3&&Math.abs(V.y-NET.ry)<2){var nx=dx/dd,nz=dz/dd;V.x+=nx*(rr-dd)*.7;V.z+=nz*(rr-dd)*.7;var rel=-((V.vx-NET.rv.x)*nx+(V.vz-NET.rv.z)*nz);if(rel>0){V.vx+=nx*rel*1.1;V.vz+=nz*rel*1.1;if(rel>5){G.hp-=rel*.35;sfx('metal2',.4);W.camR.shake=Math.max(W.camR.shake,.4)}}}}
+ /* baliza */ if(NET.wp&&G.mode==='play'){var d=Math.hypot(V.x-NET.wp.x,V.z-NET.wp.z);if(d<7){NET.score[0]++;W.money(1000,'¡LLEGASTE PRIMERO!');W.toast('¡LLEGASTE PRIMERO!','TÚ '+NET.score[0]+' · ÉL '+NET.score[1]);send({t:'win'});clrWP();NET.wp=null;if(NET.role==='host')setTimeout(newWP,2500)}}
+}
+V3.on(upd);
+/* punto del amigo y baliza en el minimapa: dibujamos sobre el canvas tras el frame principal */
+var mmc=$('mm').getContext('2d');
+V3.on(function(){if(!NET.on||G.mode!=='play')return;var S=208,sc=S/2/95;mmc.save();mmc.beginPath();mmc.arc(S/2,S/2,S/2-2,0,6.283);mmc.clip();mmc.translate(S/2,S/2);mmc.rotate(-(Math.PI/2-V.h)-Math.PI/2+Math.PI);
+ function dot(x,z,col,r){var dx=(x-V.x)*sc,dz=(z-V.z)*sc,l=Math.hypot(dx,dz);if(l>S/2-6){dx*=(S/2-6)/l;dz*=(S/2-6)/l}mmc.fillStyle=col;mmc.beginPath();mmc.arc(dx,dz,r,0,6.283);mmc.fill()}
+ if(NET.R)dot(NET.rx||NET.R.x,NET.rz||NET.R.z,'#7aff9a',5);if(NET.wp)dot(NET.wp.x,NET.wp.z,'#40e0ff',6);mmc.restore()});
+/* ---------- puntos de entrada ---------- */
+var tb=document.createElement('button');tb.className='b';tb.id='t3';tb.textContent='MULTIJUGADOR';var t2=$('t2');t2.parentNode.insertBefore(tb,t2.nextSibling);tb.onclick=function(){sfx('click',.5);openMP()};
+var pb=document.createElement('button');pb.className='b s';pb.id='p5';pb.textContent='MULTIJUGADOR';var p3=$('p3');p3.parentNode.insertBefore(pb,p3);pb.onclick=function(){openMP()};
+window.addEventListener('hashchange',joinFromHash);
+setTimeout(joinFromHash,200);
+W.netDbg=NET;
+})();
+</script>
 </body></html>
