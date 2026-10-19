@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0b">
+<title>ZYXXY — Ropa</title>
+<style>
+:root{
+  --bg:#f3f1ec; --ink:#0b0b0b; --mute:#6d6a63; --card:#e7e4dc; --line:#0b0b0b1f;
+  --acid:#c8ff2e; --hot:#ff3b1f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important}}
+body{background:var(--bg);color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px}
+
+/* ticker */
+.ticker{background:var(--ink);color:var(--acid);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;overflow:hidden;white-space:nowrap;padding:8px 0}
+.ticker span{display:inline-block;animation:tick 28s linear infinite;padding-left:100%}
+@keyframes tick{to{transform:translateX(-100%)}}
+
+/* header */
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-weight:900;font-size:26px;letter-spacing:-.04em}
+.logo i{font-style:normal;color:var(--hot)}
+.links{display:flex;gap:26px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.links a:hover{text-decoration:underline;text-underline-offset:4px}
+.cartbtn{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.cartbtn b{background:var(--ink);color:var(--bg);border-radius:99px;min-width:22px;height:22px;display:grid;place-items:center;font-size:12px;padding:0 6px}
+.back{font-size:13px;font-weight:600;opacity:.6}
+
+/* hero */
+.hero{position:relative;padding:40px 0 30px;overflow:hidden}
+.hero h1{font-size:clamp(80px,22vw,330px);line-height:.8;font-weight:900;letter-spacing:-.07em;margin-left:-.04em}
+.hero h1 .ox{color:transparent;-webkit-text-stroke:2px var(--ink)}
+.herorow{display:grid;grid-template-columns:1.1fr 1fr;gap:30px;margin-top:28px;align-items:end}
+.hero p{font-size:clamp(17px,2vw,22px);line-height:1.35;max-width:30ch;font-weight:500}
+.cta{display:inline-flex;align-items:center;gap:10px;margin-top:20px;background:var(--ink);color:var(--bg);padding:16px 26px;border-radius:99px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:13px;transition:transform .2s}
+.cta:hover{transform:translateY(-2px)}
+.cta.alt{background:var(--acid);color:var(--ink)}
+.herovis{position:relative;aspect-ratio:4/3;background:var(--acid);border-radius:22px;overflow:hidden;display:grid;place-items:center}
+.herovis svg{width:70%;filter:drop-shadow(0 30px 30px #0003);animation:float 5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px) rotate(-2deg)}}
+.sticker{position:absolute;top:18px;right:18px;width:96px;height:96px;border-radius:50%;background:var(--hot);color:#fff;display:grid;place-items:center;text-align:center;font-weight:900;font-size:13px;line-height:1.05;transform:rotate(14deg);animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(374deg)}}
+.herovis .tag{position:absolute;left:18px;bottom:16px;font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+
+/* section heads */
+section{padding:60px 0}
+.sh{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+.sh h2{font-size:clamp(36px,6vw,72px);font-weight:900;letter-spacing:-.05em;line-height:.9}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--ink);border-radius:99px;padding:8px 16px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.chip.on{background:var(--ink);color:var(--bg)}
+select.sort{font:inherit;font-size:13px;font-weight:700;border:1.5px solid var(--ink);border-radius:99px;padding:8px 14px;background:transparent;color:var(--ink)}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.card{cursor:pointer}
+.ph{position:relative;aspect-ratio:3/4;border-radius:16px;overflow:hidden;display:grid;place-items:center;transition:transform .3s}
+.ph svg{width:72%;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.card:hover .ph svg{transform:scale(1.07) rotate(-2deg)}
+.badge{position:absolute;top:12px;left:12px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:6px}
+.badge.hot{background:var(--hot);color:#fff}
+.quick{position:absolute;right:12px;bottom:12px;width:42px;height:42px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:22px;font-weight:400;opacity:0;transform:translateY(8px);transition:.25s}
+.card:hover .quick{opacity:1;transform:none}
+.meta{display:flex;justify-content:space-between;gap:10px;margin-top:10px;font-size:14px;font-weight:700}
+.meta small{display:block;color:var(--mute);font-weight:500;font-size:13px;margin-top:2px}
+.price s{color:var(--mute);font-weight:500;margin-right:6px}
+.dots{display:flex;gap:4px;margin-top:6px}
+.dots i{width:10px;height:10px;border-radius:50%;border:1px solid var(--line)}
+
+/* drop banner */
+.drop{background:var(--ink);color:var(--bg);border-radius:26px;padding:50px 40px;display:grid;grid-template-columns:1.3fr 1fr;gap:30px;align-items:center;position:relative;overflow:hidden}
+.drop h3{font-size:clamp(40px,7vw,90px);font-weight:900;letter-spacing:-.05em;line-height:.88}
+.drop h3 em{font-style:normal;color:var(--acid)}
+.drop p{color:#bbb;margin-top:14px;max-width:40ch;line-height:1.45}
+.clock{display:flex;gap:12px}
+.clock div{background:#1d1d1d;border-radius:14px;padding:14px 10px;min-width:72px;text-align:center}
+.clock b{display:block;font-size:38px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--acid)}
+.clock span{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#999}
+
+/* lookbook */
+.look{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:240px 240px;gap:14px}
+.lk{border-radius:18px;position:relative;overflow:hidden;display:grid;place-items:center}
+.lk:first-child{grid-row:span 2}
+.lk svg{width:60%}
+.lk:first-child svg{width:55%}
+.lk span{position:absolute;left:16px;bottom:14px;font-weight:900;font-size:22px;letter-spacing:-.03em}
+
+/* about */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.about h2{font-size:clamp(34px,5vw,60px);font-weight:900;letter-spacing:-.05em;line-height:.95}
+.about p{font-size:18px;line-height:1.55;color:#333;margin-bottom:14px}
+.vals{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.vals div{border-top:2px solid var(--ink);padding-top:10px;font-size:14px;line-height:1.4}
+.vals b{display:block;font-size:28px;font-weight:900;letter-spacing:-.04em}
+
+/* newsletter */
+.news{background:var(--acid);border-radius:26px;padding:46px 40px;text-align:center}
+.news h3{font-size:clamp(30px,5vw,56px);font-weight:900;letter-spacing:-.05em;line-height:.95}
+.news form{display:flex;gap:10px;max-width:520px;margin:22px auto 0}
+.news input{flex:1;min-width:0;font:inherit;font-size:16px;padding:15px 20px;border-radius:99px;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+.news input::placeholder{color:#0008}
+.news .ok{margin-top:14px;font-weight:700;min-height:1.2em}
+
+footer{border-top:1px solid var(--line);padding:40px 0 60px;margin-top:40px}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px;font-size:14px}
+.fgrid h4{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--mute);margin-bottom:10px}
+.fgrid li{list-style:none;margin:6px 0}
+.big{font-size:clamp(70px,18vw,250px);font-weight:900;letter-spacing:-.07em;line-height:.8;margin-top:40px;color:transparent;-webkit-text-stroke:1.5px var(--ink);user-select:none}
+
+/* overlay / drawer / modal */
+.ov{position:fixed;inset:0;background:#0007;opacity:0;pointer-events:none;transition:.3s;z-index:40}
+.ov.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--bg);z-index:50;transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid var(--line)}
+.dh h3{font-size:22px;font-weight:900;letter-spacing:-.03em}
+.x{font-size:26px;line-height:1;width:40px;height:40px;border-radius:50%}
+.x:hover{background:var(--card)}
+.items{flex:1;overflow:auto;padding:10px 20px}
+.it{display:grid;grid-template-columns:76px 1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}
+.it .th{width:76px;height:92px;border-radius:10px;display:grid;place-items:center}
+.it .th svg{width:78%}
+.it h5{font-size:14px;font-weight:800}
+.it small{color:var(--mute);font-size:12px}
+.qty{display:inline-flex;align-items:center;border:1.5px solid var(--ink);border-radius:99px;margin-top:6px}
+.qty button{width:28px;height:26px;font-weight:800}
+.qty span{min-width:18px;text-align:center;font-size:13px;font-weight:700}
+.rm{font-size:12px;color:var(--mute);text-decoration:underline;margin-top:4px}
+.df{padding:20px;border-top:1px solid var(--line)}
+.row{display:flex;justify-content:space-between;font-size:14px;margin:6px 0}
+.row.tot{font-size:20px;font-weight:900;margin-top:10px}
+.ship{height:6px;background:var(--card);border-radius:9px;overflow:hidden;margin:6px 0 4px}
+.ship i{display:block;height:100%;background:var(--ink);transition:width .4s}
+.shipt{font-size:12px;color:var(--mute)}
+.full{width:100%;justify-content:center;margin-top:14px}
+.empty{text-align:center;padding:60px 10px;color:var(--mute)}
+.empty b{display:block;font-size:44px;margin-bottom:10px;color:var(--ink)}
+
+.modal{position:fixed;left:50%;top:50%;width:min(920px,94vw);max-height:92vh;overflow:auto;background:var(--bg);border-radius:24px;z-index:50;transform:translate(-50%,-46%) scale(.97);opacity:0;pointer-events:none;transition:.3s;display:grid;grid-template-columns:1fr 1fr}
+.modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.mv{display:grid;place-items:center;min-height:440px;border-radius:24px 0 0 24px;position:relative}
+.mv svg{width:70%}
+.mi{padding:30px;position:relative}
+.mi .x{position:absolute;top:14px;right:14px}
+.mi h3{font-size:34px;font-weight:900;letter-spacing:-.04em;line-height:1;margin-right:40px}
+.mi .pr{font-size:22px;font-weight:800;margin:10px 0 14px}
+.mi p{color:#444;line-height:1.5;font-size:15px}
+.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:800;margin:20px 0 8px;display:flex;justify-content:space-between}
+.lbl span{color:var(--mute);font-weight:600;text-transform:none;letter-spacing:0}
+.sw{display:flex;gap:10px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);outline:2px solid transparent;outline-offset:2px}
+.sw button.on{outline-color:var(--ink)}
+.sz{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.sz button{border:1.5px solid var(--line);border-radius:10px;padding:11px 0;font-weight:700;font-size:13px}
+.sz button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sz button:disabled{opacity:.3;text-decoration:line-through;cursor:not-allowed}
+.err{color:var(--hot);font-size:13px;font-weight:700;min-height:1.2em;margin-top:8px}
+.det{margin-top:18px;border-top:1px solid var(--line)}
+.det details{border-bottom:1px solid var(--line);padding:12px 0;font-size:14px}
+.det summary{font-weight:800;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+.det summary::after{content:"+"}
+.det details[open] summary::after{content:"–"}
+.det details p{margin-top:8px;font-size:14px}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--ink);color:var(--bg);padding:14px 22px;border-radius:99px;font-weight:700;font-size:14px;z-index:60;transition:transform .35s cubic-bezier(.2,.8,.2,1);white-space:nowrap}
+.toast.on{transform:translate(-50%,0)}
+
+.done{text-align:center;padding:40px 10px}
+.done b{font-size:60px;display:block}
+.done h4{font-size:26px;font-weight:900;letter-spacing:-.03em;margin:10px 0}
+.done p{color:var(--mute);line-height:1.5}
+
+@media (max-width:900px){
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .herorow,.drop,.about{grid-template-columns:1fr}
+  .look{grid-template-columns:1fr 1fr;grid-template-rows:200px 200px 200px}
+  .lk:first-child{grid-column:span 2;grid-row:auto}
+  .links{display:none}
+  .modal{grid-template-columns:1fr}
+  .mv{min-height:300px;border-radius:24px 24px 0 0}
+  .fgrid{grid-template-columns:1fr 1fr}
+  .drop,.news{padding:34px 22px}
+  .clock div{min-width:0;flex:1}
+  .quick{opacity:1;transform:none;width:36px;height:36px}
+}
+@media (max-width:480px){
+  .wrap{padding:0 16px}
+  .news form{flex-direction:column}
+  .vals{grid-template-columns:1fr}
+  .meta{font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<div class="ticker"><span>Envío gratis desde 60 € ✦ Devoluciones 30 días ✦ Drop 07 "Ruido Blanco" ya disponible ✦ Algodón orgánico ✦ Hecho en edición limitada ✦ Envío gratis desde 60 € ✦ Devoluciones 30 días ✦</span></div>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="back" title="Volver a Mis Apps">← Apps</a>
+    <a href="#top" class="logo">ZYX<i>X</i>Y</a>
+    <nav class="links"><a href="#tienda">Tienda</a><a href="#drop">Drop</a><a href="#look">Lookbook</a><a href="#marca">Marca</a></nav>
+    <button class="cartbtn" id="openCart">Cesta <b id="count">0</b></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <h1>ZYX<span class="ox">X</span>Y</h1>
+      <div class="herorow">
+        <div>
+          <p>Ropa de calle para gente que no encaja en ninguna talla mental. Cortes amplios, gráficos raros, ediciones que no vuelven.</p>
+          <a href="#tienda" class="cta">Ver colección →</a>
+        </div>
+        <div class="herovis" id="heroVis">
+          <div class="sticker">NUEVO<br>DROP<br>07</div>
+          <span class="tag">Hoodie Estática — Ácido</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tienda">
+    <div class="wrap">
+      <div class="sh">
+        <h2>Tienda</h2>
+        <div class="filters" id="filters"></div>
+        <select class="sort" id="sort" aria-label="Ordenar">
+          <option value="dest">Destacados</option>
+          <option value="asc">Precio ↑</option>
+          <option value="desc">Precio ↓</option>
+          <option value="new">Novedades</option>
+        </select>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section id="drop">
+    <div class="wrap">
+      <div class="drop">
+        <div>
+          <h3>DROP 08<br><em>“SEÑAL PERDIDA”</em></h3>
+          <p>Doce piezas. Sin reposición. Apúntate a la lista y te avisamos una hora antes que al resto.</p>
+          <a href="#news" class="cta alt" style="margin-top:22px">Avísame →</a>
+        </div>
+        <div class="clock" id="clock"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="look">
+    <div class="wrap">
+      <div class="sh"><h2>Lookbook</h2></div>
+      <div class="look" id="lookGrid"></div>
+    </div>
+  </section>
+
+  <section id="marca">
+    <div class="wrap about">
+      <h2>Ni X ni Y.<br>Algo entre medias.</h2>
+      <div>
+        <p>ZYXXY nació en un garaje con una plancha de serigrafía y demasiadas ideas. Hacemos tiradas cortas para no tirar nada: cuando una prenda se agota, se agota.</p>
+        <p>Algodón orgánico de gramaje pesado, tintes de bajo impacto y talleres que conocemos por su nombre.</p>
+        <div class="vals">
+          <div><b>100%</b>algodón orgánico certificado</div>
+          <div><b>≤300</b>unidades por modelo</div>
+          <div><b>30 d</b>para devolver sin preguntas</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="news">
+    <div class="wrap">
+      <div class="news">
+        <h3>Entra en la lista.<br>Llega antes.</h3>
+        <form id="newsForm">
+          <input type="email" id="email" placeholder="tu@email.com" required>
+          <button class="cta" type="submit" style="margin:0">Unirme</button>
+        </form>
+        <div class="ok" id="newsOk"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div><b style="font-size:20px;font-weight:900">ZYXXY</b><p style="color:var(--mute);margin-top:8px;max-width:30ch">Ropa de calle en edición limitada. Diseñada sin prisa.</p></div>
+      <div><h4>Tienda</h4><ul><li>Camisetas</li><li>Sudaderas</li><li>Pantalones</li><li>Accesorios</li></ul></div>
+      <div><h4>Ayuda</h4><ul><li>Envíos</li><li>Devoluciones</li><li>Guía de tallas</li><li>Contacto</li></ul></div>
+      <div><h4>Síguenos</h4><ul><li>Instagram</li><li>TikTok</li><li>Spotify</li></ul></div>
+    </div>
+    <div class="big">ZYXXY</div>
+  </div>
+</footer>
+
+<div class="ov" id="ov"></div>
+
+<aside class="drawer" id="drawer" aria-label="Cesta">
+  <div class="dh"><h3>Tu cesta</h3><button class="x" data-close>×</button></div>
+  <div class="items" id="items"></div>
+  <div class="df" id="df"></div>
+</aside>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- dibujos de prendas (SVG) ----------
+const SHAPES = {
+  tee: (c,a)=>`<svg viewBox="0 0 200 200"><path d="M62 28 40 36 10 62l18 30 18-10v94h108V82l18 10 18-30-30-26-22-8c-4 14-20 22-38 22S66 42 62 28z" fill="${c}" stroke="#0002" stroke-width="2"/><path d="M62 28c4 14 20 22 38 22s34-8 38-22" fill="none" stroke="#0003" stroke-width="3"/><text x="100" y="118" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="26" fill="${a}">${'ZYXXY'}</text></svg>`,
+  hoodie: (c,a)=>`<svg viewBox="0 0 200 200"><path d="M70 30c0-14 60-14 60 0l28 10 30 70-20 10-16-30v100H48V90l-16 30-20-10 30-70z" fill="${c}" stroke="#0002" stroke-width="2"/><path d="M76 30c6 22 42 22 48 0" fill="#0002"/><path d="M92 50v24M108 50v24" stroke="${a}" stroke-width="3" stroke-linecap="round"/><rect x="66" y="140" width="68" height="34" rx="8" fill="#0001" stroke="#0002"/><text x="100" y="118" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="22" fill="${a}">ZY✕✕Y</text></svg>`,
+  pants: (c,a)=>`<svg viewBox="0 0 200 200"><path d="M58 14h84l14 176h-40l-16-120-16 120H44z" fill="${c}" stroke="#0002" stroke-width="2"/><path d="M58 26h84" stroke="#0003" stroke-width="4"/><rect x="128" y="80" width="22" height="30" rx="3" fill="#0001" stroke="#0003"/><path d="M50 182h38M112 182h38" stroke="${a}" stroke-width="4"/></svg>`,
+  cap: (c,a)=>`<svg viewBox="0 0 200 200"><path d="M40 120c0-50 30-74 66-74s60 28 60 70z" fill="${c}" stroke="#0002" stroke-width="2"/><path d="M40 120c40-8 90-8 126-4 14 2 26 10 26 18-30-8-110-8-152-6z" fill="${c}" stroke="#0003" stroke-width="2" filter="brightness(.85)"/><circle cx="104" cy="48" r="5" fill="${a}"/><text x="104" y="100" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="20" fill="${a}">ZYX</text></svg>`,
+  jacket: (c,a)=>`<svg viewBox="0 0 200 200"><path d="M72 22h56l36 16 26 92-22 6-14-50v100H46V86l-14 50-22-6 26-92z" fill="${c}" stroke="#0002" stroke-width="2"/><path d="M100 30v156" stroke="${a}" stroke-width="3" stroke-dasharray="4 3"/><path d="M72 22l28 24 28-24" fill="#0002"/><rect x="58" y="110" width="28" height="22" rx="3" fill="#0001" stroke="#0003"/><rect x="114" y="110" width="28" height="22" rx="3" fill="#0001" stroke="#0003"/></svg>`,
+  tote: (c,a)=>`<svg viewBox="0 0 200 200"><path d="M70 70c0-40 60-40 60 0" fill="none" stroke="${c}" stroke-width="9" filter="brightness(.85)"/><path d="M40 70h120l10 116H30z" fill="${c}" stroke="#0002" stroke-width="2"/><text x="100" y="140" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="30" fill="${a}">ZYXXY</text></svg>`,
+  socks: (c,a)=>`<svg viewBox="0 0 200 200"><path d="M60 14h44v100l36 34c14 14 4 38-16 38H82c-20 0-24-12-24-28z" fill="${c}" stroke="#0002" stroke-width="2"/><path d="M60 30h44M60 42h44" stroke="${a}" stroke-width="5"/><path d="M112 22h34v84" fill="none" stroke="#0002" stroke-width="2"/></svg>`,
+  shorts:(c,a)=>`<svg viewBox="0 0 200 200"><path d="M46 40h108l14 110h-56l-12-50-12 50H32z" fill="${c}" stroke="#0002" stroke-width="2"/><path d="M46 52h108" stroke="#0003" stroke-width="4"/><path d="M96 52v20M104 52v20" stroke="${a}" stroke-width="3" stroke-linecap="round"/><path d="M38 136h48M114 136h48" stroke="${a}" stroke-width="4"/></svg>`
+};
+
+// ---------- catálogo ----------
+const COLS = {
+  negro:['#141414','#c8ff2e'], hueso:['#eae3d2','#141414'], acido:['#c8ff2e','#141414'],
+  rojo:['#ff3b1f','#f3f1ec'], azul:['#2f4bff','#c8ff2e'], gris:['#8d8a83','#f3f1ec'],
+  oliva:['#5d6b3a','#eae3d2'], lila:['#b9a6ff','#141414']
+};
+const BG = ['#e3dfd5','#d9e3c4','#e6d4cf','#d2d8e8','#e8e2c8','#dcd3e6'];
+const P = [
+  {id:1,n:'Hoodie Estática',t:'hoodie',cat:'sudaderas',p:89,cols:['acido','negro','hueso'],b:'Nuevo',nw:9,d:'Sudadera con capucha de felpa pesada (480 g/m²), corte boxy y hombro caído. Gráfico en relieve con tinta puff.'},
+  {id:2,n:'Camiseta Ruido',t:'tee',cat:'camisetas',p:39,cols:['hueso','negro','lila'],b:'Más vendido',nw:5,d:'Camiseta oversize de algodón orgánico 240 g/m². Serigrafía a mano en el pecho.'},
+  {id:3,n:'Cargo Interferencia',t:'pants',cat:'pantalones',p:95,cols:['oliva','negro','gris'],nw:7,d:'Pantalón cargo de sarga resistente con bolsillos de fuelle y bajo ajustable con cordón.'},
+  {id:4,n:'Gorra Señal',t:'cap',cat:'accesorios',p:32,cols:['negro','rojo','azul'],nw:4,d:'Gorra de seis paneles con bordado 3D y cierre metálico. Talla única ajustable.'},
+  {id:5,n:'Chaqueta Glitch',t:'jacket',cat:'sudaderas',p:139,old:169,cols:['azul','negro'],b:'-18%',hot:1,nw:6,d:'Chaqueta worker de lona encerada con forro acolchado. Cremallera bidireccional y puños de canalé.'},
+  {id:6,n:'Camiseta Fallo',t:'tee',cat:'camisetas',p:35,cols:['rojo','acido','negro'],nw:8,d:'Camiseta de corte recto con gráfico distorsionado. Lavada en prenda para tacto suave.'},
+  {id:7,n:'Tote Sin Señal',t:'tote',cat:'accesorios',p:22,cols:['hueso','negro'],nw:2,d:'Bolsa de lona de 12 oz con asas largas y bolsillo interior. Cabe un portátil de 15".'},
+  {id:8,n:'Shorts Pixel',t:'shorts',cat:'pantalones',p:49,cols:['gris','lila','negro'],b:'Nuevo',nw:10,d:'Pantalón corto de felpa con cintura elástica y cordón en color de contraste.'},
+  {id:9,n:'Calcetines XX',t:'socks',cat:'accesorios',p:14,cols:['acido','hueso','rojo'],nw:3,d:'Pack de calcetines de algodón peinado con rayas tejidas. Talla 36–45.'},
+  {id:10,n:'Hoodie Vacío',t:'hoodie',cat:'sudaderas',p:85,cols:['gris','oliva','lila'],nw:1,d:'La básica que no es básica: capucha doble, bolsillo canguro y etiqueta tejida en la manga.'},
+  {id:11,n:'Camiseta Eco',t:'tee',cat:'camisetas',p:42,old:49,cols:['azul','hueso'],b:'-14%',hot:1,nw:0,d:'Camiseta de manga corta con impresión en espalda y logotipo pequeño en el pecho.'},
+  {id:12,n:'Baggy Frecuencia',t:'pants',cat:'pantalones',p:99,cols:['azul','negro','hueso'],b:'Últimas',hot:1,nw:11,d:'Vaquero baggy de 14 oz con pespunte en contraste y bajo deshilachado.'}
+];
+P.forEach((p,i)=>p.bg=BG[i%BG.length]);
+const SIZES = ['XS','S','M','L','XL','XXL'];
+const soldOut = id => id%3===0 ? ['XS'] : id%4===0 ? ['XXL'] : [];
+const oneSize = p => p.cat==='accesorios';
+const eur = n => n.toLocaleString('es-ES',{style:'currency',currency:'EUR'});
+const svg = (p,col) => SHAPES[p.t](...COLS[col||p.cols[0]]);
+const $ = s => document.querySelector(s);
+
+// ---------- tienda ----------
+let filter='todo', sort='dest';
+const CATS = ['todo','camisetas','sudaderas','pantalones','accesorios'];
+$('#filters').innerHTML = CATS.map(c=>`<button class="chip${c===filter?' on':''}" data-f="${c}">${c}</button>`).join('');
+$('#filters').onclick = e => { const f=e.target.dataset.f; if(!f) return; filter=f; document.querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',b.dataset.f===f)); render(); };
+$('#sort').onchange = e => { sort=e.target.value; render(); };
+
+function render(){
+  let list = P.filter(p=>filter==='todo'||p.cat===filter);
+  if(sort==='asc') list=[...list].sort((a,b)=>a.p-b.p);
+  if(sort==='desc') list=[...list].sort((a,b)=>b.p-a.p);
+  if(sort==='new') list=[...list].sort((a,b)=>b.nw-a.nw);
+  $('#grid').innerHTML = list.map(p=>`
+    <article class="card" data-id="${p.id}">
+      <div class="ph" style="background:${p.bg}">
+        ${p.b?`<span class="badge${p.hot?' hot':''}">${p.b}</span>`:''}
+        ${svg(p)}
+        <span class="quick">+</span>
+      </div>
+      <div class="meta"><div>${p.n}<small>${p.cols.length} colores</small></div>
+        <div class="price">${p.old?`<s>${eur(p.old)}</s>`:''}${eur(p.p)}</div></div>
+      <div class="dots">${p.cols.map(c=>`<i style="background:${COLS[c][0]}"></i>`).join('')}</div>
+    </article>`).join('');
+}
+$('#grid').onclick = e => { const c=e.target.closest('.card'); if(c) openProduct(+c.dataset.id); };
+
+// hero + lookbook
+$('#heroVis').insertAdjacentHTML('beforeend', SHAPES.hoodie('#141414','#c8ff2e'));
+const LOOKS = [[1,'negro','#c8ff2e','Look 01'],[3,'oliva','#e6d4cf','Look 02'],[4,'rojo','#d2d8e8','Look 03'],[2,'lila','#141414','Look 04'],[8,'gris','#e8e2c8','Look 05']];
+$('#lookGrid').innerHTML = LOOKS.map(([id,c,bg,t])=>{const p=P.find(x=>x.id===id);return `<div class="lk" style="background:${bg};cursor:pointer" data-id="${id}">${svg(p,c)}<span style="color:${bg==='#141414'?'#f3f1ec':'#141414'}">${t}</span></div>`}).join('');
+$('#lookGrid').onclick = e => { const c=e.target.closest('.lk'); if(c) openProduct(+c.dataset.id); };
+
+// ---------- ficha de producto ----------
+let cur=null;
+function openProduct(id){
+  const p=P.find(x=>x.id===id);
+  cur={p,col:p.cols[0],size:oneSize(p)?'Única':null};
+  drawModal(); show('#modal');
+}
+function drawModal(){
+  const {p,col,size}=cur, so=soldOut(p.id);
+  $('#modal').innerHTML = `
+    <div class="mv" style="background:${p.bg}">${p.b?`<span class="badge${p.hot?' hot':''}">${p.b}</span>`:''}${svg(p,col)}</div>
+    <div class="mi">
+      <button class="x" data-close>×</button>
+      <h3>${p.n}</h3>
+      <div class="pr">${p.old?`<s style="color:var(--mute);font-weight:500;font-size:17px;margin-right:8px">${eur(p.old)}</s>`:''}${eur(p.p)}</div>
+      <p>${p.d}</p>
+      <div class="lbl">Color <span>${col}</span></div>
+      <div class="sw">${p.cols.map(c=>`<button class="${c===col?'on':''}" data-col="${c}" style="background:${COLS[c][0]}" aria-label="${c}"></button>`).join('')}</div>
+      ${oneSize(p)?'<div class="lbl">Talla <span>Única</span></div>':`
+      <div class="lbl">Talla <span>${so.length?'Tallas tachadas: agotadas':'Corte amplio, pide tu talla'}</span></div>
+      <div class="sz">${SIZES.map(s=>`<button data-sz="${s}" class="${s===size?'on':''}" ${so.includes(s)?'disabled':''}>${s}</button>`).join('')}</div>`}
+      <div class="err" id="err"></div>
+      <button class="cta full" id="add">Añadir a la cesta — ${eur(p.p)}</button>
+      <div class="det">
+        <details><summary>Composición y cuidado</summary><p>100% algodón orgánico. Lavar a 30 °C del revés. No usar secadora para cuidar el estampado.</p></details>
+        <details><summary>Envío y devoluciones</summary><p>Envío en 24–72 h. Gratis a partir de 60 €. Tienes 30 días para devolverlo.</p></details>
+      </div>
+    </div>`;
+}
+$('#modal').onclick = e => {
+  const t=e.target;
+  if(t.dataset.col){ cur.col=t.dataset.col; drawModal(); }
+  else if(t.dataset.sz){ cur.size=t.dataset.sz; drawModal(); }
+  else if(t.id==='add'){
+    if(!cur.size){ $('#err').textContent='Elige una talla primero'; return; }
+    addToCart(cur.p.id,cur.col,cur.size); hide('#modal'); toast(`✓ ${cur.p.n} añadido`);
+  }
+};
+
+// ---------- cesta ----------
+const KEY='zyxxy-cesta';
+let cart=[];
+try{ cart=JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){}
+const save=()=>{ try{localStorage.setItem(KEY,JSON.stringify(cart));}catch(e){} };
+function addToCart(id,col,size){
+  const k=`${id}-${col}-${size}`, ex=cart.find(i=>i.k===k);
+  ex ? ex.q++ : cart.push({k,id,col,size,q:1});
+  save(); drawCart();
+}
+function drawCart(){
+  const n=cart.reduce((s,i)=>s+i.q,0);
+  $('#count').textContent=n;
+  if(!cart.length){
+    $('#items').innerHTML=`<div class="empty"><b>∅</b>Tu cesta está vacía.<br>Algo bonito te espera en la tienda.</div>`;
+    $('#df').innerHTML=`<button class="cta full" data-close data-go="#tienda">Ir a la tienda</button>`;
+    return;
+  }
+  const sub=cart.reduce((s,i)=>s+P.find(p=>p.id===i.id).p*i.q,0);
+  const free=60, envio=sub>=free?0:4.95;
+  $('#items').innerHTML=cart.map(i=>{const p=P.find(x=>x.id===i.id);return `
+    <div class="it">
+      <div class="th" style="background:${p.bg}">${svg(p,i.col)}</div>
+      <div><h5>${p.n}</h5><small>${i.col} · ${i.size}</small><br>
+        <div class="qty"><button data-dec="${i.k}">−</button><span>${i.q}</span><button data-inc="${i.k}">+</button></div><br>
+        <button class="rm" data-rm="${i.k}">Quitar</button></div>
+      <b>${eur(p.p*i.q)}</b>
+    </div>`}).join('');
+  $('#df').innerHTML=`
+    <div class="shipt">${sub>=free?'🎉 Tienes envío gratis':`Te faltan ${eur(free-sub)} para el envío gratis`}</div>
+    <div class="ship"><i style="width:${Math.min(100,sub/free*100)}%"></i></div>
+    <div class="row"><span>Subtotal</span><span>${eur(sub)}</span></div>
+    <div class="row"><span>Envío</span><span>${envio?eur(envio):'Gratis'}</span></div>
+    <div class="row tot"><span>Total</span><span>${eur(sub+envio)}</span></div>
+    <button class="cta full" id="checkout">Finalizar compra</button>`;
+}
+$('#drawer').onclick = e => {
+  const d=e.target.dataset, f=k=>cart.find(i=>i.k===k);
+  if(d.inc){ f(d.inc).q++; }
+  else if(d.dec){ const i=f(d.dec); i.q--; if(!i.q) cart=cart.filter(x=>x!==i); }
+  else if(d.rm){ cart=cart.filter(x=>x.k!==d.rm); }
+  else if(e.target.id==='checkout'){
+    const num='ZX-'+Math.floor(100000+Math.random()*900000);
+    cart=[]; save(); $('#count').textContent=0;
+    $('#items').innerHTML=`<div class="done"><b>✦</b><h4>¡Pedido hecho!</h4><p>Número de pedido <b style="font-size:inherit;display:inline">${num}</b>.<br>Esto es una tienda de demostración: no se ha cobrado nada.</p></div>`;
+    $('#df').innerHTML=`<button class="cta full" data-close>Seguir mirando</button>`;
+    return;
+  } else return;
+  save(); drawCart();
+};
+$('#openCart').onclick=()=>{ drawCart(); show('#drawer'); };
+
+// ---------- overlay / util ----------
+function show(s){ $(s).classList.add('on'); $('#ov').classList.add('on'); }
+function hide(s){ $(s).classList.remove('on'); if(!document.querySelector('.drawer.on,.modal.on')) $('#ov').classList.remove('on'); }
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-close]'); if(!c) return;
+  hide('#drawer'); hide('#modal');
+  if(c.dataset.go) location.hash=c.dataset.go;
+});
+$('#ov').onclick=()=>{ hide('#drawer'); hide('#modal'); };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ hide('#drawer'); hide('#modal'); }});
+let tt; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),2200); }
+
+// ---------- cuenta atrás del drop (próximo viernes 20:00) ----------
+function nextDrop(){ const d=new Date(); d.setHours(20,0,0,0); let add=(5-d.getDay()+7)%7; if(add===0&&new Date()>d) add=7; d.setDate(d.getDate()+add); return d; }
+const target=nextDrop();
+function tick(){
+  let s=Math.max(0,(target-new Date())/1000|0);
+  const parts=[[s/86400|0,'días'],[(s%86400)/3600|0,'horas'],[(s%3600)/60|0,'min'],[s%60,'seg']];
+  $('#clock').innerHTML=parts.map(([v,l])=>`<div><b>${String(v).padStart(2,'0')}</b><span>${l}</span></div>`).join('');
+}
+tick(); setInterval(tick,1000);
+
+// ---------- newsletter ----------
+$('#newsForm').onsubmit=e=>{ e.preventDefault(); $('#newsOk').textContent=`Hecho. Te escribiremos a ${$('#email').value} antes del próximo drop.`; e.target.reset(); };
+
+render(); drawCart();
+</script>
+</body>
+</html>
