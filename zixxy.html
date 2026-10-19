@@ -137,6 +137,17 @@ section{padding:110px 0}
 .dt figcaption{position:absolute;left:12px;bottom:10px;color:var(--sand2);font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;text-shadow:0 1px 6px #000a}
 .dt:nth-child(2){transition-delay:.12s}.dt:nth-child(3){transition-delay:.24s}.dt:nth-child(4){transition-delay:.36s}
 
+/* ---------- lookbook ---------- */
+.lb{overflow:hidden;padding:0 24px}
+.lbt{display:flex;gap:16px;will-change:transform}
+.lbt figure{flex:0 0 min(34vw,380px);margin:0;cursor:pointer;position:relative}
+.lbt .fr{aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:var(--bg2)}
+.lbt img{width:100%;height:115%;object-fit:cover;transform:translateY(var(--iy,0));transition:filter .5s}
+.lbt figure:hover img{filter:brightness(1.06)}
+.lbt figcaption{display:flex;justify-content:space-between;margin-top:10px}
+.lbt figure:nth-child(even){margin-top:60px}
+@media (max-width:900px){.lbt figure{flex-basis:68vw}.lbt figure:nth-child(even){margin-top:30px}}
+
 /* ---------- tienda ---------- */
 .filters{display:flex;gap:8px;flex-wrap:wrap}
 .chip{border:1px solid var(--ink);border-radius:99px;padding:9px 16px;transition:.25s}
@@ -145,12 +156,10 @@ section{padding:110px 0}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
 .card{cursor:pointer}
 .ph{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:var(--bg2);display:grid;place-items:center}
-.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .5s,transform .8s var(--ease)}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 22%;transition:opacity .5s,transform .8s var(--ease)}
 .ph img.b{opacity:0}
 .card:hover .ph img.b{opacity:1}
 .card:hover .ph img{transform:scale(1.04)}
-.ph svg.g{width:76%;transition:transform .8s var(--ease)}
-.card:hover .ph svg.g{transform:scale(1.06) rotate(-2deg)}
 .badge{position:absolute;top:12px;left:12px;z-index:2;background:var(--char2);color:var(--sand);padding:5px 9px;border-radius:6px;font-size:10px}
 .quick{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;background:var(--char2);color:var(--sand);border-radius:99px;padding:12px;text-align:center;transform:translateY(160%);transition:transform .45s var(--ease)}
 .card:hover .quick{transform:none}
@@ -197,7 +206,6 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
 .it{display:grid;grid-template-columns:78px 1fr auto;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);align-items:center;animation:up .4s var(--ease)}
 .it .th{width:78px;height:96px;border-radius:10px;background:var(--bg2);display:grid;place-items:center;overflow:hidden}
 .it .th img{width:100%;height:100%;object-fit:cover}
-.it .th svg{width:80%}
 .it h5{font-size:14px;font-weight:800}
 .it small{color:var(--mute);font-size:10px}
 .qty{display:inline-flex;align-items:center;border:1px solid var(--ink);border-radius:99px;margin-top:8px}
@@ -217,9 +225,8 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
 .modal{position:fixed;left:50%;top:50%;width:min(980px,94vw);max-height:92svh;overflow:auto;background:var(--bg);border-radius:22px;z-index:50;transform:translate(-50%,-46%) scale(.97);opacity:0;pointer-events:none;transition:.4s var(--ease);display:grid;grid-template-columns:1.1fr 1fr}
 .modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
 .mv{background:var(--bg2);padding:16px;display:flex;flex-direction:column;gap:10px}
-.mv .main{aspect-ratio:1;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:var(--bg)}
+.mv .main{aspect-ratio:4/5;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:var(--bg)}
 .mv .main img{width:100%;height:100%;object-fit:cover;animation:fadein .4s}
-.mv .main svg{width:78%;animation:fadein .4s}
 @keyframes fadein{from{opacity:0}}
 .thumbs{display:flex;gap:8px;overflow-x:auto}
 .thumbs button{flex:0 0 64px;height:64px;border-radius:8px;overflow:hidden;border:2px solid transparent}
@@ -311,7 +318,7 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
       <svg viewBox="0 0 120 100"><use href="#z" class="zl"/></svg>
       <div><b>ZIXXY</b><span>STUDIO</span></div>
     </a>
-    <nav class="links mono"><a href="#prenda">Prenda</a><a href="#detalles">Detalles</a><a href="#tienda">Tienda</a><a href="#paleta">Paleta</a></nav>
+    <nav class="links mono"><a href="#prenda">Prenda</a><a href="#detalles">Detalles</a><a href="#look">Lookbook</a><a href="#tienda">Tienda</a><a href="#paleta">Paleta</a></nav>
     <div class="right mono">
       <a href="index.html" title="Volver a Mis Apps">← Apps</a>
       <button class="cartbtn" id="openCart">Cesta <b id="count">0</b></button>
@@ -393,6 +400,12 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
     </div>
   </section>
 
+  <!-- LOOKBOOK -->
+  <section id="look" style="padding-top:20px">
+    <div class="wrap"><div class="sh"><h2 class="rv">Lookbook</h2><p class="mono rv">Designed in Spain<br>Málaga · 36.72° N</p></div></div>
+    <div class="lb"><div class="lbt" id="lbt"></div></div>
+  </section>
+
   <!-- TIENDA -->
   <section id="tienda" style="padding-top:20px">
     <div class="wrap">
@@ -460,44 +473,51 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const Z = (c='currentColor') => `<use href="#z" fill="${c}"/>`;
 
-// ---------- prendas dibujadas (para colores sin foto) ----------
-const SHAPES = {
-  tee:(c,a)=>`<svg class="g" viewBox="0 0 200 200"><path d="M62 28 40 36 10 62l18 30 18-10v94h108V82l18 10 18-30-30-26-22-8c-4 14-20 22-38 22S66 42 62 28z" fill="${c}"/><path d="M62 28c4 14 20 22 38 22s34-8 38-22" fill="none" stroke="#0003" stroke-width="4"/><svg x="84" y="76" width="32" height="27" viewBox="0 0 120 100">${Z(a)}</svg><text x="100" y="114" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="9" letter-spacing="1" fill="${a}">ZIXXY</text></svg>`,
-  hoodie:(c,a)=>`<svg class="g" viewBox="0 0 200 200"><path d="M70 30c0-14 60-14 60 0l28 10 30 70-20 10-16-30v100H48V90l-16 30-20-10 30-70z" fill="${c}"/><path d="M76 30c6 22 42 22 48 0" fill="#0002"/><path d="M92 50v24M108 50v24" stroke="${a}" stroke-width="3" stroke-linecap="round"/><rect x="66" y="140" width="68" height="34" rx="8" fill="#0000001a"/><svg x="78" y="86" width="44" height="37" viewBox="0 0 120 100">${Z(a)}</svg></svg>`,
-  cap:(c,a)=>`<svg class="g" viewBox="0 0 200 200"><path d="M40 120c0-50 30-74 66-74s60 28 60 70z" fill="${c}"/><path d="M40 120c40-8 90-8 126-4 14 2 26 10 26 18-30-8-110-8-152-6z" fill="#00000040"/><circle cx="104" cy="48" r="5" fill="${a}"/><svg x="84" y="70" width="40" height="33" viewBox="0 0 120 100">${Z(a)}</svg></svg>`,
-  tote:(c,a)=>`<svg class="g" viewBox="0 0 200 200"><path d="M70 70c0-40 60-40 60 0" fill="none" stroke="${c}" stroke-width="9"/><path d="M40 70h120l10 116H30z" fill="${c}"/><svg x="70" y="96" width="60" height="50" viewBox="0 0 120 100">${Z(a)}</svg><text x="100" y="166" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="13" letter-spacing="3" fill="${a}">ZIXXY</text></svg>`,
-  pants:(c,a)=>`<svg class="g" viewBox="0 0 200 200"><path d="M58 14h84l14 176h-40l-16-120-16 120H44z" fill="${c}"/><path d="M58 26h84" stroke="#0003" stroke-width="4"/><rect x="128" y="80" width="22" height="30" rx="3" fill="#0000001a"/><svg x="62" y="40" width="20" height="17" viewBox="0 0 120 100">${Z(a)}</svg></svg>`
-};
-const COLS = {
-  'carbón':['#3b3b37','#ddd09a'],'oliva':['#7c8569','#efe6c2'],'arena':['#ddd09a','#3b3b37']
-};
-const PHOTOS = ['frente','espalda','d1','d2','d3','d4'].map(n=>`img/zixxy/${n}.webp`);
+// ---------- catálogo (fotos reales, cada color con sus fotos) ----------
+const im = (...n) => n.map(x=>`img/zixxy/${x}.webp`);
 const P = [
-  {id:1,n:'Studio Tee — Washed',t:'tee',cat:'camisetas',p:45,cols:['carbón','oliva','arena'],photo:1,b:'Drop 2024',d:'Camiseta oversize de algodón pesado 280 g/m² lavada a la piedra. Logo ZIXXY pequeño en el pecho y estampado completo en la espalda con el manifiesto del estudio.'},
-  {id:2,n:'Next Chapter Hoodie',t:'hoodie',cat:'sudaderas',p:79,cols:['carbón','oliva'],b:'Nuevo',d:'Sudadera con capucha de felpa 450 g/m², corte boxy y la Z bordada en el pecho. Interior perchado.'},
-  {id:3,n:'Studio Tee — Arena',t:'tee',cat:'camisetas',p:42,cols:['arena','oliva'],d:'La camiseta Studio en tono arena con estampado en carbón. Mismo corte amplio, mismo algodón pesado.'},
-  {id:4,n:'Z Cap',t:'cap',cat:'accesorios',p:29,cols:['carbón','arena','oliva'],d:'Gorra de seis paneles en algodón lavado con la Z bordada en 3D. Talla única ajustable.'},
-  {id:5,n:'Worldwide Tote',t:'tote',cat:'accesorios',p:19,cols:['arena','carbón'],d:'Bolsa de lona gruesa con asas largas. Cabe un portátil de 15" y todas tus ideas.'},
-  {id:6,n:'Studio Cargo',t:'pants',cat:'pantalones',p:75,cols:['oliva','carbón'],b:'Últimas',d:'Pantalón cargo de sarga con bolsillos de fuelle, bajo ajustable y la Z bordada en la cintura.'},
-  {id:7,n:'Hoodie Oliva',t:'hoodie',cat:'sudaderas',p:79,cols:['oliva','arena'],d:'La hoodie de siempre en el verde oliva de la paleta ZIXXY, con logo en arena.'},
-  {id:8,n:'Studio Tee — Oliva',t:'tee',cat:'camisetas',p:42,cols:['oliva','carbón'],d:'Camiseta Studio en verde oliva con logo en arena. Lavado suave para un tacto vivido.'}
+  {id:1,n:'Studio Tee',cat:'camisetas',p:45,b:'Drop 2024',v:[
+    {c:'carbón',h:'#3b3b37',i:im('frente','espalda','d1','d2','d3','d4')},
+    {c:'blanco / navy',h:'#f1f1ef',i:im('blanca-frente','blanca-espalda','blanca-d1','blanca-d2','blanca-d3','blanca-d4')}],
+   d:'Camiseta oversize de algodón pesado lavado. Logo ZIXXY pequeño en el pecho y estampado completo en la espalda: Ideas into reality · Creative studio · Worldwide visuals and design.'},
+  {id:2,n:'ZXY Hoodie',cat:'sudaderas',p:79,b:'Nuevo',v:[
+    {c:'negro',h:'#1f1f1e',i:im('hoodie-negra-frente','hoodie-negra-espalda','hoodie-negra-d1','hoodie-negra-d2','hoodie-negra-d3','hoodie-negra-d4')},
+    {c:'ciruela / naranja',h:'#6e5563',i:im('hoodie-morada-frente','hoodie-morada-espalda')},
+    {c:'gris / blanco',h:'#6b6b69',i:im('hoodie-gris-frente','hoodie-gris-espalda')}],
+   d:'Sudadera con capucha de felpa pesada con lavado vintage, capucha doble y puños de canalé. ZIXXY y Studio en el pecho; ZXY en grande en la espalda: “More than just clothes, it’s a mindset”.'},
+  {id:3,n:'Athletic Club Tee',cat:'camisetas',p:45,b:'Málaga',v:[{c:'navy',h:'#1f2a44',i:im('athletic-frente','athletic-espalda')}],
+   d:'Camiseta oversize azul marino con escudo universitario: ZIXXY Athletic Club, laureles y la Z. Est. 2026 · Málaga.'},
+  {id:4,n:'Good People Tee',cat:'camisetas',p:45,v:[{c:'verde salvia',h:'#7a8c76',i:im('crest-frente','crest-espalda')}],
+   d:'Camiseta lavada en verde salvia con escudo, corona y globo. “Good people, better days” · MMXXIV.'},
+  {id:5,n:'Coastal Club Tee',cat:'camisetas',p:42,v:[{c:'arena',h:'#cdc4b8',i:im('coastal-frente','coastal-espalda')}],
+   d:'Camiseta color arena con la ola de ZIXXY en la espalda. From the south of Spain · Coastal Club.'},
+  {id:6,n:'Creative Department Tee',cat:'camisetas',p:42,v:[{c:'crudo',h:'#ebe5d8',i:im('creative-frente','creative-espalda')}],
+   d:'Camiseta crudo con la Z dibujada como un plano técnico: cuadrícula, cotas y coordenadas. Creative Department · Designed in Spain.'},
+  {id:7,n:'South of Spain Tee',cat:'camisetas',p:42,v:[{c:'marrón',h:'#6d5245',i:im('marron-frente','marron-espalda')}],
+   d:'Camiseta marrón lavada con ZIXXY Studio y la Z grande en la espalda. Style · Essence · South of Spain. 2026.'},
+  {id:8,n:'Rugby Polo',cat:'polos',p:89,b:'Edición limitada',v:[{c:'verde / crudo',h:'#1f4d38',i:im('rugby')}],
+   d:'Polo de rugby de manga larga a rayas anchas verde botella y crudo, cuello blanco, Z bordada en el pecho y etiqueta ZIXXY en el bajo.'}
 ];
 const SIZES = ['XS','S','M','L','XL','XXL'];
-const soldOut = id => id===1?['XS']:id===6?['XS','XXL']:[];
-const oneSize = p => p.cat==='accesorios';
+const soldOut = id => id===1?['XS']:id===8?['XS','XXL']:[];
+const oneSize = p => false;
 const eur = n => n.toLocaleString('es-ES',{style:'currency',currency:'EUR'});
-const usesPhoto = (p,col) => p.photo && col==='carbón';
-const draw = (p,col) => SHAPES[p.t](...COLS[col||p.cols[0]]);
-const visual = (p,col,i=0) => usesPhoto(p,col||p.cols[0]) ? `<img src="${PHOTOS[i]}" alt="${p.n}">` : draw(p,col);
+const varOf = (p,c) => p.v.find(x=>x.c===c)||p.v[0];
+const visual = (p,c,i=0) => `<img src="${varOf(p,c).i[i]}" alt="${p.n} ${varOf(p,c).c}">`;
 
 // ---------- marquee ----------
-const MQ = ['Ideas into reality','Creative studio','Est. 2024','Worldwide visuals','Same vision'];
+const MQ = ['Ideas into reality','Creative studio','South of Spain','Worldwide visuals','Good people, better days'];
 const chunk = `<span>${MQ.map(t=>`${t}<svg viewBox="0 0 40 40"><use href="#star"/></svg>`).join('')}</span>`;
 $('#mq').innerHTML = chunk+chunk+chunk;
 
+// ---------- lookbook ----------
+const LOOK=[[3,'navy',0,'Athletic Club'],[7,'marrón',1,'South of Spain'],[6,'crudo',1,'Creative Dept.'],[2,'ciruela / naranja',1,'ZXY Hoodie'],[5,'arena',1,'Coastal Club'],[3,'navy',1,'Est. 2026'],[4,'verde salvia',1,'Good People'],[8,'verde / crudo',0,'Rugby Polo']];
+$('#lbt').innerHTML=LOOK.map(([id,c,i,t],k)=>{const p=P.find(x=>x.id===id);return `<figure data-id="${id}" data-col="${c}"><div class="fr"><img src="${varOf(p,c).i[i]}" alt="${t}" loading="lazy"></div><figcaption class="mono"><span>${String(k+1).padStart(2,'0')} / ${t}</span><span>${eur(p.p)}</span></figcaption></figure>`}).join('');
+$('#lbt').onclick=e=>{const f=e.target.closest('figure'); if(f){ openProduct(+f.dataset.id); cur.col=f.dataset.col; drawModal(); }};
+
 // ---------- tienda ----------
 let filter='todo';
-const CATS=['todo','camisetas','sudaderas','pantalones','accesorios'];
+const CATS=['todo','camisetas','sudaderas','polos'];
 $('#filters').innerHTML = CATS.map(c=>`<button class="chip${c===filter?' on':''}" data-f="${c}">${c}</button>`).join('');
 $('#filters').onclick = e => { const f=e.target.dataset.f; if(!f) return; filter=f; $$('.chip').forEach(b=>b.classList.toggle('on',b.dataset.f===f)); render(); };
 function render(){
@@ -506,11 +526,11 @@ function render(){
     <article class="card rv" style="transition-delay:${(i%4)*.08}s" data-id="${p.id}">
       <div class="ph">
         ${p.b?`<span class="badge mono">${p.b}</span>`:''}
-        ${p.photo?`<img src="${PHOTOS[0]}" alt="${p.n}" loading="lazy"><img class="b" src="${PHOTOS[1]}" alt="" loading="lazy">`:draw(p)}
+        <img src="${p.v[0].i[0]}" alt="${p.n}" loading="lazy">${p.v[0].i[1]?`<img class="b" src="${p.v[0].i[1]}" alt="" loading="lazy">`:''}
         <span class="quick mono">Ver prenda</span>
       </div>
-      <div class="meta"><div>${p.n}<small class="mono">${p.cols.length} colores</small></div><div>${eur(p.p)}</div></div>
-      <div class="dots">${p.cols.map(c=>`<i style="background:${COLS[c][0]}"></i>`).join('')}</div>
+      <div class="meta"><div>${p.n}<small class="mono">${p.v.length>1?p.v.length+' colores':p.v[0].c}</small></div><div>${eur(p.p)}</div></div>
+      <div class="dots">${p.v.map(x=>`<i style="background:${x.h}"></i>`).join('')}</div>
     </article>`).join('');
   observe();
 }
@@ -520,15 +540,15 @@ $('#grid').onclick = e => { const c=e.target.closest('.card'); if(c) openProduct
 let cur=null;
 function openProduct(id){
   const p=P.find(x=>x.id===id);
-  cur={p,col:p.cols[0],size:oneSize(p)?'Única':null,img:0};
+  cur={p,col:p.v[0].c,size:oneSize(p)?'Única':null,img:0};
   drawModal(); show('#modal');
 }
 function drawModal(){
-  const {p,col,size,img}=cur, so=soldOut(p.id), ph=usesPhoto(p,col);
+  const {p,col,size,img}=cur, so=soldOut(p.id), V=varOf(p,col);
   $('#modal').innerHTML=`
     <div class="mv">
-      <div class="main">${ph?`<img src="${PHOTOS[img]}" alt="${p.n}">`:draw(p,col)}</div>
-      ${ph?`<div class="thumbs">${PHOTOS.map((s,i)=>`<button class="${i===img?'on':''}" data-img="${i}"><img src="${s}" alt=""></button>`).join('')}</div>`:''}
+      <div class="main">${visual(p,col,img)}</div>
+      ${V.i.length>1?`<div class="thumbs">${V.i.map((s,i)=>`<button class="${i===img?'on':''}" data-img="${i}"><img src="${s}" alt=""></button>`).join('')}</div>`:''}
     </div>
     <div class="mi">
       <button class="xb" data-close aria-label="Cerrar">×</button>
@@ -537,7 +557,7 @@ function drawModal(){
       <div class="pr">${eur(p.p)}</div>
       <p>${p.d}</p>
       <div class="lbl mono">Color <span>${col}</span></div>
-      <div class="cols">${p.cols.map(c=>`<button class="${c===col?'on':''}" data-col="${c}" style="background:${COLS[c][0]}" aria-label="${c}"></button>`).join('')}</div>
+      <div class="cols">${p.v.map(x=>`<button class="${x.c===col?'on':''}" data-col="${x.c}" style="background:${x.h}" aria-label="${x.c}"></button>`).join('')}</div>
       ${oneSize(p)?'<div class="lbl mono">Talla <span>Única</span></div>':`
       <div class="lbl mono">Talla <span>${so.length?'Tachadas = agotadas':'Corte oversize'}</span></div>
       <div class="sz">${SIZES.map(s=>`<button data-sz="${s}" class="${s===size?'on':''}" ${so.includes(s)?'disabled':''}>${s}</button>`).join('')}</div>`}
@@ -564,7 +584,7 @@ $('#modal').onclick = e => {
 const KEY='zixxy-cesta';
 let cart=[];
 try{ cart=JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){}
-cart=cart.filter(i=>P.some(p=>p.id===i.id)&&COLS[i.col]);
+cart=cart.filter(i=>{const p=P.find(p=>p.id===i.id);return p&&p.v.some(x=>x.c===i.col);});
 const save=()=>{ try{localStorage.setItem(KEY,JSON.stringify(cart));}catch(e){} };
 function addToCart(id,col,size){
   const k=`${id}-${col}-${size}`, ex=cart.find(i=>i.k===k);
@@ -635,6 +655,7 @@ mt.innerHTML=mt.textContent.split(' ').map(w=>`<span>${w}</span>`).join(' ');
 const words=[...mt.children];
 
 // ---------- scroll ----------
+const lbt=$('#lbt'), lbImgs=[...lbt.querySelectorAll('img')], look=$('#look');
 const card=$('#card3d'), flip=$('#prenda'), steps=$$('.step'), pbar=$('#pbar');
 const bigz=$('#bigz'), tee=$('#heroTee'), mani=$('#mani'), fbig=$('#fbig'), zbg=$('#zbg'), mq=$('#mq'), hdr=$('#hdr'), prog=$('#prog');
 const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
@@ -656,6 +677,11 @@ function onScroll(){
   // manifiesto
   const mr=mani.getBoundingClientRect(), mp=clamp((vh*.8-mr.top)/(mr.height*.7));
   words.forEach((w,i)=>w.style.opacity=clamp(mp*words.length*1.1-i,.14,1));
+  // lookbook: avanza en horizontal al bajar
+  const lr=look.getBoundingClientRect(), lp=clamp((vh-lr.top)/(vh+lr.height));
+  const maxX=Math.max(0,lbt.scrollWidth-lbt.parentElement.clientWidth+48);
+  lbt.style.transform=`translateX(${-lp*maxX}px)`;
+  lbImgs.forEach((m,k)=>m.style.setProperty('--iy',(-lp*12-(k%2)*2)+'%'));
   // footer relleno
   const fb=fbig.getBoundingClientRect(); fbig.style.setProperty('--fill',clamp((vh-fb.top)/(vh*.6))*100+'%');
   const nb=zbg.getBoundingClientRect(); zbg.style.setProperty('--rot',(nb.top-vh/2)*-.05+'deg');

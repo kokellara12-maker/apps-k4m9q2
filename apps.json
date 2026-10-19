@@ -2,7 +2,7 @@
  "apps": [
   {
    "nombre": "ZIXXY Studio",
-   "desc": "Web de la marca de ropa ZIXXY Studio: intro con el logo Z, animaciones al bajar (la camiseta gira de frente a espalda, manifiesto palabra a palabra, fotos de detalle), tienda con tallas y colores, cesta y newsletter. Tienda de demostración.",
+   "desc": "Web de la marca de ropa ZIXXY Studio (Málaga): intro con el logo Z, camiseta que gira al bajar, lookbook que se desliza, fotos reales de 8 prendas con colores (camisetas, sudaderas ZXY y polo rugby), cesta y newsletter. Tienda de demostración.",
    "href": "zixxy.html",
    "icono": "👕",
    "color": "#ddd09a",
