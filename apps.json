@@ -1,15 +1,15 @@
 {
  "apps": [
   {
-   "nombre": "ZYXXY",
-   "desc": "Web de la marca de ropa ZYXXY: tienda con sudaderas, camisetas, pantalones y accesorios, filtros, colores y tallas, cesta con envío gratis desde 60 €, cuenta atrás del próximo drop, lookbook y newsletter. Tienda de demostración.",
-   "href": "zyxxy.html",
+   "nombre": "ZIXXY",
+   "desc": "Web de la marca de ropa ZIXXY: tienda con sudaderas, camisetas, pantalones y accesorios, filtros, colores y tallas, cesta con envío gratis desde 60 €, cuenta atrás del próximo drop, lookbook y newsletter. Tienda de demostración.",
+   "href": "zixxy.html",
    "icono": "🧥",
    "color": "#c8ff2e",
    "cat": "herramientas",
-   "img": "img/zyxxy.webp",
+   "img": "img/zixxy.webp",
    "sub": "util",
-   "tags": "ropa marca tienda moda streetwear web camiseta sudadera hoodie zyxxy"
+   "tags": "ropa marca tienda moda streetwear web camiseta sudadera hoodie zixxy"
   },
   {
    "nombre": "Voltio City",
