@@ -98,17 +98,6 @@ header:not(.solid) .cartbtn b{background:var(--sand);color:var(--char2)}
 .rv.l{transform:translateX(-40px)}.rv.r{transform:translateX(40px)}
 .rv.in.l,.rv.in.r{transform:none}
 
-/* ---------- la prenda: frente y espalda ---------- */
-.fe{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.fe figure{margin:0}
-.fe .fr{border-radius:16px;overflow:hidden;background:var(--bg)}
-.fe img{width:100%;height:auto;transition:transform 1s var(--ease)}
-.fe figure:hover img{transform:scale(1.03)}
-.fe figcaption{display:flex;justify-content:space-between;gap:12px;margin-top:12px}
-.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
-.spec{border-top:1px solid var(--line);padding-top:12px}
-.spec b{display:block;font-size:clamp(20px,2.4vw,30px);font-weight:900;letter-spacing:.02em;margin-top:4px}
-
 /* ---------- manifiesto ---------- */
 .mani{background:var(--char2);color:var(--sand);padding:22vh 0}
 .mani .mono{color:#d9cc9688;margin-bottom:30px;display:flex;gap:14px;align-items:center}
@@ -163,6 +152,15 @@ section{padding:110px 0}
 .meta small{display:block;color:var(--mute);font-weight:400;margin-top:3px;font-size:10px}
 .dots{display:flex;gap:5px;margin-top:8px}
 .dots i{width:11px;height:11px;border-radius:50%;border:1px solid var(--line)}
+
+/* ---------- marca: el logo en sus colores ---------- */
+.brandg{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.bt{position:relative;aspect-ratio:16/10;border-radius:16px;display:grid;place-items:center;overflow:hidden}
+.bt .lf{width:62%;transition:transform .8s var(--ease)}
+.bt .lz{width:34%;transition:transform .8s var(--ease)}
+.bt:hover .lf,.bt:hover .lz{transform:scale(1.06)}
+.bt span{position:absolute;left:16px;bottom:12px;opacity:.7}
+@media (max-width:600px){.brandg{grid-template-columns:1fr}}
 
 /* ---------- paleta ---------- */
 .pal{display:flex;gap:14px;height:340px}
@@ -273,8 +271,6 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
   section{padding:80px 0}
 }
 @media (max-width:600px){
-  .fe{grid-template-columns:1fr}
-  .specs{gap:10px}
 }
 @media (max-width:520px){
   .wrap{padding:0 16px}
@@ -331,7 +327,7 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
     <a href="#top" class="brand" aria-label="ZIXXY Studio">
       <svg class="lf"><use href="#lf"/></svg>
     </a>
-    <nav class="links mono"><a href="#prenda">Prenda</a><a href="#detalles">Detalles</a><a href="#look">Lookbook</a><a href="#tienda">Tienda</a><a href="#paleta">Paleta</a></nav>
+    <nav class="links mono"><a href="#marca">Marca</a><a href="#tienda">Tienda</a><a href="#look">Lookbook</a><a href="#detalles">Detalles</a></nav>
     <div class="right mono">
       <a href="index.html" title="Volver a Mis Apps">← Apps</a>
       <button class="cartbtn" id="openCart">Cesta <b id="count">0</b></button>
@@ -354,29 +350,13 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
     </div>
     <div class="wrap hfoot mono fade d3">
       <div>Ideas into reality<br>Creative studio</div>
-      <a href="#prenda" class="scroll"><i></i>Baja</a>
+      <a href="#mani" class="scroll"><i></i>Baja</a>
       <div style="text-align:right">Worldwide<br>visuals &amp; design</div>
     </div>
   </section>
 
   <!-- MARQUEE -->
   <div class="mq" aria-hidden="true"><div class="t" id="mq"></div></div>
-
-  <!-- LA PRENDA -->
-  <section id="prenda">
-    <div class="wrap">
-      <div class="sh"><h2 class="rv">Studio Tee</h2><p class="mono rv">Frente y espalda<br>Drop 2024</p></div>
-      <div class="fe">
-        <figure class="rv"><div class="fr"><img src="img/zixxy/frente.webp" alt="Studio Tee carbón, frente" loading="lazy"></div><figcaption class="mono"><span>Frente</span><span>Logo en el pecho</span></figcaption></figure>
-        <figure class="rv" style="transition-delay:.12s"><div class="fr"><img src="img/zixxy/espalda.webp" alt="Studio Tee carbón, espalda" loading="lazy"></div><figcaption class="mono"><span>Espalda</span><span>Same vision</span></figcaption></figure>
-      </div>
-      <div class="specs mono">
-        <div class="spec rv">Corte<b>Oversize</b></div>
-        <div class="spec rv" style="transition-delay:.1s">Acabado<b>Washed</b></div>
-        <div class="spec rv" style="transition-delay:.2s">Diseño<b>Spain</b></div>
-      </div>
-    </div>
-  </section>
 
   <!-- MANIFIESTO -->
   <div class="mani" id="mani">
@@ -391,23 +371,29 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
     </div>
   </div>
 
-  <!-- DETALLES -->
-  <section id="detalles">
+  <!-- MARCA -->
+  <section id="marca">
     <div class="wrap">
-      <div class="sh"><h2 class="rv">Detalles</h2><p class="mono rv" style="max-width:34ch">Cada costura cuenta. Mira de cerca.</p></div>
-      <div class="det">
-        <figure class="dt"><img src="img/zixxy/d1.webp" alt="Logo del pecho" loading="lazy"><figcaption>01 / Pecho</figcaption></figure>
-        <figure class="dt"><img src="img/zixxy/d2.webp" alt="Estampado trasero" loading="lazy"><figcaption>02 / Espalda</figcaption></figure>
-        <figure class="dt"><img src="img/zixxy/d3.webp" alt="Etiqueta del cuello" loading="lazy"><figcaption>03 / Etiqueta</figcaption></figure>
-        <figure class="dt"><img src="img/zixxy/d4.webp" alt="Textura del tejido lavado" loading="lazy"><figcaption>04 / Tejido</figcaption></figure>
+      <div class="sh"><h2 class="rv">La marca</h2><p class="mono rv">Ideas into reality<br>Creative studio · Est. 2024</p></div>
+      <div class="brandg">
+        <div class="bt rv" style="background:#2e2e2b;color:#ddd09a"><svg class="lf" role="img" aria-label="ZIXXY Studio"><use href="#lf"/></svg><span class="mono">Arena / Carbón</span></div>
+        <div class="bt rv" style="background:#ddd09a;color:#2e2e2b;transition-delay:.1s"><svg class="lz" aria-hidden="true"><use href="#lz"/></svg><span class="mono">Z / Símbolo</span></div>
+        <div class="bt rv" style="background:#1f2a44;color:#efe6c2;transition-delay:.15s"><svg class="lz" aria-hidden="true"><use href="#lz"/></svg><span class="mono">Navy / Crudo</span></div>
+        <div class="bt rv" style="background:#7c8569;color:#efe6c2;transition-delay:.2s"><svg class="lf" role="img" aria-label="ZIXXY Studio"><use href="#lf"/></svg><span class="mono">Oliva / Crudo</span></div>
       </div>
     </div>
   </section>
 
-  <!-- LOOKBOOK -->
-  <section id="look" style="padding-top:20px">
-    <div class="wrap"><div class="sh"><h2 class="rv">Lookbook</h2><p class="mono rv">Designed in Spain<br>Málaga · 36.72° N</p></div></div>
-    <div class="lb"><div class="lbt" id="lbt"></div></div>
+  <!-- PALETA -->
+  <section id="paleta" style="padding-top:20px">
+    <div class="wrap">
+      <div class="sh"><h2 class="rv">Paleta</h2><p class="mono rv">Los colores de ZIXXY</p></div>
+      <div class="pal">
+        <div class="sw rv" style="background:#3b3b37;color:#ddd09a"><span class="mono">01</span><div><b>Carbón</b><div class="mono">#3B3B37</div></div></div>
+        <div class="sw rv" style="background:#7c8569;color:#efe6c2;transition-delay:.1s"><span class="mono">02</span><div><b>Oliva</b><div class="mono">#7C8569</div></div></div>
+        <div class="sw rv" style="background:#ddd09a;color:#2e2e2b;transition-delay:.2s"><span class="mono">03</span><div><b>Arena</b><div class="mono">#DDD09A</div></div></div>
+      </div>
+    </div>
   </section>
 
   <!-- TIENDA -->
@@ -418,14 +404,21 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
     </div>
   </section>
 
-  <!-- PALETA -->
-  <section id="paleta" style="padding-top:20px">
+  <!-- LOOKBOOK -->
+  <section id="look" style="padding-top:20px">
+    <div class="wrap"><div class="sh"><h2 class="rv">Lookbook</h2><p class="mono rv">Designed in Spain<br>Málaga · 36.72° N</p></div></div>
+    <div class="lb"><div class="lbt" id="lbt"></div></div>
+  </section>
+
+  <!-- DETALLES -->
+  <section id="detalles">
     <div class="wrap">
-      <div class="sh"><h2 class="rv">Paleta</h2><p class="mono rv">Tres colores. Una identidad.</p></div>
-      <div class="pal">
-        <div class="sw rv" style="background:#3b3b37;color:#ddd09a"><span class="mono">01</span><div><b>Carbón</b><div class="mono">#3B3B37</div></div></div>
-        <div class="sw rv" style="background:#7c8569;color:#efe6c2;transition-delay:.1s"><span class="mono">02</span><div><b>Oliva</b><div class="mono">#7C8569</div></div></div>
-        <div class="sw rv" style="background:#ddd09a;color:#2e2e2b;transition-delay:.2s"><span class="mono">03</span><div><b>Arena</b><div class="mono">#DDD09A</div></div></div>
+      <div class="sh"><h2 class="rv">Detalles</h2><p class="mono rv" style="max-width:34ch">Cada costura cuenta. Mira de cerca.</p></div>
+      <div class="det">
+        <figure class="dt"><img src="img/zixxy/d1.webp" alt="Logo del pecho" loading="lazy"><figcaption>01 / Pecho</figcaption></figure>
+        <figure class="dt"><img src="img/zixxy/d2.webp" alt="Estampado trasero" loading="lazy"><figcaption>02 / Espalda</figcaption></figure>
+        <figure class="dt"><img src="img/zixxy/d3.webp" alt="Etiqueta del cuello" loading="lazy"><figcaption>03 / Etiqueta</figcaption></figure>
+        <figure class="dt"><img src="img/zixxy/d4.webp" alt="Textura del tejido lavado" loading="lazy"><figcaption>04 / Tejido</figcaption></figure>
       </div>
     </div>
   </section>
