@@ -1,11 +1,11 @@
 {
  "apps": [
   {
-   "nombre": "ZIXXY",
-   "desc": "Web de la marca de ropa ZIXXY: tienda con sudaderas, camisetas, pantalones y accesorios, filtros, colores y tallas, cesta con envío gratis desde 60 €, cuenta atrás del próximo drop, lookbook y newsletter. Tienda de demostración.",
+   "nombre": "ZIXXY Studio",
+   "desc": "Web de la marca de ropa ZIXXY Studio: intro con el logo Z, animaciones al bajar (la camiseta gira de frente a espalda, manifiesto palabra a palabra, fotos de detalle), tienda con tallas y colores, cesta y newsletter. Tienda de demostración.",
    "href": "zixxy.html",
-   "icono": "🧥",
-   "color": "#c8ff2e",
+   "icono": "👕",
+   "color": "#ddd09a",
    "cat": "herramientas",
    "img": "img/zixxy.webp",
    "sub": "util",
