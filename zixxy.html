@@ -41,7 +41,6 @@ img{display:block;max-width:100%;height:auto}
 /* ---------- barra progreso + header ---------- */
 #prog{position:fixed;top:0;left:0;height:3px;background:var(--olive);z-index:30;width:0}
 header{position:fixed;top:0;left:0;right:0;z-index:25;transition:transform .4s var(--ease),background .3s}
-header.hide{transform:translateY(-100%)}
 header.solid{background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
 .brand{display:flex;align-items:center;gap:10px}
@@ -105,7 +104,9 @@ header:not(.solid) .cartbtn b{background:var(--sand);color:var(--char2)}
 .lbt .fr{aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:var(--bg2)}
 .lbt img{width:100%;height:115%;object-fit:cover;transform:translateY(var(--iy,0));transition:filter .5s}
 .lbt figure:hover img{filter:brightness(1.06)}
-.lbt figcaption{display:flex;justify-content:space-between;margin-top:10px}
+.lbt figcaption{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:11px;letter-spacing:.14em}
+.lbt figcaption span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbt figcaption span:last-child{flex:none}
 .lbt figure:nth-child(even){margin-top:60px}
 @media (max-width:900px){.lbt figure{flex-basis:68vw}.lbt figure:nth-child(even){margin-top:30px}}
 
@@ -189,8 +190,9 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
 .thumbs button.on{border-color:var(--ink)}
 .thumbs img{width:100%;height:100%;object-fit:cover}
 .mi{padding:30px;position:relative}
-.mi .xb{position:absolute;top:14px;right:14px}
-.mi h3{font-size:32px;font-weight:900;letter-spacing:.02em;line-height:1.02;margin:8px 44px 0 0}
+.mclose{position:absolute;top:12px;right:12px;z-index:3;background:var(--bg);box-shadow:0 2px 12px #0000002a}
+.mclose:hover{background:var(--bg)}
+.mi h3{font-size:clamp(24px,3vw,32px);font-weight:900;letter-spacing:.02em;line-height:1.05;margin:8px 44px 0 0}
 .mi .pr{font-size:22px;font-weight:800;margin:12px 0 14px}
 .mi p{color:#4a4a45;line-height:1.55;font-size:15px}
 .lbl{margin:22px 0 10px;display:flex;justify-content:space-between}
@@ -213,14 +215,21 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
 .acc details[open] summary::after{content:"–"}
 .acc details p{margin-top:8px;font-size:14px}
 
-.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140px);background:var(--char2);color:var(--sand);padding:14px 22px;border-radius:99px;z-index:60;transition:transform .45s var(--ease);white-space:nowrap;display:flex;gap:10px;align-items:center}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-160%);max-width:calc(100vw - 32px);background:var(--char2);color:var(--sand);padding:14px 22px;border-radius:99px;z-index:60;transition:transform .45s var(--ease);display:flex;gap:10px;align-items:center}
 .toast .lz{width:24px;flex:none}
 .toast.on{transform:translate(-50%,0)}
 
 @media (max-width:900px){
   .links{display:none}
   .grid{grid-template-columns:repeat(2,1fr);gap:12px}
-  .modal{grid-template-columns:1fr}
+  .modal{display:block;left:0;right:0;top:auto;bottom:0;width:100%;max-height:94svh;border-radius:20px 20px 0 0;transform:translateY(40px);overscroll-behavior:contain}
+  .modal.on{transform:none}
+  .mclose{position:sticky;top:10px;display:block;margin:10px 10px -50px auto}
+  .mv{padding:12px}
+  .mv .main{aspect-ratio:auto;height:min(46svh,100vw)}
+  .mv .main img{object-fit:contain}
+  .mi{padding:20px 18px 28px}
+  .mi h3{margin-right:0}
   .fgrid{grid-template-columns:1fr 1fr}
   .quick{transform:none;padding:9px;font-size:10px}
   .news{padding:44px 22px}
@@ -248,7 +257,8 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
   .hero{padding-top:72px}
   .stage{gap:12px}
   .word{width:min(60vw,70svh)}
-  .modal{grid-template-columns:1fr 1fr}
+  .modal{display:grid;grid-template-columns:1fr 1fr}
+  .mclose{position:absolute;margin:0}
   .mv .main{aspect-ratio:auto;height:70svh}
   .lbt figure{flex-basis:min(34vw,240px)}
 }
@@ -422,10 +432,11 @@ let filter='todo';
 const CATS=['todo','camisetas','sudaderas','polos'];
 $('#filters').innerHTML = CATS.map(c=>`<button class="chip${c===filter?' on':''}" data-f="${c}">${c}</button>`).join('');
 $('#filters').onclick = e => { const f=e.target.dataset.f; if(!f) return; filter=f; $$('.chip').forEach(b=>b.classList.toggle('on',b.dataset.f===f)); render(); };
+let firstRender=true;
 function render(){
   const list=P.filter(p=>filter==='todo'||p.cat===filter);
   $('#grid').innerHTML = list.map((p,i)=>`
-    <article class="card rv" style="transition-delay:${(i%4)*.08}s" data-id="${p.id}">
+    <article class="card rv${firstRender?'':' in'}" style="transition-delay:${firstRender?(i%4)*.08:0}s" data-id="${p.id}">
       <div class="ph">
         ${p.b?`<span class="badge mono">${p.b}</span>`:''}
         <img src="${p.v[0].i[0]}" alt="${p.n}" loading="lazy">${p.v[0].i[1]?`<img class="b" src="${p.v[0].i[1]}" alt="" loading="lazy">`:''}
@@ -434,7 +445,7 @@ function render(){
       <div class="meta"><div>${p.n}<small class="mono">${p.v.length>1?p.v.length+' colores':p.v[0].c}</small></div><div>${eur(p.p)}</div></div>
       <div class="dots">${p.v.map(x=>`<i style="background:${x.h}"></i>`).join('')}</div>
     </article>`).join('');
-  observe();
+  observe(); firstRender=false;
 }
 $('#grid').onclick = e => { const c=e.target.closest('.card'); if(c) openProduct(+c.dataset.id); };
 
@@ -448,12 +459,12 @@ function openProduct(id){
 function drawModal(){
   const {p,col,size,img}=cur, so=soldOut(p.id), V=varOf(p,col);
   $('#modal').innerHTML=`
+    <button class="xb mclose" data-close aria-label="Cerrar">×</button>
     <div class="mv">
       <div class="main">${visual(p,col,img)}</div>
       ${V.i.length>1?`<div class="thumbs">${V.i.map((s,i)=>`<button class="${i===img?'on':''}" data-img="${i}"><img src="${s}" alt=""></button>`).join('')}</div>`:''}
     </div>
     <div class="mi">
-      <button class="xb" data-close aria-label="Cerrar">×</button>
       <span class="mono" style="color:var(--mute)">ZIXXY Studio · ${p.cat}</span>
       <h3>${p.n}</h3>
       <div class="pr">${eur(p.p)}</div>
@@ -536,8 +547,8 @@ $('#drawer').onclick = e => {
 $('#openCart').onclick=()=>{ drawCart(); show('#drawer'); };
 
 // ---------- overlays ----------
-function show(s){ $(s).classList.add('on'); $('#ov').classList.add('on'); }
-function hide(s){ $(s).classList.remove('on'); if(!document.querySelector('.drawer.on,.modal.on')) $('#ov').classList.remove('on'); }
+function show(s){ $(s).classList.add('on'); $('#ov').classList.add('on'); document.documentElement.style.overflow='hidden'; }
+function hide(s){ $(s).classList.remove('on'); if(!document.querySelector('.drawer.on,.modal.on')){ $('#ov').classList.remove('on'); document.documentElement.style.overflow=''; } }
 const closeAll=()=>{ hide('#drawer'); hide('#modal'); };
 document.addEventListener('click',e=>{ const c=e.target.closest('[data-close]'); if(!c) return; closeAll(); if(c.dataset.go) $(c.dataset.go).scrollIntoView({behavior:'smooth'}); });
 $('#ov').onclick=closeAll;
@@ -560,7 +571,6 @@ function onScroll(){
   const y=scrollY, vh=innerHeight, H=document.documentElement.scrollHeight-vh;
   prog.style.width=(H>0?y/H*100:0)+'%';
   hdr.classList.toggle('solid',y>40);
-  hdr.classList.toggle('hide',y>lastY&&y>400&&!document.querySelector('.drawer.on,.modal.on'));
   vel=y-lastY; lastY=y;
   // hero parallax
   if(y<vh*1.2){ bigz.style.setProperty('--py',y*.35+'px'); bigz.style.setProperty('--rot',y*.04+'deg'); }
