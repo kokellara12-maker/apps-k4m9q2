@@ -65,6 +65,13 @@ header.solid{background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-fi
 .bigz{position:absolute;left:50%;top:50%;width:min(130vw,1200px,170svh);color:#ffffff07;transform:translate(-50%,-50%) translateY(var(--py,0)) rotate(var(--rot,0deg))}
 .word{position:relative;width:min(84vw,860px,95svh)}
 .word .lf{width:100%;color:var(--sand);clip-path:inset(0 100% 0 0);transition:clip-path 1.5s var(--ease) .2s}
+/* logo 3D: si hay WebGL sustituye al logo plano */
+.logo3d{position:relative;width:100%;height:clamp(200px,44svh,520px);display:none}
+.logo3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.has3d .logo3d{display:block}
+.has3d .word{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.spark{position:absolute;width:var(--s,16px);color:var(--sand2);opacity:0;pointer-events:none;filter:drop-shadow(0 0 6px #fff8d0);animation:tw var(--d,2.6s) var(--dl,0s) ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:0;transform:scale(.3) rotate(0deg)}45%{opacity:1;transform:scale(1) rotate(45deg)}60%{opacity:.9}}
 body.ready .word .lf{clip-path:inset(0 0 0 0)}
 .claim{color:#d9cc96b0;max-width:36ch}
 .hbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
@@ -311,6 +318,13 @@ footer{background:var(--char2);color:var(--sand);padding:70px 0 40px;margin-top:
     <div class="stage">
       <svg class="lz bigz" id="bigz" aria-hidden="true"><use href="#lz"/></svg>
       <h1 class="word"><svg class="lf" role="img" aria-label="ZIXXY Studio"><use href="#lf"/></svg></h1>
+      <div class="logo3d" id="logo3d" aria-hidden="true">
+        <svg class="spark" viewBox="0 0 40 40" style="left:8%;top:18%;--s:14px;--dl:.2s"><use href="#star"/></svg>
+        <svg class="spark" viewBox="0 0 40 40" style="left:30%;top:72%;--s:10px;--dl:1.1s;--d:2.2s"><use href="#star"/></svg>
+        <svg class="spark" viewBox="0 0 40 40" style="left:52%;top:12%;--s:18px;--dl:.6s;--d:3s"><use href="#star"/></svg>
+        <svg class="spark" viewBox="0 0 40 40" style="left:76%;top:64%;--s:12px;--dl:1.6s"><use href="#star"/></svg>
+        <svg class="spark" viewBox="0 0 40 40" style="left:90%;top:26%;--s:16px;--dl:2.1s;--d:2.8s"><use href="#star"/></svg>
+      </div>
       <p class="mono claim fade d2">More than just design.<br>It's a state of mind.</p>
       <div class="hbtns fade d3"><a href="#tienda" class="cta sand">Ver colección</a><a href="#look" class="cta ghost">Lookbook</a></div>
     </div>
@@ -593,6 +607,79 @@ addEventListener('resize',onScroll);
   mq.style.transform=`translateX(${mqX}px)`;
   requestAnimationFrame(loop);
 })();
+
+// ---------- logo 3D (Three.js): gira de lado al bajar, con reflejos metálicos ----------
+const THREE_SRC='three.min.js';
+const L3={};
+function load3D(){
+  try{ const c=document.createElement('canvas'); if(!(c.getContext('webgl2')||c.getContext('webgl'))) throw 0; }catch(e){ document.body.classList.remove('has3d'); return; }
+  const sc=document.createElement('script'); sc.src=THREE_SRC; sc.onerror=()=>document.body.classList.remove('has3d'); sc.onload=()=>{ try{ init3D(); }catch(e){ console.warn('3D desactivado',e); document.body.classList.remove('has3d'); } };
+  document.head.appendChild(sc);
+}
+function logoShapes(){
+  // contornos del logo (M/L/Z); los que quedan dentro de otro un nº impar de veces son agujeros
+  const d=document.querySelector('#lf path').getAttribute('d');
+  const loops=d.split('Z').map(t=>t.trim()).filter(Boolean).map(t=>{const n=t.replace(/[ML]/g,' ').trim().split(/\s+/).map(Number);const pts=[];for(let i=0;i<n.length;i+=2)pts.push(new THREE.Vector2(n[i],-n[i+1]));return pts;});
+  const inside=(p,poly)=>{let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)c=!c;}return c;};
+  const area=pts=>Math.abs(THREE.ShapeUtils.area(pts));
+  const info=loops.map((pts,i)=>({pts,i,parents:loops.map((q,j)=>j!==i&&area(q)>area(pts)&&inside(pts[0],q)?j:-1).filter(j=>j>=0)}));
+  const shapes=new Map();
+  info.filter(o=>o.parents.length%2===0).forEach(o=>{ let pts=o.pts; if(THREE.ShapeUtils.isClockWise(pts)) pts=pts.slice().reverse(); shapes.set(o.i,new THREE.Shape(pts)); });
+  info.filter(o=>o.parents.length%2===1).forEach(o=>{
+    const par=o.parents.filter(j=>shapes.has(j)).sort((a,b)=>area(loops[a])-area(loops[b]))[0];
+    if(par===undefined) return; let pts=o.pts; if(!THREE.ShapeUtils.isClockWise(pts)) pts=pts.slice().reverse();
+    shapes.get(par).holes.push(new THREE.Path(pts));
+  });
+  return [...shapes.values()];
+}
+function init3D(){
+  const box=$('#logo3d');
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+  renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.25;
+  box.prepend(renderer.domElement);
+  const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(28,1,.1,500);
+  // entorno de estudio para los reflejos (tiras de luz)
+  const env=new THREE.Scene();
+  env.add(new THREE.Mesh(new THREE.SphereGeometry(50,32,16),new THREE.MeshBasicMaterial({color:0x2a2a26,side:THREE.BackSide})));
+  [[0,18,-10,40,4,0xffffff],[-24,4,10,6,30,0xfff3cc],[24,-2,12,6,30,0xffffff],[0,-16,14,40,3,0xd8cfa0]].forEach(([x,y,z,w,h,c])=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);env.add(m);});
+  const pm=new THREE.PMREMGenerator(renderer); scene.environment=pm.fromScene(env,.04).texture;
+  const geo=new THREE.ExtrudeGeometry(logoShapes(),{depth:5,bevelEnabled:true,bevelThickness:.9,bevelSize:.45,bevelSegments:4,curveSegments:4});
+  geo.center(); geo.computeBoundingBox();
+  const W=geo.boundingBox.max.x-geo.boundingBox.min.x, Hh=geo.boundingBox.max.y-geo.boundingBox.min.y;
+  const face=new THREE.MeshPhysicalMaterial({color:0xeadca4,metalness:.85,roughness:.22,clearcoat:1,clearcoatRoughness:.12});
+  const side=new THREE.MeshPhysicalMaterial({color:0xb8a463,metalness:.95,roughness:.32});
+  const mesh=new THREE.Mesh(geo,[face,side]); const s=10/W; mesh.scale.setScalar(s);
+  const pivot=new THREE.Group(); pivot.add(mesh); scene.add(pivot);
+  const key=new THREE.DirectionalLight(0xffffff,2.2); key.position.set(4,6,10); scene.add(key);
+  const glint=new THREE.PointLight(0xfff6d8,60,40); scene.add(glint);
+  scene.add(new THREE.AmbientLight(0xffffff,.5));
+  function fit(){
+    const w=box.clientWidth, h=box.clientHeight; if(!w||!h) return;
+    renderer.setSize(w,h,false); cam.aspect=w/h;
+    const t=Math.tan(THREE.MathUtils.degToRad(cam.fov/2));
+    const dW=10/(.84*2*t*cam.aspect), dH=(Hh*s)/(.5*2*t);
+    cam.position.set(0,0,Math.max(dW,dH)); cam.updateProjectionMatrix();
+  }
+  fit(); addEventListener('resize',fit);
+  let visible=true, t0=performance.now();
+  new IntersectionObserver(e=>{visible=e[0].isIntersecting;}).observe(box);
+  const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  (function frame(now){
+    requestAnimationFrame(frame);
+    if(!visible||document.hidden) return;
+    const t=(now-t0)/1000, p=scrollY/Math.max(1,innerHeight);
+    // al bajar gira de lado; en reposo se balancea un poco
+    pivot.rotation.y=p*Math.PI*1.6+(still?0:Math.sin(t*.7)*.22);
+    pivot.rotation.x=(still?0:Math.sin(t*.5)*.05)+p*.15;
+    // brillo que recorre el logo
+    glint.position.set(Math.sin(t*1.3+p*4)*9,Math.cos(t*.9)*2.5,6);
+    renderer.render(scene,cam);
+  })(t0);
+  L3.box=box; document.body.classList.add('has3d'); fit();
+}
+document.body.classList.add('has3d'); load3D();
+setTimeout(()=>{ if(!L3.box) document.body.classList.remove('has3d'); },8000);
 
 // ---------- arranque ----------
 render(); drawCart(); onScroll();
