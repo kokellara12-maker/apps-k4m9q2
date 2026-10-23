@@ -1,6 +1,17 @@
 {
  "apps": [
   {
+   "nombre": "Cardputer",
+   "desc": "Manda fotos, vídeos y canciones a tu Cardputer (kokeOS): se convierten solos y le llegan por internet. También canciones por enlace para su Radio.",
+   "href": "cardputer.html",
+   "icono": "📟",
+   "color": "#ff8a3d",
+   "cat": "herramientas",
+   "img": "img/cardputer.webp",
+   "sub": "util",
+   "tags": "cardputer kokeos m5stack enviar mandar fotos videos canciones musica mp3 subir transferir"
+  },
+  {
    "nombre": "ZIXXY Studio",
    "desc": "Web de la marca de ropa ZIXXY Studio (Málaga): intro con el logo Z, camiseta que gira al bajar, lookbook que se desliza, fotos reales de 8 prendas con colores (camisetas, sudaderas ZXY y polo rugby), cesta y newsletter. Tienda de demostración.",
    "href": "zixxy.html",

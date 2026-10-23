@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="es">
+<head><script src="mute.js"></script><script src="progress.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f1115">
+<title>Cardputer</title>
+<style>
+/* Mandar fotos, videos y canciones a la Cardputer (kokeOS). Todo se convierte aqui
+   al formato de la Cardputer y viaja por un buzon de ntfy.sh que solo conocen tu
+   Cardputer y tu (el codigo sale en Archivos > Transferir). */
+:root{--bg:#0f1115;--card:#181b22;--line:#262a34;--ink:#f3f4f7;--dim:#8b91a1;--acc:#ff8a3d;--acc2:#ffb27a;--ok:#34d27b;--bad:#ff5a5f;--font:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font)}
+body{padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 60px)}
+main{max-width:520px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between}
+.back{color:var(--acc);text-decoration:none;font-size:17px;font-weight:500}
+h1{margin:6px 0 4px;font-size:30px;font-weight:700;letter-spacing:-.02em}
+.sub{color:var(--dim);font-size:15px;margin:0 0 16px;line-height:1.4}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:20px 4px 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+label.l{display:block;font-size:13px;color:var(--dim);margin-bottom:6px}
+input[type=text],input[type=url]{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:500 16px var(--font);outline:none}
+input:focus{border-color:var(--acc)}
+.codigo{display:flex;gap:8px}
+.codigo input{flex:1;font-family:ui-monospace,Menlo,monospace;letter-spacing:.08em}
+.btn{appearance:none;border:0;border-radius:12px;padding:12px 16px;font:600 16px var(--font);background:var(--acc);color:#1a0c00;cursor:pointer}
+.btn.sec{background:var(--line);color:var(--ink)}
+.btn:disabled{opacity:.4}
+.estado{font-size:14px;margin-top:8px;color:var(--dim);min-height:1.2em}
+.estado.ok{color:var(--ok)} .estado.mal{color:var(--bad)}
+.tipos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tipo{display:flex;flex-direction:column;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 14px;cursor:pointer;position:relative}
+.tipo:active{transform:scale(.98)}
+.tipo .ic{font-size:30px;line-height:1}
+.tipo b{font-size:17px}
+.tipo small{color:var(--dim);font-size:13px;line-height:1.3}
+.tipo input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.enlace{display:grid;gap:8px}
+.cam{display:none;margin-top:10px}
+.cam.on{display:block}
+.cam video{width:100%;aspect-ratio:240/135;object-fit:cover;border-radius:12px;background:#000;display:block;margin-bottom:10px}
+.cola{display:grid;gap:8px}
+.fila{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.fila .t{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.fila b{font-size:15px;overflow-wrap:anywhere}
+.fila span{font-size:13px;color:var(--dim);white-space:nowrap}
+.fila span.ok{color:var(--ok)} .fila span.mal{color:var(--bad)}
+.barra{height:5px;border-radius:9px;background:var(--line);margin-top:8px;overflow:hidden}
+.barra i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .2s}
+.vacio{color:var(--dim);font-size:14px;text-align:center;padding:10px}
+.nota{color:var(--dim);font-size:12.5px;line-height:1.45;margin:14px 4px}
+</style>
+</head>
+<body><main>
+<div class="top"><a class="back" href="index.html">‹ Apps</a></div>
+<h1>Cardputer</h1>
+<p class="sub">Manda fotos, vídeos y canciones a tu Cardputer. Se convierten solos y le llegan por internet, estés donde estés.</p>
+
+<h2>Tu Cardputer</h2>
+<div class="card">
+  <label class="l" for="cod">Código (sale en la Cardputer: Archivos › Transferir)</label>
+  <div class="codigo">
+    <input id="cod" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="p. ej. k7x2p9q4mn" maxlength="16">
+    <button class="btn sec" id="guardar" type="button">Guardar</button>
+  </div>
+  <div class="estado" id="estado"></div>
+</div>
+
+<h2>Mandar</h2>
+<div class="tipos">
+  <label class="tipo"><span class="ic">🖼️</span><b>Foto</b><small>Se ve en la app Fotos</small><input id="fFoto" type="file" accept="image/*" multiple></label>
+  <label class="tipo"><span class="ic">🎬</span><b>Vídeo</b><small>Hasta 2 min, a la app Vídeos</small><input id="fVideo" type="file" accept="video/*"></label>
+  <label class="tipo"><span class="ic">🎵</span><b>Canción</b><small>Al Reproductor, en MP3</small><input id="fCancion" type="file" accept="audio/*" multiple></label>
+  <label class="tipo"><span class="ic">📣</span><b>Sonido broma</b><small>8 s, a la Botonera</small><input id="fSonido" type="file" accept="audio/*" multiple></label>
+</div>
+
+<div class="card" style="margin-top:10px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <b>📸 Hacer una foto</b>
+    <button class="btn sec" id="camBtn" type="button">Abrir cámara</button>
+  </div>
+  <div class="cam" id="cam">
+    <video id="video" autoplay playsinline muted></video>
+    <button class="btn" id="disparo" type="button" style="width:100%">Hacer foto y mandarla</button>
+  </div>
+</div>
+
+<h2>Canción por enlace</h2>
+<div class="card enlace">
+  <input id="enNombre" type="text" placeholder="Nombre (ej: Mi canción)" maxlength="40">
+  <input id="enUrl" type="url" placeholder="Enlace a un MP3 o a una radio (http…)" inputmode="url">
+  <button class="btn" id="enBtn" type="button">Mandar enlace</button>
+  <small style="color:var(--dim);font-size:12.5px;line-height:1.4">Sale arriba del todo en la <b>Radio</b> de la Cardputer y suena sin descargarse. Tiene que ser un enlace directo a audio (.mp3 o una emisora); los de YouTube o Spotify no valen.</small>
+</div>
+
+<h2>Envíos</h2>
+<div class="cola" id="cola"><div class="vacio" id="vacio">Aquí verás lo que mandes.</div></div>
+
+<p class="nota">Cómo funciona: lo que mandas se queda unas horas en un buzón de <b>ntfy.sh</b> que solo conocen tu Cardputer y tú (por el código). La Cardputer lo mira cada minuto cuando tiene WiFi, lo baja y te avisa. Máximo 15 MB por archivo.</p>
+</main>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id)};
+var KEY='cardputer_codigo', MAX=15*1024*1024;
+var codigo='';
+try{codigo=localStorage.getItem(KEY)||''}catch(e){}
+$('cod').value=codigo;
+
+function estado(t,c){var e=$('estado');e.textContent=t;e.className='estado'+(c?' '+c:'')}
+function valido(c){return /^[a-z0-9]{8,16}$/.test(c)}
+function guarda(){
+  var c=$('cod').value.trim().toLowerCase();
+  if(!valido(c)){estado('El código son 10 letras y números, como sale en la Cardputer.','mal');return false}
+  codigo=c;try{localStorage.setItem(KEY,c)}catch(e){}
+  estado('Guardado. Ya puedes mandar cosas.','ok');return true
+}
+$('guardar').onclick=guarda;
+$('cod').onkeydown=function(e){if(e.key==='Enter')guarda()};
+if(codigo)estado('Listo para mandar a la Cardputer.','ok');else estado('Pon el código de tu Cardputer para empezar.');
+function topic(){return 'https://ntfy.sh/kokeos-'+codigo}
+function listo(){if(!codigo&&!guarda())return false;return true}
+
+/* ---------- la cola de envios ---------- */
+function fila(nombre){
+  $('vacio').style.display='none';
+  var d=document.createElement('div');d.className='fila';
+  d.innerHTML='<div class="t"><b></b><span></span></div><div class="barra"><i></i></div>';
+  d.querySelector('b').textContent=nombre;
+  $('cola').prepend(d);
+  return{
+    dice:function(t,c){var s=d.querySelector('span');s.textContent=t;s.className=c||''},
+    barra:function(p){d.querySelector('i').style.width=Math.round(Math.min(1,p)*100)+'%'}
+  }
+}
+function sube(blob,nombre,carpeta,f,desde,hasta){
+  desde=desde||0;hasta=hasta||1;
+  return new Promise(function(ok){
+    if(blob.size>MAX){ok('grande');return}
+    var x=new XMLHttpRequest();
+    x.open('PUT',topic());
+    x.setRequestHeader('Filename',nombre);
+    x.setRequestHeader('Title',carpeta);
+    x.upload.onprogress=function(e){if(e.lengthComputable)f.barra(desde+(hasta-desde)*e.loaded/e.total)};
+    x.onload=function(){ok(x.status>=200&&x.status<300?'ok':'mal')};
+    x.onerror=function(){ok('mal')};
+    x.send(blob);
+  })
+}
+function fin(f,r){
+  f.barra(1);
+  if(r==='ok')f.dice('enviado ✓ (llega en un minuto)','ok');
+  else if(r==='grande')f.dice('pasa de 15 MB','mal');
+  else f.dice('no se pudo enviar','mal');
+}
+function limpio(n,ext){
+  var s=n.replace(/\.[^.]+$/,'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9 _-]/g,'').trim().slice(0,40);
+  return (s||'archivo')+ext;
+}
+
+/* ---------- fotos: 240x135, lo que mide su pantalla ---------- */
+function aFoto(src,w,h,calidad){
+  var c=document.createElement('canvas');c.width=240;c.height=135;
+  var g=c.getContext('2d'),k=Math.max(240/w,135/h),dw=w*k,dh=h*k;
+  g.drawImage(src,(240-dw)/2,(135-dh)/2,dw,dh);
+  return new Promise(function(r){c.toBlob(r,'image/jpeg',calidad||.88)});
+}
+function cargaImg(file){
+  return new Promise(function(ok,mal){var u=URL.createObjectURL(file),i=new Image();i.onload=function(){ok(i)};i.onerror=mal;i.src=u});
+}
+async function foto(file){
+  var f=fila(file.name);
+  try{
+    f.dice('convirtiendo…');
+    var img=await cargaImg(file);
+    var b=await aFoto(img,img.naturalWidth,img.naturalHeight);
+    f.dice('enviando…');
+    fin(f,await sube(b,limpio(file.name,'.jpg'),'fotos',f));
+  }catch(e){f.dice('no se pudo leer la foto','mal')}
+}
+
+/* ---------- audio: a MP3 con lamejs ---------- */
+var lamePromesa=null;
+function lame(){
+  if(window.lamejs)return Promise.resolve();
+  if(!lamePromesa)lamePromesa=new Promise(function(ok,mal){
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js';
+    s.onload=ok;s.onerror=function(){lamePromesa=null;mal()};document.head.appendChild(s)});
+  return lamePromesa;
+}
+async function decodifica(file,rate,maxSeg){
+  var buf=await file.arrayBuffer();
+  var AC=window.AudioContext||window.webkitAudioContext;var ac=new AC();
+  var a=await new Promise(function(ok,mal){ac.decodeAudioData(buf,ok,mal)});
+  try{ac.close()}catch(e){}
+  var dur=Math.min(a.duration,maxSeg||a.duration);
+  var off=new OfflineAudioContext(1,Math.ceil(dur*rate),rate);
+  var s=off.createBufferSource();s.buffer=a;s.connect(off.destination);s.start(0,0,dur);
+  var out=await off.startRendering();
+  var d=out.getChannelData(0),pico=1e-4;
+  for(var i=0;i<d.length;i++){var v=Math.abs(d[i]);if(v>pico)pico=v}
+  var k=.95/pico,pcm=new Int16Array(d.length);
+  for(i=0;i<d.length;i++){var x=d[i]*k;pcm[i]=(x>1?1:x<-1?-1:x)*32767}
+  return pcm;
+}
+async function aMp3(pcm,rate,kbps,f,desde,hasta){
+  await lame();
+  var enc=new lamejs.Mp3Encoder(1,rate,kbps),partes=[],B=1152*20;
+  for(var i=0;i<pcm.length;i+=B){
+    var m=enc.encodeBuffer(pcm.subarray(i,i+B));if(m.length)partes.push(new Uint8Array(m));
+    if(f&&i%(B*20)===0){f.barra(desde+(hasta-desde)*i/pcm.length);await new Promise(function(r){setTimeout(r)})}
+  }
+  var u=enc.flush();if(u.length)partes.push(new Uint8Array(u));
+  return new Blob(partes,{type:'audio/mpeg'});
+}
+async function audio(file,tipo){
+  var f=fila(file.name);
+  try{
+    f.dice('convirtiendo…');
+    var broma=tipo==='sonido';
+    var rate=broma?22050:32000;
+    var pcm=await decodifica(file,rate,broma?8:null);
+    var mp3=await aMp3(pcm,rate,broma?64:96,f,0,.5);
+    f.dice('enviando…');
+    fin(f,await sube(mp3,limpio(file.name,'.mp3'),broma?'botonera':'musica',f,.5,1));
+  }catch(e){f.dice('no se pudo convertir','mal')}
+}
+
+/* ---------- video: KVID (JPEG 240x135 a 10 fps) + KAUD (MP3) ---------- */
+function espera(el,ev){return new Promise(function(r){el.addEventListener(ev,r,{once:true})})}
+async function duracion(v){
+  // los videos grabados por el navegador no dicen cuanto duran hasta
+  // que se salta al final
+  if(isFinite(v.duration)&&v.duration>0)return v.duration;
+  v.currentTime=1e7;await espera(v,'durationchange');
+  var d=v.duration;v.currentTime=0;await espera(v,'seeked');
+  return isFinite(d)?d:0;
+}
+function fotograma(c,g,v){
+  var w=v.videoWidth,h=v.videoHeight,k=Math.max(240/w,135/h),dw=w*k,dh=h*k;
+  g.drawImage(v,(240-dw)/2,(135-dh)/2,dw,dh);
+  var b64=c.toDataURL('image/jpeg',.62).split(',')[1],bin=atob(b64),u=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  return u;
+}
+async function video(file){
+  var f=fila(file.name);
+  try{
+    f.dice('preparando…');
+    var v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';
+    v.src=URL.createObjectURL(file);
+    await espera(v,'loadeddata');
+    var FPS=10,dur=Math.min(await duracion(v),120);
+    if(!dur)throw 0;
+    var c=document.createElement('canvas');c.width=240;c.height=135;var g=c.getContext('2d');
+    var cab=new Uint8Array(6);cab.set([75,86,73,68]);cab[4]=FPS;cab[5]=0;
+    var partes=[cab],total=6,sig=0,n=0;
+    // se reproduce en silencio, rapido, y se va cogiendo un fotograma
+    // cada decima de segundo de video
+    v.playbackRate=2;
+    await v.play();
+    await new Promise(function(ok){
+      (function paso(){
+        var t=v.currentTime;
+        while(sig<=t&&sig<dur){
+          var j=fotograma(c,g,v),l=new Uint8Array(4);
+          new DataView(l.buffer).setUint32(0,j.length,true);
+          partes.push(l,j);total+=4+j.length;sig+=1/FPS;n++;
+        }
+        f.dice('fotogramas '+n);f.barra(.45*Math.min(1,t/dur));
+        if(v.ended||t>=dur||total>MAX){v.pause();ok();return}
+        setTimeout(paso,30);
+      })();
+    });
+    var kvid=new Blob(partes);
+    var base=limpio(file.name,'');
+    f.dice('sonido…');
+    var kaud=null;
+    try{var pcm=await decodifica(file,22050,dur);kaud=await aMp3(pcm,22050,48,f,.45,.6)}catch(e){}
+    f.dice('enviando…');
+    var r=await sube(kvid,base+'.kvid','videos',f,.6,.9);
+    if(r==='ok'&&kaud)r=await sube(kaud,base+'.kaud','videos',f,.9,1);
+    fin(f,r);
+    URL.revokeObjectURL(v.src);
+  }catch(e){f.dice('no se pudo convertir este vídeo','mal')}
+}
+
+/* ---------- enlaces ---------- */
+$('enBtn').onclick=async function(){
+  if(!listo())return;
+  var nom=$('enNombre').value.trim()||'Cancion',url=$('enUrl').value.trim();
+  if(!/^https?:\/\/\S+$/i.test(url)){alert('Pega un enlace que empiece por http:// o https://');return}
+  var f=fila('🔗 '+nom);f.dice('enviando…');
+  try{
+    var r=await fetch(topic(),{method:'POST',headers:{'Title':'enlace'},body:nom.replace(/\|/g,' ')+'|'+url});
+    fin(f,r.ok?'ok':'mal');if(r.ok){$('enNombre').value='';$('enUrl').value=''}
+  }catch(e){fin(f,'mal')}
+};
+
+/* ---------- archivos ---------- */
+function entrada(id,fn){
+  $(id).onchange=function(){var fs=[].slice.call(this.files);this.value='';if(!listo())return;fs.forEach(fn)};
+}
+entrada('fFoto',foto);
+entrada('fVideo',video);
+entrada('fCancion',function(x){audio(x,'cancion')});
+entrada('fSonido',function(x){audio(x,'sonido')});
+
+/* ---------- camara ---------- */
+var flujo=null;
+$('camBtn').onclick=async function(){
+  if(flujo){flujo.getTracks().forEach(function(t){t.stop()});flujo=null;$('cam').className='cam';this.textContent='Abrir cámara';return}
+  try{
+    flujo=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:1280,height:720}});
+    $('video').srcObject=flujo;$('cam').className='cam on';this.textContent='Cerrar';
+  }catch(e){alert('No se puede abrir la cámara')}
+};
+$('disparo').onclick=async function(){
+  if(!listo())return;
+  var v=$('video');if(!v.videoWidth)return;
+  var nombre='foto_'+new Date().toISOString().slice(0,19).replace(/[-:T]/g,'')+'.jpg';
+  var f=fila(nombre);f.dice('enviando…');
+  var b=await aFoto(v,v.videoWidth,v.videoHeight);
+  fin(f,await sube(b,nombre,'fotos',f));
+};
+})();
+</script>
+</body></html>
